@@ -1,0 +1,58 @@
+TODO: Protocol 
+--------------
+* gestion des pings
+
+* robustesse de la liste splittée avec espaces à revoir (utiliser des , et les interdire dans le qlinedit)
+* bug: si un nouvel user se connecte avec mon nick, il recevra mes messages, et je ne recevrai plus rien
+
+
+TODO: Client
+------------
+* horodatage
+
+SettingsWindow
+// .h
+ protected:
+     void closeEvent(QCloseEvent *event);
+
+// surdefinition
+ void SettingsWindow::closeEvent(QCloseEvent *event)
+ {
+       readSettings();
+       event->accept();
+ }
+
+comme ça Annuler appellera un close() normal
+
+ensuite on fera un truc similaire pour Appliquer, mais il devra écrire dans le fichier
+(qui sera donc relu juste après, au moment du close - un peu useless, mais au moins on est sûr que la conf est bonne)
+
+--
+
+* possibilité de montrer/masquer certains layout (en particulier la zone de whisper) via un menu Affichage (choupi à faire)
+    displayWhisperAction checkable true
+    displayWhisperAction ischecked true
+
+
+    on_displayWhisperAction_toggled ( bool checked ) // possible ??
+    if (checked)
+    users->show();
+    whisper->show();
+    else
+    users->hide();
+    whisper->hide();
+
+TODO: Server
+------------
+* tester la synchronisation sur l'Internet
+
+
+Sur un plus long terme
+----------------------
+* [vraiment négligeable] virer les std, regarder du côté de QDebug
+* les pubmsg s'affichent d'abord chez le client à la manière des whisper
+  -- et donc le serveur ne renvoie pas nos propres privmsg
+* impossibilité de se whisperer à soi-même car c'est trop débile
+* classe dédiée à la connexion dans le client (délicat)
+* intégration OGRE
+* vraie base de données pour les clients
