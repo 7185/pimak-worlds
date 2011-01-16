@@ -1,0 +1,290 @@
+#include "MainWindow.h"
+#include "Protocol.h"
+
+
+MainWindow::MainWindow()
+{
+
+    /*
+      NOTES:
+      Les segfaults se contournent en créant des attributs du genre:
+        monobjet = new QObject;
+      au lieu de:
+        QObject *monobjet = new QObject;
+      C'est étrange et j'en recherche l'explication, ainsi que la différence entre ces deux procédés
+      (peut-être est-ce parce qu'ils sont déjà déclarés dans les headers ?)
+    */
+
+
+    setWindowIcon(QIcon(":/img/icon.png"));
+    setWindowTitle("Pimak Worlds");
+
+    initActions();
+    initMenus();
+
+    // Barre de statut
+    QStatusBar *statusB = statusBar();
+    statusB->show();
+
+    // Fenêtre d'options
+    settings = new SettingsWindow();
+
+    // Fenêtre principale
+    QWidget *mainHolder = new QWidget;
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+
+    chatZone = new QTextEdit;
+    chatZone->setReadOnly(true);
+
+    message = new QLineEdit;
+    message->setObjectName("message");
+    message->setEnabled(false);
+
+    QHBoxLayout *whisperLayout = new QHBoxLayout;
+    users = new QComboBox;
+    whisper = new QLineEdit;
+    whisper->setObjectName("whisper");
+
+    whisperLayout->addWidget(users);
+    whisperLayout->addWidget(whisper);
+
+    mainLayout->addWidget(chatZone);
+    mainLayout->addWidget(message);
+    mainLayout->addLayout(whisperLayout);
+
+    mainHolder->setLayout(mainLayout);
+    setCentralWidget(mainHolder);
+
+    socket = new QTcpSocket(this);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(dataRecv()));
+    connect(socket, SIGNAL(connected()), this, SLOT(clientConnect()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+
+    messageSize = 0;
+
+    QMetaObject::connectSlotsByName(this); // NOTE: définir les noms des objets à connecter
+}
+
+void MainWindow::initActions()
+{
+    // Actions - ne pas oublier de les déclarer
+    connectAction = new QAction("Se connecter",this);
+    connectAction->setObjectName("connectAction");
+    connectAction->setIcon(QIcon(":/img/gtk-connect.png"));
+
+    disconnectAction = new QAction("Se déconnecter",this);
+    disconnectAction->setObjectName("disconnectAction");
+    disconnectAction->setIcon(QIcon(":/img/gtk-disconnect.png"));
+    disconnectAction->setEnabled(false);
+
+    quitAction = new QAction("Quitter",this);
+    quitAction->setShortcut(QKeySequence("Ctrl+Q"));
+    quitAction->setIcon(QIcon(":/img/application-exit.png"));
+    quitAction->setStatusTip("Quitte le programme");
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    settingsAction = new QAction("Options...",this);
+    settingsAction->setIcon(QIcon(":/img/preferences-desktop.png"));
+    settingsAction->setStatusTip("Options du programme");
+    connect(settingsAction, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
+
+    aboutAction = new QAction("À propos de PimakWorlds...",this);
+    aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
+    aboutAction->setStatusTip("Informations à propos du programme");
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+}
+
+void MainWindow::initMenus()
+{
+    // Barre de Menu
+    QMenu *fileMenu = menuBar()->addMenu("Fichier");
+    fileMenu->addAction(connectAction);
+    fileMenu->addAction(disconnectAction);
+    fileMenu->addAction(quitAction);
+    QMenu *displayMenu = menuBar()->addMenu("Affichage");
+    QMenu *toolsMenu = menuBar()->addMenu("Outils");
+    toolsMenu->addAction(settingsAction);
+    QMenu *helpMenu = menuBar()->addMenu("Aide");
+    helpMenu->addAction(aboutAction);
+}
+
+void MainWindow::openSettingsWindow()
+{   settings->show(); }
+
+void MainWindow::about()
+{
+    // Fenetre About
+    QDialog *aboutBox = new QDialog(this);
+    QGridLayout *aboutBoxLayout = new QGridLayout;
+    QLabel *logo = new QLabel(aboutBox);
+    QLabel *texte = new QLabel(tr("<h1>PimakWorlds 0.0.1a</h1><h3>koi sa march pa</h3><p>Client basé sur Qt 4.7.0</p>"));
+    QPushButton *buttonClose = new QPushButton("Fermer");
+    logo->setPixmap(QPixmap(":/img/pimak.png"));
+    texte->setAlignment(Qt::AlignHCenter);
+    logo->setAlignment(Qt::AlignHCenter);
+    buttonClose->setIcon(QIcon(":/img/dialog-close.png"));
+
+    connect(buttonClose,SIGNAL(clicked()),aboutBox,SLOT(close()));
+    aboutBoxLayout->addWidget(logo,0,0,1,3);
+    aboutBoxLayout->addWidget(texte,4,0,1,3);
+    aboutBoxLayout->addWidget(buttonClose,5,2);
+
+    aboutBox->setLayout(aboutBoxLayout);
+    aboutBox->show();
+
+}
+
+/*
+   void MainWindow::on_chatZone_textChanged()
+{
+    chatZone->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+}
+*/
+
+void MainWindow::on_connectAction_triggered()
+{
+    chatZone->append(tr("<strong>Connexion à ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
+
+    socket->abort(); // Désactivation des éventuelles anciennes connexions
+    socket->connectToHost(settings->getHost(), settings->getPort());
+}
+
+void MainWindow::on_disconnectAction_triggered()
+{
+    socket->disconnectFromHost();
+}
+
+void MainWindow::on_message_returnPressed()
+{
+    dataSend(CS_PUBMSG, message->text());
+    message->clear();
+    message->setFocus();
+}
+void MainWindow::on_whisper_returnPressed()
+{
+    chatZone->append("<span style=\"color:blue;\"><em>(to: "+users->currentText()+") "+whisper->text()+"</em></span>");
+    dataSend(CS_PRIVMSG, users->currentText()+" "+whisper->text());
+    whisper->clear();
+    whisper->setFocus();
+}
+
+
+
+void MainWindow::dataSend(quint16 msgCode, QString msgToSend)
+{
+    QByteArray packet;
+    QDataStream out(&packet, QIODevice::WriteOnly);
+
+    out << (quint16) 0;
+    out << (quint16) msgCode;
+    out << msgToSend;
+    out.device()->seek(0);
+    out << (quint16) (packet.size()-sizeof(quint16));
+
+    socket->write(packet);
+
+}
+
+void MainWindow::dataRecv()
+{
+    forever {
+    QDataStream in(socket);
+    if (messageSize == 0)
+    {
+        if (socket->bytesAvailable() < (int)sizeof(quint16))
+             return;
+        in >> messageSize;
+    }
+
+    if (socket->bytesAvailable() < messageSize)
+        return; // on attend la fin du message
+
+    quint16 messageCode;
+    in >> messageCode;
+
+    QString messageRecu;
+    in >> messageRecu;
+
+    dataHandler(messageCode,messageRecu);
+
+    // on redéfinit la taille à 0 en attente de prochaines données
+    messageSize = 0;
+}
+}
+
+void MainWindow::dataHandler(quint16 dataCode, QString data)
+{
+    switch (dataCode) {
+    case SC_PUBMSG:
+        data = "<span style=\"color:black;\">"+data+"</span>";
+        chatZone->append(data);
+        break;
+    case SC_EVENT:
+        data = "<em>"+data+"</em>";
+        chatZone->append(data);
+        break;
+    case SC_JOIN:
+        dataSend(CS_USERLIST,"");
+        data = "<span style=\"color:green;\"><em>"+data+tr(" vient de se connecter")+"</em></span>";
+        chatZone->append(data);
+        break;
+    case SC_PART:
+        dataSend(CS_USERLIST,"");
+        data = "<span style=\"color:red;\"><em>"+data+tr(" vient de se déconnecter")+"</em></span>";
+        chatZone->append(data);
+        break;
+    case SC_USERLIST:
+        users->clear();
+        foreach(QString nick, data.split(" ")){
+            users->addItem(nick);
+        }
+        break;
+    case SC_PRIVMSG:
+        chatZone->append("<span style=\"color:blue;\"><em>"+data+"</em></span>");
+        break;
+    default:
+        chatZone->append(tr("Message du serveur non reconnu"));
+    }
+}
+
+
+
+void MainWindow::clientConnect()
+{
+    dataSend(CS_AUTH,settings->getNickname());
+    chatZone->append(tr("<strong>Connexion réussie</strong>"));
+    connectAction->setEnabled(false);
+    disconnectAction->setEnabled(true);
+    message->setEnabled(true);
+    whisper->setEnabled(true);
+}
+
+void MainWindow::clientDisconnect()
+{
+    chatZone->append(tr("<strong>Déconnecté du serveur</strong>"));
+    connectAction->setEnabled(true);
+    disconnectAction->setEnabled(false);
+    message->setEnabled(false);
+    whisper->setEnabled(false);
+    users->clear();
+}
+
+void MainWindow::socketError(QAbstractSocket::SocketError erreur)
+{
+    switch(erreur)
+    {
+        case QAbstractSocket::HostNotFoundError:
+            chatZone->append(tr("<strong>ERREUR : serveur non trouvé.</strong>"));
+            break;
+        case QAbstractSocket::ConnectionRefusedError:
+            chatZone->append(tr("<strong>ERREUR : connexion refusée. Le serveur est-il bien lancé ?</strong>"));
+            break;
+        case QAbstractSocket::RemoteHostClosedError:
+            chatZone->append(tr("<strong>ERREUR : le serveur a coupé la connexion.</strong>"));
+            break;
+        default:
+            chatZone->append(tr("<strong>ERREUR : ") + socket->errorString() + tr("</strong>"));
+    }
+}
