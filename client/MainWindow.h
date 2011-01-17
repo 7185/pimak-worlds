@@ -25,6 +25,7 @@ class MainWindow : public QMainWindow
         void on_disconnectAction_triggered();
         void on_message_returnPressed();
         void on_whisper_returnPressed();
+        void on_displayWhisperAction_toggled(bool checked);
         void dataRecv();
         void dataSend(quint16,QString);
         void dataHandler(quint16 dataCode, QString data);
@@ -44,6 +45,7 @@ class MainWindow : public QMainWindow
 
         QAction *quitAction;
         QAction *settingsAction;
+        QAction *displayWhisperAction;
         QAction *aboutAction;
         QAction *connectAction;
         QAction *disconnectAction;
