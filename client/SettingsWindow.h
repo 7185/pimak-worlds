@@ -11,14 +11,19 @@ class SettingsWindow : public QWidget
     public:
          explicit SettingsWindow(QWidget *parent = 0);
          void readSettings();
+         void writeSettings();
          QString getHost();
          QString getNickname();
          int getPort();
 
-    private:
+    public slots:
+         void applyEvent();
 
+    protected:
+         void closeEvent(QCloseEvent *event);
 
     private:
+         QSettings *settings;
          QLineEdit *nickname;
          QLineEdit *host;
          QSpinBox *port;

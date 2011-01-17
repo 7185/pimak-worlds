@@ -7,7 +7,7 @@ QMap<QString,Client*> Client::clients;
 
 Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageSize(0)
 {
-    // Pour que le QTcpSocket soit détruit en même temps que Client
+    // QTcpSocket must be destroyed with Client
     tcp->setParent(this);
 
     QString nickname = "undefined";
@@ -58,7 +58,7 @@ void Client::dataHandler(quint16 dataCode, QString data)
     switch (dataCode) {
     case CS_AUTH:
         nickname=data;
-        // Ajoute le client à la liste des clients
+        // Adding the client to the list
         clients.insert(nickname,this);
         sendToAll(SC_JOIN,nickname);
         break;
@@ -68,7 +68,7 @@ void Client::dataHandler(quint16 dataCode, QString data)
     case CS_USERLIST:
         emit sendList();
         break;
-    case CS_PRIVMSG: // à tester
+    case CS_PRIVMSG:
         splitted=data.split(" ");
         receiver=splitted[0];
         splitted[0]=nickname+":";
@@ -83,14 +83,14 @@ void Client::dataHandler(quint16 dataCode, QString data)
 void Client::clientDisconnect()
 {
     emit sendToAll(SC_PART,nickname);
-    // On laisse le client s'effacer lui même, parce que c'est plus simple
+    // We let the Client delete itself
     deleteLater();
 }
 
 void Client::sendList()
 {
     QStringList userlist;
-    foreach(QString string, clients.keys())
+    foreach (QString string, clients.keys())
     {
         userlist.append(string);
     }
@@ -107,7 +107,7 @@ void Client::sendToAll(const quint16 &messageCode, const QString &message)
     out.device()->seek(0);
     out << (quint16) (packet.size() - sizeof(quint16));
 
-    foreach(Client *client, clients)
+    foreach (Client *client, clients)
     {
         client->sendPacket(packet);
     }

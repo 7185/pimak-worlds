@@ -22,14 +22,14 @@ MainWindow::MainWindow()
     initActions();
     initMenus();
 
-    // Barre de statut
+    // Statusbar
     QStatusBar *statusB = statusBar();
     statusB->show();
 
-    // Fenêtre d'options
+    // Settings window
     settings = new SettingsWindow();
 
-    // Fenêtre principale
+    // Main window
     QWidget *mainHolder = new QWidget;
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -44,6 +44,7 @@ MainWindow::MainWindow()
     users = new QComboBox;
     whisper = new QLineEdit;
     whisper->setObjectName("whisper");
+    whisper->setEnabled(false);
 
     whisperLayout->addWidget(users);
     whisperLayout->addWidget(whisper);
@@ -63,12 +64,12 @@ MainWindow::MainWindow()
 
     messageSize = 0;
 
-    QMetaObject::connectSlotsByName(this); // NOTE: définir les noms des objets à connecter
+    QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
 }
 
 void MainWindow::initActions()
 {
-    // Actions - ne pas oublier de les déclarer
+    // Actions - don't forget to declare them
     connectAction = new QAction("Se connecter",this);
     connectAction->setObjectName("connectAction");
     connectAction->setIcon(QIcon(":/img/gtk-connect.png"));
@@ -89,6 +90,11 @@ void MainWindow::initActions()
     settingsAction->setStatusTip("Options du programme");
     connect(settingsAction, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
 
+    displayWhisperAction = new QAction("Murmurer",this);
+    displayWhisperAction->setObjectName("displayWhisperAction");
+    displayWhisperAction->setCheckable(true);
+    displayWhisperAction->setChecked(true);
+
     aboutAction = new QAction("À propos de PimakWorlds...",this);
     aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
     aboutAction->setStatusTip("Informations à propos du programme");
@@ -98,12 +104,13 @@ void MainWindow::initActions()
 
 void MainWindow::initMenus()
 {
-    // Barre de Menu
+    // Menus
     QMenu *fileMenu = menuBar()->addMenu("Fichier");
     fileMenu->addAction(connectAction);
     fileMenu->addAction(disconnectAction);
     fileMenu->addAction(quitAction);
     QMenu *displayMenu = menuBar()->addMenu("Affichage");
+    displayMenu->addAction(displayWhisperAction);
     QMenu *toolsMenu = menuBar()->addMenu("Outils");
     toolsMenu->addAction(settingsAction);
     QMenu *helpMenu = menuBar()->addMenu("Aide");
@@ -111,11 +118,11 @@ void MainWindow::initMenus()
 }
 
 void MainWindow::openSettingsWindow()
-{   settings->show(); }
+{   settings->show();  }
 
 void MainWindow::about()
 {
-    // Fenetre About
+    // About Dialog
     QDialog *aboutBox = new QDialog(this);
     QGridLayout *aboutBoxLayout = new QGridLayout;
     QLabel *logo = new QLabel(aboutBox);
@@ -136,18 +143,30 @@ void MainWindow::about()
 
 }
 
-/*
+/* lolcopter
    void MainWindow::on_chatZone_textChanged()
 {
     chatZone->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 }
 */
 
+void MainWindow::on_displayWhisperAction_toggled(bool checked)
+{
+    if (checked) {
+        users->show();
+        whisper->show();
+    }
+    else {
+        users->hide();
+        whisper->hide();
+    }
+}
+
 void MainWindow::on_connectAction_triggered()
 {
     chatZone->append(tr("<strong>Connexion à ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
 
-    socket->abort(); // Désactivation des éventuelles anciennes connexions
+    socket->abort(); // Closing old connexions
     socket->connectToHost(settings->getHost(), settings->getPort());
 }
 
@@ -199,7 +218,7 @@ void MainWindow::dataRecv()
     }
 
     if (socket->bytesAvailable() < messageSize)
-        return; // on attend la fin du message
+        return; // we wait for the end of the message
 
     quint16 messageCode;
     in >> messageCode;
@@ -209,7 +228,7 @@ void MainWindow::dataRecv()
 
     dataHandler(messageCode,messageRecu);
 
-    // on redéfinit la taille à 0 en attente de prochaines données
+    // we reset the messageSize to 0, waiting for next data
     messageSize = 0;
 }
 }

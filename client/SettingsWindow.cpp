@@ -3,9 +3,8 @@
 SettingsWindow::SettingsWindow(QWidget *parent) :
         QWidget(parent)
 {
-    // Fenetre Options
+    // Settings window
 
-    readSettings();
 
     QGridLayout *settingsBoxLayout = new QGridLayout;
     QFormLayout *formLayout = new QFormLayout;
@@ -13,6 +12,11 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     buttonApply->setIcon(QIcon(":/img/dialog-apply.png"));
     QPushButton *buttonCancel = new QPushButton("Annuler");
     buttonCancel->setIcon(QIcon(":/img/dialog-cancel.png"));
+
+    settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
+    nickname = new QLineEdit;
+    host = new QLineEdit;
+    port = new QSpinBox;
 
     formLayout->addRow("Adresse :",host);
     formLayout->addRow("Port :",port);
@@ -22,28 +26,39 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     settingsBoxLayout->addWidget(buttonCancel,5,1);
     settingsBoxLayout->addWidget(buttonApply,5,2);
 
-    // TODO: close & initSettings
     connect(buttonCancel,SIGNAL(clicked()),this,SLOT(close()));
-
     // TODO: close & writeSettings
-    connect(buttonApply,SIGNAL(clicked()),this,SLOT(close()));
-
+    connect(buttonApply,SIGNAL(clicked()),this,SLOT(applyEvent()));
 
     setLayout(settingsBoxLayout);
+
+    readSettings();
+
 }
 
 void SettingsWindow::readSettings()
 {
-    QSettings *settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
-    // TODO: settings->setValue("account/name",nickname->text()); À régler dans une boîte spéciale et à sync()
-    nickname = new QLineEdit;
     nickname->setText(settings->value("account/name").toString());
-    host = new QLineEdit;
     host->setText(settings->value("server/host").toString());
-    port = new QSpinBox;
     port->setMaximum(65535);
     port->setValue(settings->value("server/port").toInt());
+}
 
+void SettingsWindow::writeSettings()
+{
+    settings->setValue("account/name",nickname->text());
+    settings->setValue("server/host",host->text());
+    settings->setValue("server/port",port->value());
+}
+
+void SettingsWindow::applyEvent() {
+    writeSettings();
+    close();
+}
+
+void SettingsWindow::closeEvent(QCloseEvent *event) {
+    readSettings();
+    event->accept();
 }
 
 QString SettingsWindow::getHost()
