@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow
     private slots:
         void about();
         void openSettingsWindow();
+        void appendData(QString);
 
         void on_connectAction_triggered();
         void on_disconnectAction_triggered();
