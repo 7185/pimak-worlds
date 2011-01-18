@@ -1,13 +1,13 @@
 TODO: Protocol 
 --------------
 * gestion des pings
-* robustesse de la liste splittée avec espaces à revoir (utiliser des , et les interdire dans le qlinedit)
+* interdire les ":" dans les nicks dans le qlinedit (ce qui autorise les espaces)
   -- qvalidator ? inputmask ?
 * bug: si un nouvel user se connecte avec mon nick, il recevra mes messages, et je ne recevrai plus rien
+  -- envoyer un signal SC_NICKINUSE suite à une vérification pendant l'AUTH
 
 TODO: Client
 ------------
-* horodatage
 
 TODO: Server
 ------------
@@ -15,9 +15,6 @@ TODO: Server
 
 Sur un plus long terme
 ----------------------
-* les pubmsg s'affichent d'abord chez le client à la manière des whisper
-  -- et donc le serveur ne renvoie pas nos propres pubmsg
-* impossibilité de se whisperer à soi-même car c'est trop débile
 * classe dédiée à la connexion dans le client (délicat)
 * intégration OGRE
 * vraie base de données pour les clients

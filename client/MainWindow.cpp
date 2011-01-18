@@ -177,14 +177,15 @@ void MainWindow::on_disconnectAction_triggered()
 
 void MainWindow::on_message_returnPressed()
 {
+    appendData("<span style=\"color:black;\">"+settings->getNickname()+": "+message->text()+"</span>");
     dataSend(CS_PUBMSG, message->text());
     message->clear();
     message->setFocus();
 }
 void MainWindow::on_whisper_returnPressed()
 {
-    chatZone->append("<span style=\"color:blue;\"><em>(to: "+users->currentText()+") "+whisper->text()+"</em></span>");
-    dataSend(CS_PRIVMSG, users->currentText()+" "+whisper->text());
+    appendData("<span style=\"color:blue;\"><em>(to: "+users->currentText()+") "+whisper->text()+"</em></span>");
+    dataSend(CS_PRIVMSG, users->currentText()+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
 }
@@ -235,40 +236,56 @@ void MainWindow::dataRecv()
 
 void MainWindow::dataHandler(quint16 dataCode, QString data)
 {
+    QStringList split;
+    QString sender;
     switch (dataCode) {
     case SC_PUBMSG:
-        data = "<span style=\"color:black;\">"+data+"</span>";
-        chatZone->append(data);
+        split=data.split(":");
+        sender=split[0];
+        split.removeAt(0);
+        data = "<span style=\"color:black;\">"+sender+": "+split.join(":")+"</span>";
+        appendData(data);
         break;
     case SC_EVENT:
         data = "<em>"+data+"</em>";
-        chatZone->append(data);
+        appendData(data);
         break;
     case SC_JOIN:
         dataSend(CS_USERLIST,"");
         data = "<span style=\"color:green;\"><em>"+data+tr(" vient de se connecter")+"</em></span>";
-        chatZone->append(data);
+        appendData(data);
         break;
     case SC_PART:
         dataSend(CS_USERLIST,"");
         data = "<span style=\"color:red;\"><em>"+data+tr(" vient de se déconnecter")+"</em></span>";
-        chatZone->append(data);
+        appendData(data);
         break;
     case SC_USERLIST:
         users->clear();
-        foreach(QString nick, data.split(" ")){
-            users->addItem(nick);
+        if (!data.isEmpty()) {
+            whisper->setEnabled(true);
+            foreach(QString nick, data.split(":")) {
+                users->addItem(nick);
+            }
         }
+        else whisper->setEnabled(false);
         break;
     case SC_PRIVMSG:
-        chatZone->append("<span style=\"color:blue;\"><em>"+data+"</em></span>");
+        split = data.split(":");
+        sender=split[0];
+        split.removeAt(0);
+        data = "<span style=\"color:blue;\"><em>"+sender+": "+split.join(":")+"</em></span>";
+        appendData(data);
         break;
     default:
-        chatZone->append(tr("Message du serveur non reconnu"));
+        appendData(tr("Message du serveur non reconnu"));
     }
 }
 
-
+void MainWindow::appendData(QString data)
+{
+    chatZone->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+data);
+}
 
 void MainWindow::clientConnect()
 {

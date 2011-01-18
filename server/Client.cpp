@@ -51,7 +51,6 @@ void Client::dataRecv()
 
 void Client::dataHandler(quint16 dataCode, QString data)
 {
-
     QStringList splitted;
     QString receiver;
 
@@ -63,16 +62,19 @@ void Client::dataHandler(quint16 dataCode, QString data)
         sendToAll(SC_JOIN,nickname);
         break;
     case CS_PUBMSG:
-        sendToAll(SC_PUBMSG,nickname+": "+data);
+        foreach (QString user, clients.keys())
+        {
+            if (user!=nickname) emit sendTo(user,SC_PUBMSG,nickname+":"+data);
+        }
         break;
     case CS_USERLIST:
         emit sendList();
         break;
     case CS_PRIVMSG:
-        splitted=data.split(" ");
+        splitted=data.split(":");
         receiver=splitted[0];
-        splitted[0]=nickname+":";
-        sendTo(receiver,SC_PRIVMSG,splitted.join(" "));
+        splitted[0]=nickname;
+        sendTo(receiver,SC_PRIVMSG,splitted.join(":"));
         break;
     default:
         std::cout << nickname.toStdString() << tr(" a envoyé une requête inconnue !").toStdString() << std::endl;
@@ -90,11 +92,11 @@ void Client::clientDisconnect()
 void Client::sendList()
 {
     QStringList userlist;
-    foreach (QString string, clients.keys())
+    foreach (QString user, clients.keys())
     {
-        userlist.append(string);
+        if (user!=nickname) userlist.append(user);
     }
-    emit sendTo(nickname,SC_USERLIST,userlist.join(" "));
+    emit sendTo(nickname,SC_USERLIST,userlist.join(":"));
 }
 
 void Client::sendToAll(const quint16 &messageCode, const QString &message)
@@ -112,6 +114,7 @@ void Client::sendToAll(const quint16 &messageCode, const QString &message)
         client->sendPacket(packet);
     }
 }
+
 void Client::sendTo(QString user,const quint16 &messageCode, const QString &message)
 {
     QByteArray packet;
