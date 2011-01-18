@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
         void on_message_returnPressed();
         void on_whisper_returnPressed();
         void on_displayWhisperAction_toggled(bool checked);
+
         void dataRecv();
         void dataSend(quint16,QString);
         void dataHandler(quint16 dataCode, QString data);
@@ -37,6 +38,7 @@ class MainWindow : public QMainWindow
     private:
         QTcpSocket *socket; // serveur
         quint16 messageSize;
+        QWidget *renderZone;
         QTextEdit *chatZone;
         QLineEdit *message;
         QLineEdit *whisper;
@@ -47,6 +49,7 @@ class MainWindow : public QMainWindow
         QAction *quitAction;
         QAction *settingsAction;
         QAction *displayWhisperAction;
+        QAction *displayTimeAction;
         QAction *aboutAction;
         QAction *connectAction;
         QAction *disconnectAction;

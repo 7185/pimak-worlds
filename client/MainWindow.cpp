@@ -27,11 +27,15 @@ MainWindow::MainWindow()
     statusB->show();
 
     // Settings window
-    settings = new SettingsWindow();
+    settings = new SettingsWindow;
 
     // Main window
     QWidget *mainHolder = new QWidget;
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    QSplitter *renderSplitter = new QSplitter;
+    renderSplitter->setOrientation(Qt::Vertical);
+
+    renderZone = new QWidget;
 
     chatZone = new QTextEdit;
     chatZone->setReadOnly(true);
@@ -49,7 +53,10 @@ MainWindow::MainWindow()
     whisperLayout->addWidget(users);
     whisperLayout->addWidget(whisper);
 
-    mainLayout->addWidget(chatZone);
+    renderSplitter->addWidget(renderZone);
+    renderSplitter->addWidget(chatZone);
+
+    mainLayout->addWidget(renderSplitter);
     mainLayout->addWidget(message);
     mainLayout->addLayout(whisperLayout);
 
@@ -95,6 +102,11 @@ void MainWindow::initActions()
     displayWhisperAction->setCheckable(true);
     displayWhisperAction->setChecked(true);
 
+    displayTimeAction = new QAction("Horodatage",this);
+    displayTimeAction->setObjectName("displayTimeAction");
+    displayTimeAction->setCheckable(true);
+    displayTimeAction->setChecked(false);
+
     aboutAction = new QAction("À propos de PimakWorlds...",this);
     aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
     aboutAction->setStatusTip("Informations à propos du programme");
@@ -111,6 +123,7 @@ void MainWindow::initMenus()
     fileMenu->addAction(quitAction);
     QMenu *displayMenu = menuBar()->addMenu("Affichage");
     displayMenu->addAction(displayWhisperAction);
+    displayMenu->addAction(displayTimeAction);
     QMenu *toolsMenu = menuBar()->addMenu("Outils");
     toolsMenu->addAction(settingsAction);
     QMenu *helpMenu = menuBar()->addMenu("Aide");
@@ -284,7 +297,8 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
 
 void MainWindow::appendData(QString data)
 {
-    chatZone->append(QDateTime::currentDateTime().toString("[hh:mm:ss] ")+data);
+    if (displayTimeAction->isChecked()) data = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+data;
+    chatZone->append(data);
 }
 
 void MainWindow::clientConnect()

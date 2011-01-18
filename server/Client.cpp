@@ -43,7 +43,7 @@ void Client::dataRecv()
         QString message;
         in >> message;
 
-        std::cout << "[From: " << nickname.toStdString() << "] " << messageCode << ": " << message.toStdString() << std::endl;
+        std::cout << "[From: " << nickname.toStdString() << "] (" << messageCode << ") " << message.toStdString() << std::endl;
         dataHandler(messageCode, message);
 
     }
