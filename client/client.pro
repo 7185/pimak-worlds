@@ -5,12 +5,15 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . /usr/include/OGRE
+LIBS += -lOgreMain
 QT += network
 RESOURCES = application.qrc
 
 # Input
 HEADERS += MainWindow.h \
-    SettingsWindow.h Protocol.h
+    SettingsWindow.h Protocol.h \
+    OgreWidget.h
 SOURCES += main.cpp MainWindow.cpp \
-    SettingsWindow.cpp
+    SettingsWindow.cpp \
+    OgreWidget.cpp

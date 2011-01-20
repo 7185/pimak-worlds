@@ -35,7 +35,8 @@ MainWindow::MainWindow()
     QSplitter *renderSplitter = new QSplitter;
     renderSplitter->setOrientation(Qt::Vertical);
 
-    renderZone = new QWidget;
+    renderZone = new OgreWidget(renderSplitter);
+    renderZone->hide();
 
     chatZone = new QTextEdit;
     chatZone->setReadOnly(true);
@@ -72,6 +73,7 @@ MainWindow::MainWindow()
     messageSize = 0;
 
     QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
+
 }
 
 void MainWindow::initActions()
@@ -178,7 +180,6 @@ void MainWindow::on_displayWhisperAction_toggled(bool checked)
 void MainWindow::on_connectAction_triggered()
 {
     chatZone->append(tr("<strong>Connexion à ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
-
     socket->abort(); // Closing old connexions
     socket->connectToHost(settings->getHost(), settings->getPort());
 }
@@ -337,4 +338,9 @@ void MainWindow::socketError(QAbstractSocket::SocketError erreur)
         default:
             chatZone->append(tr("<strong>ERREUR : ") + socket->errorString() + tr("</strong>"));
     }
+}
+
+void MainWindow::showRenderZone()
+{
+    renderZone->show();
 }
