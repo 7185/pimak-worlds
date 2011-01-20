@@ -4,6 +4,7 @@
 #include <QtNetwork>
 #include <QtGui>
 #include "SettingsWindow.h"
+#include "OgreWidget.h"
 
 
 class MainWindow : public QMainWindow
@@ -12,6 +13,7 @@ class MainWindow : public QMainWindow
 
     public:
         MainWindow();
+        void showRenderZone();
 
     private:
         void initActions();
@@ -38,7 +40,7 @@ class MainWindow : public QMainWindow
     private:
         QTcpSocket *socket; // serveur
         quint16 messageSize;
-        QWidget *renderZone;
+        OgreWidget *renderZone;
         QTextEdit *chatZone;
         QLineEdit *message;
         QLineEdit *whisper;
