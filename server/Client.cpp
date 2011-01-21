@@ -10,8 +10,6 @@ Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageS
     // QTcpSocket must be destroyed with Client
     tcp->setParent(this);
 
-    QString nickname = "undefined";
-
     connect(clientTcp,SIGNAL(disconnected()), SLOT(clientDisconnect()));
     connect(clientTcp,SIGNAL(readyRead()), SLOT(dataRecv()));
 }
@@ -56,11 +54,19 @@ void Client::dataHandler(quint16 dataCode, QString data)
 
     switch (dataCode) {
     case CS_AUTH:
-        nickname=data;
-        // Adding the client to the list
-        clients.insert(nickname,this);
-        sendToAll(SC_JOIN,nickname);
-        break;
+        if (clients.keys().contains(data))
+        {
+            clients.insert(nickname,this);
+            sendTo(nickname,SC_NICKINUSE);
+            break;
+        }
+        else
+        {
+            nickname=data;
+            clients.insert(nickname,this); // Adding the client to the list
+            sendToAll(SC_JOIN,nickname);
+            break;
+        }
     case CS_PUBMSG:
         foreach (QString user, clients.keys())
         {
@@ -84,7 +90,7 @@ void Client::dataHandler(quint16 dataCode, QString data)
 
 void Client::clientDisconnect()
 {
-    emit sendToAll(SC_PART,nickname);
+    if (!nickname.isEmpty()) emit sendToAll(SC_PART,nickname);
     // We let the Client delete itself
     deleteLater();
 }

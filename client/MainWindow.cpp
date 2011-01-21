@@ -79,39 +79,40 @@ MainWindow::MainWindow()
 void MainWindow::initActions()
 {
     // Actions - don't forget to declare them
-    connectAction = new QAction("Se connecter",this);
+    connectAction = new QAction(tr("Connect"),this);
     connectAction->setObjectName("connectAction");
     connectAction->setIcon(QIcon(":/img/gtk-connect.png"));
 
-    disconnectAction = new QAction("Se déconnecter",this);
+    disconnectAction = new QAction(tr("Disconnect"),this);
     disconnectAction->setObjectName("disconnectAction");
     disconnectAction->setIcon(QIcon(":/img/gtk-disconnect.png"));
     disconnectAction->setEnabled(false);
 
-    quitAction = new QAction("Quitter",this);
-    quitAction->setShortcut(QKeySequence("Ctrl+Q"));
+    quitAction = new QAction(tr("Quit"),this);
+    quitAction->setShortcut(QKeySequence(tr("Ctrl+Q")));
     quitAction->setIcon(QIcon(":/img/application-exit.png"));
-    quitAction->setStatusTip("Quitte le programme");
+    quitAction->setStatusTip(tr("Close the application"));
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    settingsAction = new QAction("Options...",this);
+    settingsAction = new QAction(tr("Settings..."),this);
+    settingsAction->setShortcut(QKeySequence("Ctrl+P"));
     settingsAction->setIcon(QIcon(":/img/preferences-desktop.png"));
-    settingsAction->setStatusTip("Options du programme");
+    settingsAction->setStatusTip(tr("Application settings"));
     connect(settingsAction, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
 
-    displayWhisperAction = new QAction("Murmurer",this);
+    displayWhisperAction = new QAction(tr("Whisper"),this);
     displayWhisperAction->setObjectName("displayWhisperAction");
     displayWhisperAction->setCheckable(true);
     displayWhisperAction->setChecked(true);
 
-    displayTimeAction = new QAction("Horodatage",this);
+    displayTimeAction = new QAction(tr("Time"),this);
     displayTimeAction->setObjectName("displayTimeAction");
     displayTimeAction->setCheckable(true);
     displayTimeAction->setChecked(false);
 
-    aboutAction = new QAction("À propos de PimakWorlds...",this);
+    aboutAction = new QAction(tr("About Pimak Worlds..."),this);
     aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
-    aboutAction->setStatusTip("Informations à propos du programme");
+    aboutAction->setStatusTip(tr("Information about the application"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
 }
@@ -119,16 +120,16 @@ void MainWindow::initActions()
 void MainWindow::initMenus()
 {
     // Menus
-    QMenu *fileMenu = menuBar()->addMenu("Fichier");
+    QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(connectAction);
     fileMenu->addAction(disconnectAction);
     fileMenu->addAction(quitAction);
-    QMenu *displayMenu = menuBar()->addMenu("Affichage");
+    QMenu *displayMenu = menuBar()->addMenu(tr("View"));
     displayMenu->addAction(displayWhisperAction);
     displayMenu->addAction(displayTimeAction);
-    QMenu *toolsMenu = menuBar()->addMenu("Outils");
+    QMenu *toolsMenu = menuBar()->addMenu(tr("Tools"));
     toolsMenu->addAction(settingsAction);
-    QMenu *helpMenu = menuBar()->addMenu("Aide");
+    QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
     helpMenu->addAction(aboutAction);
 }
 
@@ -141,8 +142,8 @@ void MainWindow::about()
     QDialog *aboutBox = new QDialog(this);
     QGridLayout *aboutBoxLayout = new QGridLayout;
     QLabel *logo = new QLabel(aboutBox);
-    QLabel *texte = new QLabel(tr("<h1>PimakWorlds 0.0.1a</h1><h3>koi sa march pa</h3><p>Client basé sur Qt 4.7.0</p>"));
-    QPushButton *buttonClose = new QPushButton("Fermer");
+    QLabel *texte = new QLabel(tr("<h1>Pimak Worlds 0.0.1a</h1><h3>Version numbers are useless</h3><p>Client based on Qt 4.7.0</p>"));
+    QPushButton *buttonClose = new QPushButton(tr("Close"));
     logo->setPixmap(QPixmap(":/img/pimak.png"));
     texte->setAlignment(Qt::AlignHCenter);
     logo->setAlignment(Qt::AlignHCenter);
@@ -179,7 +180,7 @@ void MainWindow::on_displayWhisperAction_toggled(bool checked)
 
 void MainWindow::on_connectAction_triggered()
 {
-    chatZone->append(tr("<strong>Connexion à ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
+    chatZone->append(tr("<strong>Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
     socket->abort(); // Closing old connexions
     socket->connectToHost(settings->getHost(), settings->getPort());
 }
@@ -198,7 +199,7 @@ void MainWindow::on_message_returnPressed()
 }
 void MainWindow::on_whisper_returnPressed()
 {
-    appendData("<span style=\"color:blue;\"><em>(to: "+users->currentText()+") "+whisper->text()+"</em></span>");
+    appendData("<span style=\"color:blue;\"><em>("+tr("to: ")+users->currentText()+") "+whisper->text()+"</em></span>");
     dataSend(CS_PRIVMSG, users->currentText()+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
@@ -238,10 +239,10 @@ void MainWindow::dataRecv()
     quint16 messageCode;
     in >> messageCode;
 
-    QString messageRecu;
-    in >> messageRecu;
+    QString messageText;
+    in >> messageText;
 
-    dataHandler(messageCode,messageRecu);
+    dataHandler(messageCode,messageText);
 
     // we reset the messageSize to 0, waiting for next data
     messageSize = 0;
@@ -260,18 +261,23 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
         data = "<span style=\"color:black;\">"+sender+": "+split.join(":")+"</span>";
         appendData(data);
         break;
+    case SC_NICKINUSE:
+        data = "<span style=\"color:red;\"><strong>"+tr("This nick is already used. Please retry with another one")+"</strong></span>";
+        appendData(data);
+        socket->disconnectFromHost(); // FIXME: should be managed by the server
+        break;
     case SC_EVENT:
         data = "<em>"+data+"</em>";
         appendData(data);
         break;
     case SC_JOIN:
-        dataSend(CS_USERLIST,"");
-        data = "<span style=\"color:green;\"><em>"+data+tr(" vient de se connecter")+"</em></span>";
+        dataSend(CS_USERLIST);
+        data = "<span style=\"color:green;\"><em>"+data+tr(" just log in")+"</em></span>";
         appendData(data);
         break;
     case SC_PART:
-        dataSend(CS_USERLIST,"");
-        data = "<span style=\"color:red;\"><em>"+data+tr(" vient de se déconnecter")+"</em></span>";
+        dataSend(CS_USERLIST);
+        data = "<span style=\"color:brown;\"><em>"+data+tr(" has quit")+"</em></span>";
         appendData(data);
         break;
     case SC_USERLIST:
@@ -292,7 +298,7 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
         appendData(data);
         break;
     default:
-        appendData(tr("Message du serveur non reconnu"));
+        appendData(tr("Unknown message received"));
     }
 }
 
@@ -305,7 +311,7 @@ void MainWindow::appendData(QString data)
 void MainWindow::clientConnect()
 {
     dataSend(CS_AUTH,settings->getNickname());
-    chatZone->append(tr("<strong>Connexion réussie</strong>"));
+    chatZone->append(tr("<strong>Connection successful</strong>"));
     connectAction->setEnabled(false);
     disconnectAction->setEnabled(true);
     message->setEnabled(true);
@@ -314,7 +320,7 @@ void MainWindow::clientConnect()
 
 void MainWindow::clientDisconnect()
 {
-    chatZone->append(tr("<strong>Déconnecté du serveur</strong>"));
+    chatZone->append(tr("<strong>Disconnected from the server</strong>"));
     connectAction->setEnabled(true);
     disconnectAction->setEnabled(false);
     message->setEnabled(false);
@@ -327,16 +333,16 @@ void MainWindow::socketError(QAbstractSocket::SocketError erreur)
     switch(erreur)
     {
         case QAbstractSocket::HostNotFoundError:
-            chatZone->append(tr("<strong>ERREUR : serveur non trouvé.</strong>"));
+            chatZone->append(tr("<strong>ERROR : host not found</strong>"));
             break;
         case QAbstractSocket::ConnectionRefusedError:
-            chatZone->append(tr("<strong>ERREUR : connexion refusée. Le serveur est-il bien lancé ?</strong>"));
+            chatZone->append(tr("<strong>ERROR : connection refused. Is the server launched?</strong>"));
             break;
         case QAbstractSocket::RemoteHostClosedError:
-            chatZone->append(tr("<strong>ERREUR : le serveur a coupé la connexion.</strong>"));
+            chatZone->append(tr("<strong>ERROR : connection closed by remote host</strong>"));
             break;
         default:
-            chatZone->append(tr("<strong>ERREUR : ") + socket->errorString() + tr("</strong>"));
+            chatZone->append(tr("<strong>ERROR : ") + socket->errorString() + tr("</strong>"));
     }
 }
 

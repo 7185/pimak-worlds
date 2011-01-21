@@ -13,8 +13,8 @@ class Client : public QObject
         ~Client();
 
     public slots:
-        static void sendToAll(const quint16 &, const QString &);
-        void sendTo(QString, const quint16 &, const QString &);
+        static void sendToAll(const quint16 &, const QString & = "");
+        void sendTo(QString, const quint16 &, const QString & = "");
         void sendPacket(const QByteArray &);
         void sendList();
 

@@ -8,9 +8,9 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     QGridLayout *settingsBoxLayout = new QGridLayout;
     QFormLayout *formLayout = new QFormLayout;
-    QPushButton *buttonApply = new QPushButton("Valider");
+    QPushButton *buttonApply = new QPushButton(tr("Apply"));
     buttonApply->setIcon(QIcon(":/img/dialog-apply.png"));
-    QPushButton *buttonCancel = new QPushButton("Annuler");
+    QPushButton *buttonCancel = new QPushButton(tr("Cancel"));
     buttonCancel->setIcon(QIcon(":/img/dialog-cancel.png"));
 
     settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
@@ -18,9 +18,9 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     host = new QLineEdit;
     port = new QSpinBox;
 
-    formLayout->addRow("Adresse :",host);
-    formLayout->addRow("Port :",port);
-    formLayout->addRow("Pseudo :",nickname);
+    formLayout->addRow(tr("Host :"),host);
+    formLayout->addRow(tr("Port :"),port);
+    formLayout->addRow(tr("Nickname :"),nickname);
 
     settingsBoxLayout->addLayout(formLayout,0,0,2,2);
     settingsBoxLayout->addWidget(buttonCancel,5,1);
