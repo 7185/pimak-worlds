@@ -111,12 +111,12 @@
     <message>
         <location filename="MainWindow.cpp" line="275"/>
         <source> just log in</source>
-        <translation>vient de se connecter</translation>
+        <translation> vient de se connecter</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="280"/>
         <source> has quit</source>
-        <translation>vient de se déconnecter</translation>
+        <translation> vient de se déconnecter</translation>
     </message>
     <message>
         <location filename="MainWindow.cpp" line="301"/>
