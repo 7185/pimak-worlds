@@ -60,6 +60,12 @@ void Client::dataHandler(quint16 dataCode, QString data)
             sendTo(nickname,SC_NICKINUSE);
             break;
         }
+        else if (data.contains(":"))
+        {
+            clients.insert(nickname,this);
+            sendTo(nickname,SC_ERRONEOUSNICK);
+            break;
+        }
         else
         {
             nickname=data;

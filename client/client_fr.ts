@@ -109,56 +109,61 @@
         <translation>Ce pseudo est déjà utilisé. Veuillez en choisir un nouveau</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="275"/>
+        <location filename="MainWindow.cpp" line="270"/>
+        <source>Erroneous nickname. Please retry with another one</source>
+        <translation>Pseudonyme incorrect. Veuillez en choisir un nouveau</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="280"/>
         <source> just log in</source>
         <translation> vient de se connecter</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="280"/>
+        <location filename="MainWindow.cpp" line="285"/>
         <source> has quit</source>
         <translation> vient de se déconnecter</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="301"/>
+        <location filename="MainWindow.cpp" line="310"/>
         <source>Unknown message received</source>
         <translation>Message reçu inconnu</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="314"/>
+        <location filename="MainWindow.cpp" line="323"/>
         <source>&lt;strong&gt;Connection successful&lt;/strong&gt;</source>
         <translation>&lt;strong&gt;Connexion réussie&lt;/strong&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="323"/>
+        <location filename="MainWindow.cpp" line="333"/>
         <source>&lt;strong&gt;Disconnected from the server&lt;/strong&gt;</source>
         <translation>&lt;strong&gt;Déconnecté du serveur&lt;/strong&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="336"/>
+        <location filename="MainWindow.cpp" line="347"/>
         <source>&lt;strong&gt;ERROR : host not found&lt;/strong&gt;</source>
         <oldsource>&lt;strong&gt;ERREUR : host not found&lt;/strong&gt;</oldsource>
         <translation>&lt;strong&gt;ERREUR : serveur non trouvé&lt;/strong&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="339"/>
+        <location filename="MainWindow.cpp" line="350"/>
         <source>&lt;strong&gt;ERROR : connection refused. Is the server launched?&lt;/strong&gt;</source>
         <oldsource>&lt;strong&gt;ERREUR : connection refused. Is the server launched?&lt;/strong&gt;</oldsource>
         <translation>&lt;strong&gt;ERREUR : connexion refusée. Le serveur est-il lancé ?&lt;/strong&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="342"/>
+        <location filename="MainWindow.cpp" line="353"/>
         <source>&lt;strong&gt;ERROR : connection closed by remote host&lt;/strong&gt;</source>
         <oldsource>&lt;strong&gt;ERREUR : connection closed by remote host&lt;/strong&gt;</oldsource>
         <translation>&lt;strong&gt;ERREUR : connexion coupée par le serveur&lt;/strong&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="345"/>
+        <location filename="MainWindow.cpp" line="356"/>
         <source>&lt;strong&gt;ERROR : </source>
         <oldsource>&lt;strong&gt;ERREUR : </oldsource>
         <translation>&lt;strong&gt;ERREUR : </translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="345"/>
+        <location filename="MainWindow.cpp" line="356"/>
         <source>&lt;/strong&gt;</source>
         <translation>&lt;/strong&gt;</translation>
     </message>

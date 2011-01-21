@@ -27,5 +27,6 @@
 #define SC_JOIN       4
 #define SC_PART       5
 #define SC_USERLIST   6
+#define SC_ERRONEOUSNICK 7
 
 #endif

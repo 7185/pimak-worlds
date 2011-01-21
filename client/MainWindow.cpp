@@ -50,7 +50,7 @@ MainWindow::MainWindow()
     whisper = new QLineEdit;
     whisper->setObjectName("whisper");
     whisper->setEnabled(false);
-
+    users->setEnabled(false);
     whisperLayout->addWidget(users);
     whisperLayout->addWidget(whisper);
 
@@ -266,6 +266,11 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
         appendData(data);
         socket->disconnectFromHost(); // FIXME: should be managed by the server
         break;
+    case SC_ERRONEOUSNICK:
+        data = "<span style=\"color:red;\"><strong>"+tr("Erroneous nickname. Please retry with another one")+"</strong></span>";
+        appendData(data);
+        socket->disconnectFromHost(); // FIXME: should be managed by the server
+        break;
     case SC_EVENT:
         data = "<em>"+data+"</em>";
         appendData(data);
@@ -288,7 +293,11 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
                 users->addItem(nick);
             }
         }
-        else whisper->setEnabled(false);
+        else {
+            whisper->setEnabled(false);
+            users->setEnabled(false);
+        }
+
         break;
     case SC_PRIVMSG:
         split = data.split(":");
@@ -316,6 +325,7 @@ void MainWindow::clientConnect()
     disconnectAction->setEnabled(true);
     message->setEnabled(true);
     whisper->setEnabled(true);
+    users->setEnabled(true);
 }
 
 void MainWindow::clientDisconnect()
@@ -326,6 +336,7 @@ void MainWindow::clientDisconnect()
     message->setEnabled(false);
     whisper->setEnabled(false);
     users->clear();
+    users->setEnabled(false);
 }
 
 void MainWindow::socketError(QAbstractSocket::SocketError erreur)
