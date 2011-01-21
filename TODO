@@ -10,6 +10,7 @@ TODO: Client
 TODO: Server
 ------------
 * tester la synchronisation sur l'Internet
+* plus de robustesse (le client doit être incapable de le planter)
 
 Sur un plus long terme
 ----------------------
