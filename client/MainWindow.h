@@ -31,7 +31,7 @@ class MainWindow : public QMainWindow
         void on_displayWhisperAction_toggled(bool checked);
 
         void dataRecv();
-        void dataSend(quint16,QString);
+        void dataSend(quint16,QString = "");
         void dataHandler(quint16 dataCode, QString data);
         void clientConnect();
         void clientDisconnect();

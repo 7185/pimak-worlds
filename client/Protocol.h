@@ -20,6 +20,7 @@
 #define CS_USERLIST   6
 
 // Server -> Client
+#define SC_NICKINUSE  0
 #define SC_PUBMSG     1
 #define SC_PRIVMSG    2
 #define SC_EVENT      3

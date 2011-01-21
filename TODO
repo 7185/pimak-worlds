@@ -3,8 +3,6 @@ TODO: Protocol
 * gestion des pings
 * interdire les ":" dans les nicks dans le qlinedit (ce qui autorise les espaces)
   -- qvalidator ? inputmask ?
-* bug: si un nouvel user se connecte avec mon nick, il recevra mes messages, et je ne recevrai plus rien
-  -- envoyer un signal SC_NICKINUSE suite à une vérification pendant l'AUTH
 
 TODO: Client
 ------------

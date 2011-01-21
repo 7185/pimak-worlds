@@ -9,6 +9,7 @@ INCLUDEPATH += . /usr/include/OGRE
 LIBS += -lOgreMain
 QT += network
 RESOURCES = application.qrc
+TRANSLATIONS = client_fr.ts
 
 # Input
 HEADERS += MainWindow.h \
