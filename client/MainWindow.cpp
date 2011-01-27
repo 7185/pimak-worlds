@@ -4,18 +4,6 @@
 
 MainWindow::MainWindow()
 {
-
-    /*
-      NOTES:
-      Les segfaults se contournent en créant des attributs du genre:
-        monobjet = new QObject;
-      au lieu de:
-        QObject *monobjet = new QObject;
-      C'est étrange et j'en recherche l'explication, ainsi que la différence entre ces deux procédés
-      (peut-être est-ce parce qu'ils sont déjà déclarés dans les headers ?)
-    */
-
-
     setWindowIcon(QIcon(":/img/icon.png"));
     setWindowTitle("Pimak Worlds");
 

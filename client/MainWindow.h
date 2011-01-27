@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
         void socketError(QAbstractSocket::SocketError erreur);
 
     private:
-        QTcpSocket *socket; // serveur
+        QTcpSocket *socket; // server
         quint16 messageSize;
         OgreWidget *renderZone;
         QTextEdit *chatZone;

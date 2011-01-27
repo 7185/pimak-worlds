@@ -4,12 +4,11 @@
 #include "OgreWidget.h"
 
 OgreWidget::OgreWidget(QWidget *parent) :
-        QWidget(parent),ogreRoot(0), ogreSceneManager(0), ogreRenderWindow(0), ogreViewport(0),ogreCamera(0)
+        QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreCamera(0)
 {
     setAttribute(Qt::WA_OpaquePaintEvent,true);
     setAttribute(Qt::WA_PaintOnScreen,true);
     setMinimumSize(320,240);
-
 }
 
 OgreWidget::~OgreWidget()
@@ -22,9 +21,9 @@ OgreWidget::~OgreWidget()
     if(ogreRoot)
     {
         ogreRoot->detachRenderTarget(ogreRenderWindow);
-        if(ogreSceneManager)
+        if(ogreSceneMgr)
         {
-            ogreRoot->destroySceneManager(ogreSceneManager);
+            ogreRoot->destroySceneManager(ogreSceneMgr);
         }
     }
     delete ogreRoot;
@@ -87,9 +86,8 @@ void OgreWidget::initOgreSystem()
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
-   // ogreRoot->initialise(true,"test");
     
-    ogreSceneManager = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
+    ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
     
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
@@ -107,12 +105,96 @@ void OgreWidget::initOgreSystem()
 #endif
     viewConfig["externalWindowHandle"] = widgetHandle;
     ogreRenderWindow = ogreRoot->createRenderWindow("Ogre rendering window",width(),height(),false,&viewConfig);
-    // ogreRenderWindow = ogreRoot->getAutoCreatedWindow();
-    ogreCamera = ogreSceneManager->createCamera("myCamera");
-    
+
+    setupNLoadResources();
+    createCamera();
+    createViewport();
+    createScene();
+
+}
+
+void OgreWidget::setupNLoadResources()
+{
+        // Load resource paths from config file
+        Ogre::ConfigFile cf;
+        cf.load("resources.cfg");
+
+        // Go through all sections & settings in the file
+        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+        Ogre::String secName, typeName, archName;
+        while (seci.hasMoreElements())
+        {
+                secName = seci.peekNextKey();
+                Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
+                Ogre::ConfigFile::SettingsMultiMap::iterator i;
+                for (i = settings->begin(); i != settings->end(); ++i)
+                {
+                        typeName = i->first;
+                        archName = i->second;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+                        // OS X does not set the working directory relative to the app,
+                        // In order to make things portable on OS X we need to provide
+                        // the loading with it's own bundle path location
+                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                                Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
+#else
+                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                                archName, typeName, secName);
+#endif
+                }
+        }
+
+        // Initialise, parse scripts etc
+        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
+
+
+void OgreWidget::createCamera()
+{
+    ogreCamera = ogreSceneMgr->createCamera("MyCamera1");
+    ogreCamera->setPosition(0,100,200);
+    ogreCamera->lookAt(0,0,0);
+    ogreCamera->setNearClipDistance(5);
+    // ogreCamera->setPolygonMode(Ogre::PM_WIREFRAME);
+}
+
+void OgreWidget::createViewport()
+{
     ogreViewport = ogreRenderWindow->addViewport(ogreCamera);
-    ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,255)); // Blue background
-    ogreCamera->setAspectRatio(Ogre::Real(width()) / Ogre::Real(height()));
+    ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
+    ogreCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
+}
+
+void OgreWidget::createScene()
+{
+
+    ogreSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1));
+
+    Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node1");
+    ogreSceneMgr->getRootSceneNode()->addChild(node);
+
+    Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
+    Ogre::MeshManager::getSingleton().createPlane("plane",
+    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+    1500, 1500,20,20,true,1,5,5,Ogre::Vector3::UNIT_Z);
+    Ogre::Entity* ent = ogreSceneMgr->createEntity("LightPlaneEntity","plane");
+    ogreSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
+    ent->setMaterialName("grass");
+
+    Ogre::Light* light = ogreSceneMgr->createLight("Light1");
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+    light->setDiffuseColour(Ogre::ColourValue(1.0f,1.0f,1.0f));
+    light->setDirection(Ogre::Vector3(1,-1,0));
+
+    Ogre::Entity* Sinbad =  ogreSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
+    Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
+
+    SinbadNode->setScale(3.0f,3.0f,3.0f);
+    SinbadNode->setPosition(Ogre::Vector3(0.0f,5.0f,0.0f));
+    SinbadNode->attachObject(Sinbad);
+
+    ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const
