@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <Ogre.h>
 
+
 class OgreWidget : public QWidget
 {
     Q_OBJECT
@@ -21,11 +22,14 @@ protected:
     
 private:
     void initOgreSystem();
-
+    void setupNLoadResources();
+    void createCamera();
+    void createViewport();
+    void createScene();
 
 private:
     Ogre::Root         *ogreRoot;
-    Ogre::SceneManager *ogreSceneManager;
+    Ogre::SceneManager *ogreSceneMgr;
     Ogre::RenderWindow *ogreRenderWindow;
     Ogre::Viewport     *ogreViewport;
     Ogre::Camera       *ogreCamera;
