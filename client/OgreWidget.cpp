@@ -4,11 +4,16 @@
 #include "OgreWidget.h"
 
 OgreWidget::OgreWidget(QWidget *parent) :
-        QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreCamera(0)
+    QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreCamera(0)
 {
     setAttribute(Qt::WA_OpaquePaintEvent,true);
     setAttribute(Qt::WA_PaintOnScreen,true);
     setMinimumSize(320,240);
+    setFocusPolicy(Qt::ClickFocus);
+
+    ogreRoot = NULL;
+    ogreSceneMgr = NULL;
+    ogreListener = NULL;
 }
 
 OgreWidget::~OgreWidget()
@@ -26,6 +31,7 @@ OgreWidget::~OgreWidget()
             ogreRoot->destroySceneManager(ogreSceneMgr);
         }
     }
+    delete ogreListener;
     delete ogreRoot;
 }
 
@@ -45,7 +51,9 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     ogreRoot->_fireFrameStarted();
     ogreRenderWindow->update();
     ogreRoot->_fireFrameEnded();
-    
+ 
+    // update(); frame queued ??  
+ 
     e->accept();
 }
 
@@ -86,9 +94,12 @@ void OgreWidget::initOgreSystem()
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
-    
+
     ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
     
+    ogreListener = new OgreFrameListener();
+    ogreRoot->addFrameListener(ogreListener);
+
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
 
@@ -103,6 +114,7 @@ void OgreWidget::initOgreSystem()
         ":" + Ogre::StringConverter::toString ((unsigned int)xInfo.screen()) +
         ":" + Ogre::StringConverter::toString ((unsigned long)q_parent->winId());
 #endif
+
     viewConfig["externalWindowHandle"] = widgetHandle;
     ogreRenderWindow = ogreRoot->createRenderWindow("Ogre rendering window",width(),height(),false,&viewConfig);
 
@@ -111,6 +123,7 @@ void OgreWidget::initOgreSystem()
     createViewport();
     createScene();
 
+   // TODO: ogreRoot->startRendering();
 }
 
 void OgreWidget::setupNLoadResources()
@@ -136,11 +149,10 @@ void OgreWidget::setupNLoadResources()
                         // OS X does not set the working directory relative to the app,
                         // In order to make things portable on OS X we need to provide
                         // the loading with it's own bundle path location
-                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                                Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
+                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(Ogre::String(macBundlePath()
+                                                                              + "/" + archName), typeName, secName);
 #else
-                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                                archName, typeName, secName);
+                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
 #endif
                 }
         }
@@ -153,10 +165,10 @@ void OgreWidget::setupNLoadResources()
 void OgreWidget::createCamera()
 {
     ogreCamera = ogreSceneMgr->createCamera("MyCamera1");
-    ogreCamera->setPosition(0,100,200);
+    ogreCamera->setPosition(0,10,100);
     ogreCamera->lookAt(0,0,0);
     ogreCamera->setNearClipDistance(5);
-    // ogreCamera->setPolygonMode(Ogre::PM_WIREFRAME);
+    //ogreCamera->setPolygonMode(Ogre::PM_WIREFRAME);
 }
 
 void OgreWidget::createViewport()
@@ -170,14 +182,15 @@ void OgreWidget::createScene()
 {
 
     ogreSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1));
+    ogreSceneMgr->setSkyDome(true,"CloudySky");
 
     Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node1");
     ogreSceneMgr->getRootSceneNode()->addChild(node);
 
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
     Ogre::MeshManager::getSingleton().createPlane("plane",
-    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-    1500, 1500,20,20,true,1,5,5,Ogre::Vector3::UNIT_Z);
+     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+     1500, 1500,20,20,true,1,5,5,Ogre::Vector3::UNIT_Z);
     Ogre::Entity* ent = ogreSceneMgr->createEntity("LightPlaneEntity","plane");
     ogreSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
     ent->setMaterialName("grass");
@@ -195,6 +208,75 @@ void OgreWidget::createScene()
     SinbadNode->attachObject(Sinbad);
 
     ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
+}
+
+
+void OgreWidget::setCameraPosition(const Ogre::Vector3 &pos)
+{
+    ogreCamera->setPosition(pos);
+    update();
+    emit cameraPositionChanged(pos);
+}
+
+void OgreWidget::setCameraYaw(const Ogre::Radian &ang)
+{
+    ogreCamera->yaw(ang);
+    update();
+}
+
+void OgreWidget::setCameraPitch(const Ogre::Radian &ang)
+{
+    ogreCamera->pitch(ang);
+    update();
+}
+
+void OgreWidget::keyPressEvent(QKeyEvent *e)
+{
+        static QMap<int, Ogre::Vector3> keyCoordModificationMapping;
+        static QMap<int, Ogre::Radian> keyYawModificationMapping;
+        static QMap<int, Ogre::Radian> keyPitchModificationMapping;
+        static bool mappingInitialised = false;
+
+        if(!mappingInitialised)
+        {
+            keyCoordModificationMapping[Qt::Key_Up]    = Ogre::Vector3( 0, 0,-5);
+            keyCoordModificationMapping[Qt::Key_Down]  = Ogre::Vector3( 0, 0, 5);
+            keyCoordModificationMapping[Qt::Key_Plus]  = Ogre::Vector3( 0, 5, 0);
+            keyCoordModificationMapping[Qt::Key_Minus] = Ogre::Vector3( 0,-5, 0);
+
+            keyYawModificationMapping[Qt::Key_Left]  = Ogre::Radian(0.1);
+            keyYawModificationMapping[Qt::Key_Right] = Ogre::Radian(-0.1);
+
+            keyPitchModificationMapping[Qt::Key_PageUp]  = Ogre::Radian(0.1);
+            keyPitchModificationMapping[Qt::Key_PageDown] = Ogre::Radian(-0.1);
+
+            mappingInitialised = true;
+        }
+
+        QMap<int, Ogre::Vector3>::iterator keyCoordPressed = keyCoordModificationMapping.find(e->key());
+        QMap<int, Ogre::Radian>::iterator keyYawPressed = keyYawModificationMapping.find(e->key());
+        QMap<int, Ogre::Radian>::iterator keyPitchPressed = keyPitchModificationMapping.find(e->key());
+
+        if(keyCoordPressed != keyCoordModificationMapping.end() && ogreCamera)
+        {
+                const Ogre::Vector3 &actualCamPos = ogreCamera->getPosition();
+                setCameraPosition(actualCamPos + keyCoordPressed.value());
+                e->accept();
+        }
+        if(keyYawPressed != keyYawModificationMapping.end() && ogreCamera)
+        {
+                setCameraYaw(keyYawPressed.value());
+                e->accept();
+        }
+        if(keyPitchPressed != keyPitchModificationMapping.end() && ogreCamera)
+        {
+                setCameraPitch(keyPitchPressed.value());
+                e->accept();
+        }
+    else
+    {
+        e->ignore();
+    }
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const
