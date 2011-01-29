@@ -3,7 +3,7 @@
 
 
 
-QMap<QString,Client*> Client::clients;
+QMap<quint16,Client*> Client::clients;
 
 Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageSize(0)
 {
@@ -12,11 +12,14 @@ Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageS
 
     connect(clientTcp,SIGNAL(disconnected()), SLOT(clientDisconnect()));
     connect(clientTcp,SIGNAL(readyRead()), SLOT(dataRecv()));
+    
+    id=clients.size();
+    clients.insert(id,this); // Adding the client to the list
 }
 
 Client::~Client()
 {
-    clients.remove(nickname);
+    clients.remove(id);
 }
 
 void Client::dataRecv()
@@ -41,7 +44,10 @@ void Client::dataRecv()
         QString message;
         in >> message;
 
-        std::cout << "[From: " << nickname.toStdString() << "] (" << messageCode << ") " << message.toStdString() << std::endl;
+        if (nickname.isEmpty())
+            std::cout << "[From: " << id << "] (" << messageCode << ") " << message.toStdString() << std::endl;
+        else
+            std::cout << "[From: " << id << " (" << nickname.toStdString() << ")] (" << messageCode << ") " << message.toStdString() << std::endl;
         dataHandler(messageCode, message);
 
     }
@@ -51,32 +57,37 @@ void Client::dataHandler(quint16 dataCode, QString data)
 {
     QStringList splitted;
     QString receiver;
+    bool nickInUse = false;
 
     switch (dataCode) {
     case CS_AUTH:
-        if (clients.keys().contains(data))
+        foreach (Client *client, clients)
         {
-            clients.insert(nickname,this);
-            sendTo(nickname,SC_NICKINUSE);
+            if (client->getNickname() == data)
+            {
+                nickInUse = true;
+                break;
+            }
+        }
+        if (nickInUse) {
+            sendTo(id,SC_NICKINUSE);
             break;
         }
         else if (data.contains(":"))
         {
-            clients.insert(nickname,this);
-            sendTo(nickname,SC_ERRONEOUSNICK);
+            sendTo(id,SC_ERRONEOUSNICK);
             break;
         }
         else
         {
             nickname=data;
-            clients.insert(nickname,this); // Adding the client to the list
             sendToAll(SC_JOIN,nickname);
             break;
         }
     case CS_PUBMSG:
-        foreach (QString user, clients.keys())
+        foreach (quint16 userId, clients.keys())
         {
-            if (user!=nickname) emit sendTo(user,SC_PUBMSG,nickname+":"+data);
+            if (userId != id) emit sendTo(userId,SC_PUBMSG,nickname+":"+data);
         }
         break;
     case CS_USERLIST:
@@ -85,11 +96,20 @@ void Client::dataHandler(quint16 dataCode, QString data)
     case CS_PRIVMSG:
         splitted=data.split(":");
         receiver=splitted[0];
-        splitted[0]=nickname;
-        sendTo(receiver,SC_PRIVMSG,splitted.join(":"));
+        foreach (Client *client, clients)
+        {
+            if (client->getNickname() == receiver)
+            {
+                sendTo(client->getId(),SC_PRIVMSG,splitted.join(":"));
+            }
+        }
         break;
     default:
-        std::cout << nickname.toStdString() << tr(" a envoyé une requête inconnue !").toStdString() << std::endl;
+        if (nickname.isEmpty())
+            std::cout << tr("UID ").toStdString() << id << tr(" a envoyé une requête inconnue !").toStdString() << std::endl;
+        else
+            std::cout << tr("UID ").toStdString() << id << tr(" (").toStdString() << nickname.toStdString()<< tr(") a envoyé une requête inconnue !").toStdString() << std::endl;
+            
     }
 }
 
@@ -104,11 +124,11 @@ void Client::clientDisconnect()
 void Client::sendList()
 {
     QStringList userlist;
-    foreach (QString user, clients.keys())
+    foreach (Client *client, clients)
     {
-        if (user!=nickname) userlist.append(user);
+        if (client->getNickname() != nickname) userlist.append(client->getNickname());
     }
-    emit sendTo(nickname,SC_USERLIST,userlist.join(":"));
+    emit sendTo(id,SC_USERLIST,userlist.join(":"));
 }
 
 void Client::sendToAll(const quint16 &messageCode, const QString &message)
@@ -127,7 +147,7 @@ void Client::sendToAll(const quint16 &messageCode, const QString &message)
     }
 }
 
-void Client::sendTo(QString user,const quint16 &messageCode, const QString &message)
+void Client::sendTo(quint16 uid,const quint16 &messageCode, const QString &message)
 {
     QByteArray packet;
     QDataStream out(&packet, QIODevice::WriteOnly);
@@ -137,7 +157,7 @@ void Client::sendTo(QString user,const quint16 &messageCode, const QString &mess
     out.device()->seek(0);
     out << (quint16) (packet.size() - sizeof(quint16));
 
-    clients[user]->sendPacket(packet);
+    clients[uid]->sendPacket(packet);
 }
 
 
@@ -145,3 +165,13 @@ void Client::sendPacket(const QByteArray &packet)
 {
     clientTcp->write(packet);
 }
+
+QString Client::getNickname()
+{
+    return nickname;
+}
+
+quint16 Client::getId() {
+    return id;
+}
+

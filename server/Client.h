@@ -14,9 +14,11 @@ class Client : public QObject
 
     public slots:
         static void sendToAll(const quint16 &, const QString & = "");
-        void sendTo(QString, const quint16 &, const QString & = "");
+        void sendTo(quint16, const quint16 &, const QString & = "");
         void sendPacket(const QByteArray &);
         void sendList();
+        QString getNickname();
+        quint16 getId();
 
     private slots:
         void dataHandler(quint16 dataCode, QString data);
@@ -27,7 +29,8 @@ class Client : public QObject
         QTcpSocket *clientTcp;
         QString nickname;
         quint16 messageSize;
-        static QMap<QString, Client*> clients;
+        quint16 id;
+        static QMap<quint16, Client*> clients;
 };
 
 #endif // CLIENT_H
