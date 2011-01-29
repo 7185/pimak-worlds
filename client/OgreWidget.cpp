@@ -52,7 +52,7 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     ogreRenderWindow->update();
     ogreRoot->_fireFrameEnded();
  
-    // update(); frame queued ??  
+    //update();
  
     e->accept();
 }
@@ -190,7 +190,7 @@ void OgreWidget::createScene()
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
     Ogre::MeshManager::getSingleton().createPlane("plane",
      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-     1500, 1500,20,20,true,1,5,5,Ogre::Vector3::UNIT_Z);
+     1500, 1500,200,200,true,1,5,5,Ogre::Vector3::UNIT_Z);
     Ogre::Entity* ent = ogreSceneMgr->createEntity("LightPlaneEntity","plane");
     ogreSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
     ent->setMaterialName("grass");
