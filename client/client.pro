@@ -14,9 +14,11 @@ TRANSLATIONS = client_fr.ts
 # Input
 HEADERS += MainWindow.h \
     SettingsWindow.h Protocol.h \
+    User.h \
     OgreWidget.h \
     OgreFrameListener.h
 SOURCES += main.cpp MainWindow.cpp \
     SettingsWindow.cpp \
+    User.cpp \
     OgreWidget.cpp \
     OgreFrameListener.cpp
