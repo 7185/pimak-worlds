@@ -14,8 +14,8 @@ class User : public QObject
         quint16 getId();
 
     private:
-        QString nickname;
-        quint16 id;
+        QString *nickname;
+        quint16 *id;
 };
 
 #endif // USER_H
