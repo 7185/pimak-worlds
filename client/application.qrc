@@ -1,0 +1,14 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>img/icon.png</file>
+     <file>img/pimak.png</file>
+     <file>img/application-exit.png</file>
+     <file>img/dialog-apply.png</file>
+     <file>img/dialog-cancel.png</file>
+     <file>img/dialog-close.png</file>
+     <file>img/gtk-about.png</file>
+     <file>img/gtk-connect.png</file>
+     <file>img/gtk-disconnect.png</file>
+     <file>img/preferences-desktop.png</file>
+ </qresource>
+ </RCC>
