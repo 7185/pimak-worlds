@@ -34,12 +34,12 @@ MainWindow::MainWindow()
     message->setEnabled(false);
 
     QHBoxLayout *whisperLayout = new QHBoxLayout;
-    users = new QComboBox;
+    whisperSelector = new QComboBox;
     whisper = new QLineEdit;
     whisper->setObjectName("whisper");
     whisper->setEnabled(false);
-    users->setEnabled(false);
-    whisperLayout->addWidget(users);
+    whisperSelector->setEnabled(false);
+    whisperLayout->addWidget(whisperSelector);
     whisperLayout->addWidget(whisper);
 
     renderSplitter->addWidget(renderZone);
@@ -157,11 +157,11 @@ void MainWindow::about()
 void MainWindow::on_displayWhisperAction_toggled(bool checked)
 {
     if (checked) {
-        users->show();
+        whisperSelector->show();
         whisper->show();
     }
     else {
-        users->hide();
+        whisperSelector->hide();
         whisper->hide();
     }
 }
@@ -187,8 +187,8 @@ void MainWindow::on_message_returnPressed()
 }
 void MainWindow::on_whisper_returnPressed()
 {
-    appendData("<span style=\"color:blue;\"><em>("+tr("to: ")+users->currentText()+") "+whisper->text()+"</em></span>");
-    dataSend(CS_PRIVMSG, users->currentText()+":"+whisper->text());
+    appendData("<span style=\"color:blue;\"><em>("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text()+"</em></span>");
+    dataSend(CS_PRIVMSG, whisperSelector->currentText()+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
 }
@@ -274,16 +274,17 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
         appendData(data);
         break;
     case SC_USERLIST:
-        users->clear();
+        whisperSelector->clear();
         if (!data.isEmpty()) {
             whisper->setEnabled(true);
-            foreach(QString nick, data.split(":")) {
-                users->addItem(nick);
+            foreach(QString pair, data.split(";")) {
+
+                whisperSelector->addItem(pair);
             }
         }
         else {
             whisper->setEnabled(false);
-            users->setEnabled(false);
+            whisperSelector->setEnabled(false);
         }
 
         break;
@@ -313,7 +314,7 @@ void MainWindow::clientConnect()
     disconnectAction->setEnabled(true);
     message->setEnabled(true);
     whisper->setEnabled(true);
-    users->setEnabled(true);
+    whisperSelector->setEnabled(true);
 }
 
 void MainWindow::clientDisconnect()
@@ -323,8 +324,8 @@ void MainWindow::clientDisconnect()
     disconnectAction->setEnabled(false);
     message->setEnabled(false);
     whisper->setEnabled(false);
-    users->clear();
-    users->setEnabled(false);
+    whisperSelector->clear();
+    whisperSelector->setEnabled(false);
 }
 
 void MainWindow::socketError(QAbstractSocket::SocketError erreur)

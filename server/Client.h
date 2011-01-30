@@ -27,7 +27,7 @@ class Client : public QObject
 
     private:
         QTcpSocket *clientTcp;
-        QString nickname;
+        QString *nickname;
         quint16 messageSize;
         quint16 id;
         static QMap<quint16, Client*> clients;
