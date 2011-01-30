@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "SettingsWindow.h"
 #include "OgreWidget.h"
+#include "User.h"
 
 
 class MainWindow : public QMainWindow
@@ -38,15 +39,16 @@ class MainWindow : public QMainWindow
         void socketError(QAbstractSocket::SocketError erreur);
 
     private:
+        static QMap<quint16, User*> userss;
+
         QTcpSocket *socket; // server
         quint16 messageSize;
         OgreWidget *renderZone;
         QTextEdit *chatZone;
         QLineEdit *message;
         QLineEdit *whisper;
-        QComboBox *users;
+        QComboBox *whisperSelector;
         SettingsWindow *settings;
-
 
         QAction *quitAction;
         QAction *settingsAction;
