@@ -2,8 +2,8 @@
 
 User::User(quint16 uid, QString nick)
 {
-    *id = uid;
-    *nickname = nick;
+    id = uid;
+    nickname = new QString(nick);
 }
 
 User::~User()
@@ -16,6 +16,6 @@ QString User::getNickname()
 }
 
 quint16 User::getId() {
-    return *id;
+    return id;
 }
 

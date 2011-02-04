@@ -62,6 +62,7 @@ MainWindow::MainWindow()
 
     QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
 
+    users = new QMap<quint16, User*>;
 }
 
 void MainWindow::initActions()
@@ -277,12 +278,36 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
         whisperSelector->clear();
         if (!data.isEmpty()) {
             whisper->setEnabled(true);
-            foreach(QString pair, data.split(";")) {
+            QList<quint16> usersInList;
 
-                whisperSelector->addItem(pair);
+            foreach(QString pair, data.split(";")) {
+                bool ok;
+                quint16 newId = pair.split(":").at(0).toUShort(&ok);
+                QString newNickname = pair.split(":").at(1);
+                
+                whisperSelector->addItem(newNickname);
+                usersInList.append(newId);
+
+                if (!users->contains(newId)) { // Creating user
+                    users->insert(newId, new User(newId, newNickname));
+                    std::cout << "Created user " << newId << std::endl;
+                }
             }
-        }
-        else {
+            foreach(quint16 userId, users->keys()) { // Finding users to delete
+                if (!usersInList.contains(userId)) { // Deleting user
+                    delete users->value(userId);
+                    users->remove(userId);
+                    std::cout << "Deleted user " << userId << std::endl;
+                }
+            }
+            if (users->size() > 0) {
+                whisper->setEnabled(true);
+                whisperSelector->setEnabled(true);
+            } else {
+                whisper->setEnabled(false);
+                whisperSelector->setEnabled(false);
+            }
+        } else {
             whisper->setEnabled(false);
             whisperSelector->setEnabled(false);
         }
@@ -350,3 +375,5 @@ void MainWindow::showRenderZone()
 {
     renderZone->show();
 }
+
+
