@@ -15,7 +15,7 @@ class User : public QObject
 
     private:
         QString *nickname;
-        quint16 *id;
+        quint16 id;
 };
 
 #endif // USER_H
