@@ -15,6 +15,10 @@ OgreWidget::OgreWidget(QWidget *parent) :
     ogreSceneMgr = NULL;
     ogreListener = NULL;
     activeCamera = NULL;
+
+    paintTimer = new QTimer;
+    paintTimer->start(100); //ton oeil en voit que 10 par seconde pd
+    connect(paintTimer,SIGNAL(timeout()),this,SLOT(update()));
 }
 
 OgreWidget::~OgreWidget()
@@ -53,9 +57,6 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     ogreRoot->_fireFrameStarted();
     ogreRenderWindow->update();
     ogreRoot->_fireFrameEnded();
- 
-    //update();
-
     e->accept();
 }
 
@@ -226,6 +227,7 @@ void OgreWidget::keyPressEvent(QKeyEvent *e)
 {
    if (e->isAutoRepeat()) return;
    ogreListener->handleKeys(e->key(),true);
+   update();
    e->accept();
 }
 
