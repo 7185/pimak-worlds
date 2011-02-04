@@ -281,8 +281,7 @@ void MainWindow::dataHandler(quint16 dataCode, QString data)
             QList<quint16> usersInList;
 
             foreach(QString pair, data.split(";")) {
-                bool ok;
-                quint16 newId = pair.split(":").at(0).toUShort(&ok);
+                quint16 newId = pair.split(":").at(0).toUShort();
                 QString newNickname = pair.split(":").at(1);
                 
                 whisperSelector->addItem(newNickname);

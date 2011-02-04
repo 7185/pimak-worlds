@@ -14,19 +14,13 @@ public:
     OgreWidget(QWidget *parent = 0);
     ~OgreWidget();
 
-public slots:
-    void setCameraPosition(const Ogre::Vector3 &pos);
-    void setCameraPitch(const Ogre::Radian &ang);
-    void setCameraYaw(const Ogre::Radian &ang);
-signals:
-    void cameraPositionChanged(const Ogre::Vector3 &pos);
-
 protected:
     virtual void moveEvent(QMoveEvent *e);
     virtual void paintEvent(QPaintEvent *e);
     virtual void resizeEvent(QResizeEvent *e);
     virtual void showEvent(QShowEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
+    virtual void keyReleaseEvent(QKeyEvent *e);
     virtual QPaintEngine* paintEngine() const;
     
 private:
@@ -35,6 +29,8 @@ private:
     void createCamera();
     void createViewport();
     void createScene();
+    void moveCamera();
+
 
 private:
     Ogre::Root         *ogreRoot;
@@ -42,7 +38,27 @@ private:
     Ogre::RenderWindow *ogreRenderWindow;
     Ogre::Viewport     *ogreViewport;
     Ogre::Camera       *ogreCamera;
+    Ogre::Camera       *ogreRootCamera;
+    Ogre::Camera       *activeCamera; //pointer
+    Ogre::SceneNode    *cameraNode;      //position
+    Ogre::SceneNode    *cameraYawNode;   //yaw
+    Ogre::SceneNode    *cameraPitchNode; //pitch
+    Ogre::SceneNode    *cameraRollNode;  //roll
+    Ogre::Entity       *avatar;
     OgreFrameListener  *ogreListener;
+
+
+    enum keys
+    {
+        UP=0,
+        RIGHT,
+        DOWN,
+        LEFT,
+        PGUP,
+        PGDOWN,
+        PLUS,
+        MINUS
+    };
 };
 
 #endif // OGREWIDGET_H
