@@ -176,7 +176,7 @@ void OgreWidget::createCamera()
 
 void OgreWidget::createViewport()
 {
-    activeCamera = ogreCamera;
+    activeCamera = ogreRootCamera;
     ogreViewport = ogreRenderWindow->addViewport(activeCamera);
     ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
@@ -227,7 +227,6 @@ void OgreWidget::keyPressEvent(QKeyEvent *e)
 {
    if (e->isAutoRepeat()) return;
    ogreListener->handleKeys(e->key(),true);
-   update();
    e->accept();
 }
 
