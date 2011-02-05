@@ -54,9 +54,8 @@ void OgreWidget::moveEvent(QMoveEvent *e)
 void OgreWidget::paintEvent(QPaintEvent *e)
 {
     moveCamera();
-    ogreRoot->_fireFrameStarted();
+    ogreRoot->renderOneFrame();
     ogreRenderWindow->update();
-    ogreRoot->_fireFrameEnded();
     e->accept();
 }
 
