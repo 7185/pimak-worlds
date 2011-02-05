@@ -7,7 +7,7 @@
 class OgreFrameListener : public Ogre::FrameListener
 {
    public:
-       OgreFrameListener();
+       OgreFrameListener(Ogre::Entity* ent);
        ~OgreFrameListener();
        bool frameStarted(const Ogre::FrameEvent &);
        bool frameEnded(const Ogre::FrameEvent &);
@@ -27,6 +27,10 @@ class OgreFrameListener : public Ogre::FrameListener
            MINUS
        };
        bool *ogreControls;
+
+    private:
+       Ogre::Entity* _ent;
+       Ogre::AnimationState* _aniState;
 };
 
 #endif // OGREFRAMELISTENER_H
