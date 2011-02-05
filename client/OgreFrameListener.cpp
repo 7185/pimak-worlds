@@ -72,7 +72,5 @@ void OgreFrameListener::handleKeys(int key, bool state)
     if (key==Qt::Key_PageDown) ogreControls[PGDOWN] = state;
     if (key==Qt::Key_Plus) ogreControls[PLUS] = state;
     if (key==Qt::Key_Minus) ogreControls[MINUS] = state;
+    if (key==Qt::Key_Control) ogreControls[CTRL] = state;
 }
-
-
-//235

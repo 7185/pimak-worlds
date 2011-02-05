@@ -49,7 +49,7 @@ private:
     Ogre::Entity       *avatar;
     OgreFrameListener  *ogreListener;
 
-
+    int turbo;
     enum keys
     {
         UP=0,
@@ -59,7 +59,8 @@ private:
         PGUP,
         PGDOWN,
         PLUS,
-        MINUS
+        MINUS,
+        CTRL
     };
 };
 

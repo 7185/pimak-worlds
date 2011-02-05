@@ -246,15 +246,17 @@ void OgreWidget::moveCamera()
     ogreCamera->setOrientation(cameraYawNode->getOrientation());
 
     // Should not be frame based
-    if (ogreListener->ogreControls[UP]) cameraYawNode->translate(-Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
-    if (ogreListener->ogreControls[DOWN]) cameraYawNode->translate(Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
-    if (ogreListener->ogreControls[PLUS]) cameraYawNode->translate(Ogre::Vector3( 0, 1, 0));
-    if (ogreListener->ogreControls[MINUS]) cameraYawNode->translate(Ogre::Vector3( 0, -1, 0));
+    if (ogreListener->ogreControls[CTRL]) turbo = 5;
+    else turbo = 1;
+    if (ogreListener->ogreControls[UP]) cameraYawNode->translate(turbo*-Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
+    if (ogreListener->ogreControls[DOWN]) cameraYawNode->translate(turbo*Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
+    if (ogreListener->ogreControls[PLUS]) cameraYawNode->translate(turbo*Ogre::Vector3( 0, 1, 0));
+    if (ogreListener->ogreControls[MINUS]) cameraYawNode->translate(turbo*Ogre::Vector3( 0, -1, 0));
 
-    if (ogreListener->ogreControls[LEFT]) cameraYawNode->yaw(Ogre::Radian(0.05));
-    if (ogreListener->ogreControls[RIGHT]) cameraYawNode->yaw(Ogre::Radian(-0.05));
-    if (ogreListener->ogreControls[PGUP]) cameraPitchNode->pitch(Ogre::Radian(0.05));
-    if (ogreListener->ogreControls[PGDOWN]) cameraPitchNode->pitch(Ogre::Radian(-0.05));
+    if (ogreListener->ogreControls[LEFT]) cameraYawNode->yaw(turbo*Ogre::Radian(0.05));
+    if (ogreListener->ogreControls[RIGHT]) cameraYawNode->yaw(turbo*Ogre::Radian(-0.05));
+    if (ogreListener->ogreControls[PGUP]) cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
+    if (ogreListener->ogreControls[PGDOWN]) cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
 
     ogreRootCamera->lookAt(cameraYawNode->getPosition());
 }
