@@ -6,6 +6,7 @@ OgreFrameListener::OgreFrameListener(Ogre::Entity* ent)
     _aniState = _ent->getAnimationState("Dance");
     _aniState->setEnabled(true);
     _aniState->setLoop(true);
+
     ogreControls = new bool[8];
     for (int i=0;i<=8;i++) { ogreControls[i] = false; }
 }
