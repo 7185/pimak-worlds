@@ -29,8 +29,10 @@ class OgreFrameListener : public Ogre::FrameListener
        bool *ogreControls;
 
     private:
+       bool running;
        Ogre::Entity* _ent;
-       Ogre::AnimationState* _aniState;
+       Ogre::AnimationState* _aniStateBase;
+       Ogre::AnimationState* _aniStateTop;
 };
 
 #endif // OGREFRAMELISTENER_H

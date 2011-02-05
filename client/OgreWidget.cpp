@@ -213,13 +213,14 @@ void OgreWidget::createScene()
 
     avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
     
+    ogreListener = new OgreFrameListener(avatar);
+    ogreRoot->addFrameListener(ogreListener);
+    
 
     //cameraNode->setScale(3.0f,3.0f,3.0f);
     cameraPitchNode->attachObject(avatar);
     cameraPitchNode->attachObject(ogreCamera);
     
-    ogreListener = new OgreFrameListener(avatar);
-    ogreRoot->addFrameListener(ogreListener);
 
     ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
 }

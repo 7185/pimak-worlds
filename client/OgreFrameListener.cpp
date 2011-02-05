@@ -3,10 +3,16 @@
 OgreFrameListener::OgreFrameListener(Ogre::Entity* ent)
 {
     _ent = ent;
-    _aniState = _ent->getAnimationState("Dance");
-    _aniState->setEnabled(true);
-    _aniState->setLoop(true);
-
+    running = false;
+    
+    _aniStateTop = _ent->getAnimationState("IdleTop");
+    _aniStateTop->setEnabled(true);
+    _aniStateTop->setLoop(true);
+    
+    _aniStateBase = _ent->getAnimationState("IdleBase");
+    _aniStateBase->setEnabled(true);
+    _aniStateBase->setLoop(true);
+    
     ogreControls = new bool[8];
     for (int i=0;i<=8;i++) { ogreControls[i] = false; }
 }
@@ -18,8 +24,31 @@ OgreFrameListener::~OgreFrameListener()
 
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
-    //std::cout << "Frame started" << std::endl;
-    _aniState->addTime(evt.timeSinceLastFrame);
+    // std::cout << "Frame started" << std::endl;
+    if (ogreControls[UP] || ogreControls[DOWN]
+            || ogreControls[LEFT] || ogreControls[RIGHT]) {
+        if (!running) {
+            running = true;
+            _aniStateTop->setEnabled(false);
+            _aniStateBase->setEnabled(false);
+            _aniStateTop = _ent->getAnimationState("RunTop");
+            _aniStateBase = _ent->getAnimationState("RunBase");
+            _aniStateTop->setEnabled(true);
+            _aniStateBase->setEnabled(true);
+        }
+    } else {
+        if (running) {
+            running = false;
+            _aniStateTop->setEnabled(false);
+            _aniStateBase->setEnabled(false);
+            _aniStateTop = _ent->getAnimationState("IdleTop");
+            _aniStateBase = _ent->getAnimationState("IdleBase");
+            _aniStateTop->setEnabled(true);
+            _aniStateBase->setEnabled(true);
+        }
+    }
+    _aniStateTop->addTime(evt.timeSinceLastFrame);
+    _aniStateBase->addTime(evt.timeSinceLastFrame);
     return true;
 }
 bool OgreFrameListener::frameEnded(const Ogre::FrameEvent &evt)
