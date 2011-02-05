@@ -26,7 +26,7 @@ class OgreFrameListener : public Ogre::FrameListener
            PLUS,
            MINUS
        };
-       bool               ogreControls[8];
+       bool *ogreControls;
 };
 
 #endif // OGREFRAMELISTENER_H

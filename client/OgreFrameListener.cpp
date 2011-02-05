@@ -1,8 +1,15 @@
 #include "OgreFrameListener.h"
 
-OgreFrameListener::OgreFrameListener() {}
+OgreFrameListener::OgreFrameListener()
+{
+    ogreControls = new bool[8];
+    for (int i=0;i<=8;i++) { ogreControls[i] = false; }
+}
 
-OgreFrameListener::~OgreFrameListener() {}
+OgreFrameListener::~OgreFrameListener()
+{
+    delete [] ogreControls;
+}
 
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
