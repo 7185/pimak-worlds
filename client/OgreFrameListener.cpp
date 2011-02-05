@@ -1,7 +1,11 @@
 #include "OgreFrameListener.h"
 
-OgreFrameListener::OgreFrameListener()
+OgreFrameListener::OgreFrameListener(Ogre::Entity* ent)
 {
+    _ent = ent;
+    _aniState = _ent->getAnimationState("Dance");
+    _aniState->setEnabled(true);
+    _aniState->setLoop(true);
     ogreControls = new bool[8];
     for (int i=0;i<=8;i++) { ogreControls[i] = false; }
 }
@@ -13,7 +17,8 @@ OgreFrameListener::~OgreFrameListener()
 
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
-    // std::cout << "Frame started" << std::endl;
+    //std::cout << "Frame started" << std::endl;
+    _aniState->addTime(evt.timeSinceLastFrame);
     return true;
 }
 bool OgreFrameListener::frameEnded(const Ogre::FrameEvent &evt)

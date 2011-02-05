@@ -28,6 +28,8 @@ MainWindow::MainWindow()
 
     chatZone = new QTextEdit;
     chatZone->setReadOnly(true);
+    
+    renderSplitter->setCollapsible(0,false);
 
     message = new QLineEdit;
     message->setObjectName("message");

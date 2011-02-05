@@ -17,7 +17,7 @@ OgreWidget::OgreWidget(QWidget *parent) :
     activeCamera = NULL;
 
     paintTimer = new QTimer;
-    paintTimer->start(100); //ton oeil en voit que 10 par seconde pd
+    paintTimer->start(20); //ton oeil en voit que 10 par seconde pd
     connect(paintTimer,SIGNAL(timeout()),this,SLOT(update()));
 }
 
@@ -96,8 +96,6 @@ void OgreWidget::initOgreSystem()
 
     ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
     
-    ogreListener = new OgreFrameListener();
-    ogreRoot->addFrameListener(ogreListener);
 
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
@@ -214,11 +212,15 @@ void OgreWidget::createScene()
     SinbadNode->attachObject(Sinbad);
 */
 
-    avatar =  ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
+    avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
+    
 
     //cameraNode->setScale(3.0f,3.0f,3.0f);
     cameraPitchNode->attachObject(avatar);
     cameraPitchNode->attachObject(ogreCamera);
+    
+    ogreListener = new OgreFrameListener(avatar);
+    ogreRoot->addFrameListener(ogreListener);
 
     ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
 }
