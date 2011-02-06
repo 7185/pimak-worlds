@@ -42,10 +42,8 @@ private:
     Ogre::Camera       *ogreCamera;
     Ogre::Camera       *ogreRootCamera;
     Ogre::Camera       *activeCamera; //pointer
-    Ogre::SceneNode    *cameraNode;      //position
-    Ogre::SceneNode    *cameraYawNode;   //yaw
-    Ogre::SceneNode    *cameraPitchNode; //pitch
-    Ogre::SceneNode    *cameraRollNode;  //roll
+    Ogre::SceneNode    *cameraNode;      // Camera node
+    Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
     Ogre::Entity       *avatar;
     OgreFrameListener  *ogreListener;
 
