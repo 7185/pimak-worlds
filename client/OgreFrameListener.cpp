@@ -26,7 +26,7 @@ bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
     // std::cout << "Frame started" << std::endl;
     if (ogreControls[UP] || ogreControls[DOWN]
-            || ogreControls[LEFT] || ogreControls[RIGHT]) {
+        /*    || ogreControls[LEFT] || ogreControls[RIGHT]*/) {
         if (!running) {
             running = true;
             _aniStateTop->setEnabled(false);

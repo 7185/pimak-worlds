@@ -166,14 +166,13 @@ void OgreWidget::createCamera()
 
     cameraNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
     //cameraNode->setPosition(0,10,100);
-    cameraYawNode = cameraNode->createChildSceneNode();
-    cameraPitchNode = cameraYawNode->createChildSceneNode();
-
+    cameraPitchNode = cameraNode->createChildSceneNode();
 }
 
 void OgreWidget::createViewport()
 {
-    activeCamera = ogreRootCamera;
+    //activeCamera = ogreRootCamera;
+    activeCamera = ogreCamera;
     ogreViewport = ogreRenderWindow->addViewport(activeCamera);
     ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
@@ -216,9 +215,10 @@ void OgreWidget::createScene()
     ogreListener = new OgreFrameListener(avatar);
     ogreRoot->addFrameListener(ogreListener);
     
-
     //cameraNode->setScale(3.0f,3.0f,3.0f);
-    cameraPitchNode->attachObject(avatar);
+    Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("AvatarNode");
+    avatarNode->yaw(Ogre::Radian(3.141592654f)); // 3rd view avatar pi offset
+    avatarNode->attachObject(avatar);
     cameraPitchNode->attachObject(ogreCamera);
     
 
@@ -242,23 +242,20 @@ void OgreWidget::keyReleaseEvent(QKeyEvent *e)
 
 void OgreWidget::moveCamera()
 {
-    // lolwut
-    ogreCamera->setOrientation(cameraYawNode->getOrientation());
-
     // Should not be frame based
     if (ogreListener->ogreControls[CTRL]) turbo = 5;
     else turbo = 1;
-    if (ogreListener->ogreControls[UP]) cameraYawNode->translate(turbo*-Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
-    if (ogreListener->ogreControls[DOWN]) cameraYawNode->translate(turbo*Ogre::Vector3(ogreCamera->getDirection().x,0,ogreCamera->getDirection().z));
-    if (ogreListener->ogreControls[PLUS]) cameraYawNode->translate(turbo*Ogre::Vector3( 0, 1, 0));
-    if (ogreListener->ogreControls[MINUS]) cameraYawNode->translate(turbo*Ogre::Vector3( 0, -1, 0));
+    if (ogreListener->ogreControls[UP]) cameraNode->translate(turbo*-Ogre::Vector3(cameraNode->getOrientation().zAxis().x,0,cameraNode->getOrientation().zAxis().z));
+    if (ogreListener->ogreControls[DOWN]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().x,0,cameraNode->getOrientation().zAxis().z));
+    if (ogreListener->ogreControls[PLUS]) cameraNode->translate(turbo*Ogre::Vector3( 0, 1, 0));
+    if (ogreListener->ogreControls[MINUS]) cameraNode->translate(turbo*Ogre::Vector3( 0, -1, 0));
 
-    if (ogreListener->ogreControls[LEFT]) cameraYawNode->yaw(turbo*Ogre::Radian(0.05));
-    if (ogreListener->ogreControls[RIGHT]) cameraYawNode->yaw(turbo*Ogre::Radian(-0.05));
+    if (ogreListener->ogreControls[LEFT]) cameraNode->yaw(turbo*Ogre::Radian(0.05));
+    if (ogreListener->ogreControls[RIGHT]) cameraNode->yaw(turbo*Ogre::Radian(-0.05));
     if (ogreListener->ogreControls[PGUP]) cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
     if (ogreListener->ogreControls[PGDOWN]) cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
 
-    ogreRootCamera->lookAt(cameraYawNode->getPosition());
+    ogreRootCamera->lookAt(cameraNode->getPosition());
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const
