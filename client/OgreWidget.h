@@ -40,8 +40,9 @@ private:
     Ogre::RenderWindow *ogreRenderWindow;
     Ogre::Viewport     *ogreViewport;
     Ogre::Camera       *ogreCamera;
+    Ogre::Camera       *cameraThirdView; // 3rd view cam
     Ogre::Camera       *ogreRootCamera;
-    Ogre::Camera       *activeCamera; //pointer
+    Ogre::Camera       *activeCamera; // Current cam
     Ogre::SceneNode    *cameraNode;      // Camera node
     Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
     Ogre::Entity       *avatar;

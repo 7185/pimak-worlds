@@ -163,6 +163,9 @@ void OgreWidget::createCamera()
 
     ogreCamera = ogreSceneMgr->createCamera("MyCamera");
     ogreCamera->setNearClipDistance(5);
+    
+    cameraThirdView = ogreSceneMgr->createCamera("ThirdView");
+    cameraThirdView->setNearClipDistance(5);
 
     cameraNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
     //cameraNode->setPosition(0,10,100);
@@ -172,7 +175,8 @@ void OgreWidget::createCamera()
 void OgreWidget::createViewport()
 {
     //activeCamera = ogreRootCamera;
-    activeCamera = ogreCamera;
+    //activeCamera = ogreCamera;
+    activeCamera = cameraThirdView;
     ogreViewport = ogreRenderWindow->addViewport(activeCamera);
     ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
@@ -221,6 +225,10 @@ void OgreWidget::createScene()
     avatarNode->attachObject(avatar);
     cameraPitchNode->attachObject(ogreCamera);
     
+    Ogre::SceneNode* nodeThirdView = cameraNode->createChildSceneNode("nodeThirdView");
+    nodeThirdView->attachObject(cameraThirdView);
+    nodeThirdView->setPosition(0,5,20);
+    
 
     ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
 }
@@ -256,6 +264,7 @@ void OgreWidget::moveCamera()
     if (ogreListener->ogreControls[PGDOWN]) cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
 
     ogreRootCamera->lookAt(cameraNode->getPosition());
+    cameraThirdView->lookAt(cameraNode->getPosition());
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const
