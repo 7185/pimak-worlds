@@ -5,7 +5,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
     // Settings window
 
-
     QGridLayout *settingsBoxLayout = new QGridLayout;
     QFormLayout *formLayout = new QFormLayout;
     QPushButton *buttonApply = new QPushButton(tr("Apply"));
@@ -27,7 +26,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     settingsBoxLayout->addWidget(buttonApply,5,2);
 
     connect(buttonCancel,SIGNAL(clicked()),this,SLOT(close()));
-    // TODO: close & writeSettings
     connect(buttonApply,SIGNAL(clicked()),this,SLOT(applyEvent()));
 
     setLayout(settingsBoxLayout);

@@ -105,15 +105,16 @@ void Client::dataHandler(quint16 dataCode, QString data)
         {
             if (client->getNickname() == receiver)
             {
+                splitted[0] = *nickname; // set the sender name
                 sendTo(client->getId(),SC_PRIVMSG,splitted.join(":"));
             }
         }
         break;
     default:
         if (nickname->isEmpty())
-            std::cout << tr("UID ").toStdString() << id << tr(" a envoyé une requête inconnue !").toStdString() << std::endl;
+            std::cout << "UID " << id << " sent an unknown request!" << std::endl;
         else
-            std::cout << tr("UID ").toStdString() << id << tr(" (").toStdString() << nickname->toStdString()<< tr(") a envoyé une requête inconnue !").toStdString() << std::endl;
+            std::cout << "UID " << id << " (" << nickname->toStdString() << ") sent an unknown request!" << std::endl;
             
     }
 }
