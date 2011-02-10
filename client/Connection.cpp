@@ -9,6 +9,7 @@ Connection::Connection()
     connect(socket, SIGNAL(readyRead()), this, SLOT(dataRecv()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
 
+    message = new QString;
     messageSize = 0;
 }
 
@@ -59,6 +60,8 @@ void Connection::dataHandler(quint16 dataCode, QString data)
 {
     QStringList split;
     QString sender;
+    QList<quint16> usersInList;
+
     switch (dataCode) {
     case SC_PUBMSG:
         split=data.split(":");
@@ -94,8 +97,6 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         break;
     case SC_USERLIST:
         if (!data.isEmpty()) {
-            QList<quint16> usersInList;
-
             foreach(QString pair, data.split(";")) {
                 quint16 newId = pair.split(":").at(0).toUShort();
                 QString newNickname = pair.split(":").at(1);
@@ -115,15 +116,15 @@ void Connection::dataHandler(quint16 dataCode, QString data)
                     std::cout << "Creating user " << newId << std::endl;
                 }
             }
-
-            foreach(quint16 userId, users->keys()) { // Finding users to delete
-                if (!usersInList.contains(userId)) { // Deleting user
-                    delete users->value(userId);
-                    users->remove(userId);
-                    std::cout << "Deleting user " << userId << std::endl;
-                }
+        }
+        foreach(quint16 userId, users->keys()) { // Finding users to delete
+            if (!usersInList.contains(userId)) { // Deleting user
+               delete users->value(userId);
+               users->remove(userId);
+               std::cout << "Deleting user " << userId << std::endl;
             }
         }
+
         emit listChanged();
         break;
     case SC_PRIVMSG:
@@ -179,6 +180,14 @@ QTcpSocket* Connection::getSocket()
 QMap<quint16, User*>* Connection::getUsers()
 {
     return users;
+}
+
+quint16 Connection::getIdByNick(QString nick)
+{
+    foreach(quint16 id, users->keys())
+    {
+        if (users->value(id)->getNickname() == nick) return id;
+    }
 }
 
 QString Connection::getMessage()
