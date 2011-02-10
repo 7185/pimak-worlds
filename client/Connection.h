@@ -23,6 +23,7 @@ class Connection : public QObject
     QTcpSocket* getSocket();
     QString getMessage();
     QMap<quint16, User*>* getUsers();
+    quint16 getIdByNick(QString);
     void clearUserlist();
 
     signals:

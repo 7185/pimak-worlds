@@ -181,7 +181,7 @@ void MainWindow::on_message_returnPressed()
 void MainWindow::on_whisper_returnPressed()
 {
     appendMessage("<span style=\"color:blue;\"><em>("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text()+"</em></span>");
-    connection->dataSend(CS_PRIVMSG, whisperSelector->currentText()+":"+whisper->text());
+    connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(whisperSelector->currentText()))+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
 }

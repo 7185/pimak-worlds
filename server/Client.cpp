@@ -103,7 +103,7 @@ void Client::dataHandler(quint16 dataCode, QString data)
         receiver=splitted[0];
         foreach (Client *client, clients)
         {
-            if (client->getNickname() == receiver)
+            if (client->getId() == receiver.toUShort())
             {
                 splitted[0] = *nickname; // set the sender name
                 sendTo(client->getId(),SC_PRIVMSG,splitted.join(":"));
