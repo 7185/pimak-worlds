@@ -25,7 +25,8 @@ class OgreFrameListener : public Ogre::FrameListener
            PGDOWN,
            PLUS,
            MINUS,
-           CTRL
+           CTRL,
+           SHIFT
        };
        bool *ogreControls;
 

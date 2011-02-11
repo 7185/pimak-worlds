@@ -13,6 +13,7 @@ class OgreWidget : public QWidget
 public:
     OgreWidget(QWidget *parent = 0);
     ~OgreWidget();
+    void setActiveCam(bool); //0: First, 1:Third
 
 protected:
     virtual void moveEvent(QMoveEvent *e);
@@ -31,15 +32,13 @@ private:
     void createScene();
     void moveCamera();
 
-
 private:
     Ogre::Root         *ogreRoot;
     Ogre::SceneManager *ogreSceneMgr;
     Ogre::RenderWindow *ogreRenderWindow;
     Ogre::Viewport     *ogreViewport;
-    Ogre::Camera       *ogreCamera;
-    Ogre::Camera       *cameraThirdView; // 3rd view cam
-    Ogre::Camera       *ogreRootCamera;
+    Ogre::Camera       *ogreFirstCamera;
+    Ogre::Camera       *ogreThirdCamera; // 3rd view cam
     Ogre::Camera       *activeCamera; // Current cam
     Ogre::SceneNode    *cameraNode;      // Camera node
     Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
@@ -57,7 +56,8 @@ private:
         PGDOWN,
         PLUS,
         MINUS,
-        CTRL
+        CTRL,
+        SHIFT
     };
 };
 

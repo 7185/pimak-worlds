@@ -5,10 +5,17 @@
 MainWindow::MainWindow()
 {
     setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle("Pimak Worlds");
+    setWindowTitle(tr("Pimak Worlds"));
+    resize(800,600);
 
     initActions();
     initMenus();
+
+    // Toolbar
+    QToolBar *toolB = addToolBar(tr("Toolbar"));
+    toolB->setIconSize(QSize(16,16));
+    toolB->addAction(firstCamAct);
+    toolB->addAction(thirdCamAct);
 
     // Statusbar
     QStatusBar *statusB = statusBar();
@@ -19,6 +26,7 @@ MainWindow::MainWindow()
 
     // Main window
     QWidget *mainHolder = new QWidget;
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     QSplitter *renderSplitter = new QSplitter;
     renderSplitter->setOrientation(Qt::Vertical);
@@ -28,7 +36,7 @@ MainWindow::MainWindow()
 
     chatZone = new QTextEdit;
     chatZone->setReadOnly(true);
-    
+
     message = new QLineEdit;
     message->setObjectName("message");
     message->setEnabled(false);
@@ -110,6 +118,19 @@ void MainWindow::initActions()
     aboutAction->setStatusTip(tr("Information about the application"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
+    // Camera actions
+    firstCamAct = new QAction(tr("First person camera"),this);
+    firstCamAct->setIcon(QIcon(":/img/eyes.png"));
+    firstCamAct->setCheckable(true);
+    firstCamAct->setChecked(true);
+    firstCamAct->setObjectName("firstCamAct");
+
+    thirdCamAct = new QAction(tr("Third person camera"),this);
+    thirdCamAct->setIcon(QIcon(":/img/camera-video.png"));
+    thirdCamAct->setCheckable(true);
+    thirdCamAct->setChecked(false);
+    thirdCamAct->setObjectName("thirdCamAct");
+
 }
 
 void MainWindow::initMenus()
@@ -155,14 +176,20 @@ void MainWindow::about()
 
 void MainWindow::on_displayWhisperAction_toggled(bool checked)
 {
-    if (checked) {
-        whisperSelector->show();
-        whisper->show();
-    }
-    else {
-        whisperSelector->hide();
-        whisper->hide();
-    }
+    whisperSelector->setVisible(checked);
+    whisper->setVisible(checked);
+}
+
+void MainWindow::on_firstCamAct_toggled(bool checked)
+{
+    if (checked) renderZone->setActiveCam(false);
+    thirdCamAct->setChecked(!checked);
+}
+
+void MainWindow::on_thirdCamAct_toggled(bool checked)
+{
+    if (checked) renderZone->setActiveCam(true);
+    firstCamAct->setChecked(!checked);
 }
 
 void MainWindow::on_connectAction_triggered()

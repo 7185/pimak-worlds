@@ -30,6 +30,8 @@ class MainWindow : public QMainWindow
         void on_message_returnPressed();
         void on_whisper_returnPressed();
         void on_displayWhisperAction_toggled(bool);
+        void on_firstCamAct_toggled(bool);
+        void on_thirdCamAct_toggled(bool);
 
         void clientConnect();
         void clientDisconnect();
@@ -52,6 +54,9 @@ class MainWindow : public QMainWindow
         QAction *aboutAction;
         QAction *connectAction;
         QAction *disconnectAction;
+
+        QAction *firstCamAct;
+        QAction *thirdCamAct;
 
 };
 
