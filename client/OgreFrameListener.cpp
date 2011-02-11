@@ -13,8 +13,8 @@ OgreFrameListener::OgreFrameListener(Ogre::Entity* ent)
     _aniStateBase->setEnabled(true);
     _aniStateBase->setLoop(true);
     
-    ogreControls = new bool[8];
-    for (int i=0;i<=8;i++) { ogreControls[i] = false; }
+    ogreControls = new bool[9];
+    for (int i=0;i<=9;i++) { ogreControls[i] = false; }
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -25,8 +25,8 @@ OgreFrameListener::~OgreFrameListener()
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
     // std::cout << "Frame started" << std::endl;
-    if (ogreControls[UP] || ogreControls[DOWN]
-        /*    || ogreControls[LEFT] || ogreControls[RIGHT]*/) {
+    if (ogreControls[UP] || ogreControls[DOWN] ||
+        ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT])) {
         if (!running) {
             running = true;
             _aniStateTop->setEnabled(false);
@@ -73,4 +73,5 @@ void OgreFrameListener::handleKeys(int key, bool state)
     if (key==Qt::Key_Plus) ogreControls[PLUS] = state;
     if (key==Qt::Key_Minus) ogreControls[MINUS] = state;
     if (key==Qt::Key_Control) ogreControls[CTRL] = state;
+    if (key==Qt::Key_Shift) ogreControls[SHIFT] = state;
 }

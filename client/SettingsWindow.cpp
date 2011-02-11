@@ -3,6 +3,9 @@
 SettingsWindow::SettingsWindow(QWidget *parent) :
         QWidget(parent)
 {
+    setWindowIcon(QIcon(":/img/icon.png"));
+    setWindowTitle(tr("Pimak Worlds - Settings"));
+
     // Settings window
     settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
 
@@ -51,10 +54,10 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     fps->setMaximum(500);
     layVideo->addRow(tr("Frame/sec."),fps);
 
-    displayTime = new QCheckBox;
-    displayColors = new QCheckBox;
-    layChat->addRow(displayTime,new QLabel(tr("Display time")));
-    layChat->addRow(displayColors,new QLabel(tr("Colored nicks")));
+    displayTime = new QCheckBox(tr("Display time"));
+    displayColors = new QCheckBox(tr("Colored nicks"));
+    layChat->addRow(displayTime);
+    layChat->addRow(displayColors);
 
     gbVideo->setLayout(layVideo);
     gbChat->setLayout(layChat);
