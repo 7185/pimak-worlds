@@ -67,33 +67,32 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         split=data.split(":");
         sender=split[0];
         split.removeAt(0);
-        data = "<span style=\"color:black;\">"+sender+": "+split.join(":")+"</span>";
-        displayData(data);
+        data = sender+": "+split.join(":");
+        displayData(data,dataCode);
         emit listChanged();
         break;
     case SC_NICKINUSE:
-        data = "<span style=\"color:red;\"><strong>"+tr("This nick is already used. Please retry with another one")+"</strong></span>";
-        displayData(data);
+        data = tr("This nick is already used. Please retry with another one");
+        displayData(data,dataCode);
         socket->disconnectFromHost(); // FIXME: should be managed by the server
         break;
     case SC_ERRONEOUSNICK:
-        data = "<span style=\"color:red;\"><strong>"+tr("Erroneous nickname. Please retry with another one")+"</strong></span>";
-        displayData(data);
+        data = tr("Erroneous nickname. Please retry with another one");
+        displayData(data,dataCode);
         socket->disconnectFromHost(); // FIXME: should be managed by the server
         break;
     case SC_EVENT:
-        data = "<em>"+data+"</em>";
-        displayData(data);
+        displayData(data,dataCode);
         break;
     case SC_JOIN:
         dataSend(CS_USERLIST);
-        data = "<span style=\"color:green;\"><em>"+data+tr(" just log in")+"</em></span>";
-        displayData(data);
+        data = data+tr(" just log in");
+        displayData(data,dataCode);
         break;
     case SC_PART:
         dataSend(CS_USERLIST);
-        data = "<span style=\"color:brown;\"><em>"+data+tr(" has quit")+"</em></span>";
-        displayData(data);
+        data = data+tr(" has quit");
+        displayData(data,dataCode);
         break;
     case SC_USERLIST:
         if (!data.isEmpty()) {
@@ -131,8 +130,8 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         split = data.split(":");
         sender=split[0];
         split.removeAt(0);
-        data = "<span style=\"color:blue;\"><em>"+sender+": "+split.join(":")+"</em></span>";
-        displayData(data);
+        data = sender+": "+split.join(":");
+        displayData(data,dataCode);
         break;
     default:
         displayData(tr("Unknown message received"));
@@ -144,22 +143,23 @@ void Connection::socketError(QAbstractSocket::SocketError error)
     switch(error)
     {
         case QAbstractSocket::HostNotFoundError:
-            displayData(tr("<strong>ERROR : host not found</strong>"));
+            displayData(tr("ERROR : host not found"));
             break;
         case QAbstractSocket::ConnectionRefusedError:
-            displayData(tr("<strong>ERROR : connection refused. Is the server launched?</strong>"));
+            displayData(tr("ERROR : connection refused. Is the server launched?"));
             break;
         case QAbstractSocket::RemoteHostClosedError:
-            displayData(tr("<strong>ERROR : connection closed by remote host</strong>"));
+            displayData(tr("ERROR : connection closed by remote host"));
             break;
         default:
-            displayData(tr("<strong>ERROR : ") + socket->errorString() + tr("</strong>"));
+            displayData(tr("ERROR : ") + socket->errorString());
     }
 }
 
-void Connection::displayData(QString data)
+void Connection::displayData(QString data, quint16 type)
 {
     *message = data;
+    messageType = type;
     emit messageChanged();
 }
 
@@ -188,6 +188,7 @@ quint16 Connection::getIdByNick(QString nick)
     {
         if (users->value(id)->getNickname() == nick) return id;
     }
+    return 0;
 }
 
 QString Connection::getMessage()
@@ -195,3 +196,7 @@ QString Connection::getMessage()
     return *message;
 }
 
+quint16 Connection::getMessageType()
+{
+    return messageType;
+}

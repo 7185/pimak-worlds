@@ -54,6 +54,19 @@ MainWindow::MainWindow()
     setCentralWidget(mainHolder);
 
     connection = new Connection;
+    nickColors = new QStringList;
+    nickColors->append("#666666");
+    nickColors->append("#0080FF");
+    nickColors->append("#00FF00");
+    nickColors->append("#FF8000");
+    nickColors->append("#FF0080");
+    nickColors->append("#00FFFF");
+    nickColors->append("#8000FF");
+
+    QTimer *paintTimer = new QTimer;
+    int updateInterval = 1000/settings->getFps();
+    paintTimer->start(updateInterval); //ton oeil en voit que 10 par seconde pd
+    connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
 
     connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
     connect(connection->getSocket(), SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
@@ -92,11 +105,6 @@ void MainWindow::initActions()
     displayWhisperAction->setCheckable(true);
     displayWhisperAction->setChecked(true);
 
-    displayTimeAction = new QAction(tr("Time"),this);
-    displayTimeAction->setObjectName("displayTimeAction");
-    displayTimeAction->setCheckable(true);
-    displayTimeAction->setChecked(false);
-
     aboutAction = new QAction(tr("About Pimak Worlds..."),this);
     aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
     aboutAction->setStatusTip(tr("Information about the application"));
@@ -113,7 +121,6 @@ void MainWindow::initMenus()
     fileMenu->addAction(quitAction);
     QMenu *displayMenu = menuBar()->addMenu(tr("View"));
     displayMenu->addAction(displayWhisperAction);
-    displayMenu->addAction(displayTimeAction);
     QMenu *toolsMenu = menuBar()->addMenu(tr("Tools"));
     toolsMenu->addAction(settingsAction);
     QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
@@ -160,7 +167,7 @@ void MainWindow::on_displayWhisperAction_toggled(bool checked)
 
 void MainWindow::on_connectAction_triggered()
 {
-    appendMessage(tr("<strong>Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
+    appendMessage(tr("Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("..."));
     connection->getSocket()->abort(); // Closing old connexions
     connection->getSocket()->connectToHost(settings->getHost(), settings->getPort());
 }
@@ -172,7 +179,7 @@ void MainWindow::on_disconnectAction_triggered()
 
 void MainWindow::on_message_returnPressed()
 {
-    appendMessage("<span style=\"color:black;\">"+settings->getNickname()+": "+message->text()+"</span>");
+    appendMessage(settings->getNickname()+": "+message->text(),SC_PUBMSG);
     connection->dataSend(CS_PUBMSG, message->text());
     message->clear();
     message->setFocus();
@@ -180,7 +187,7 @@ void MainWindow::on_message_returnPressed()
 
 void MainWindow::on_whisper_returnPressed()
 {
-    appendMessage("<span style=\"color:blue;\"><em>("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text()+"</em></span>");
+    appendMessage("("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text(),SC_PRIVMSG);
     connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(whisperSelector->currentText()))+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
@@ -189,7 +196,7 @@ void MainWindow::on_whisper_returnPressed()
 void MainWindow::clientConnect()
 {
     connection->dataSend(CS_AUTH,settings->getNickname());
-    appendMessage(tr("<strong>Connection successful</strong>"));
+    appendMessage(tr("Connection successful"));
     connectAction->setEnabled(false);
     disconnectAction->setEnabled(true);
     message->setEnabled(true);
@@ -198,7 +205,7 @@ void MainWindow::clientConnect()
 void MainWindow::clientDisconnect()
 {
     connection->clearUserlist();
-    appendMessage(tr("<strong>Disconnected from the server</strong>"));
+    appendMessage(tr("Disconnected from the server"));
     connectAction->setEnabled(true);
     disconnectAction->setEnabled(false);
     message->setEnabled(false);
@@ -207,10 +214,41 @@ void MainWindow::clientDisconnect()
     whisperSelector->setEnabled(false);
 }
 
-void MainWindow::appendMessage(QString mes)
+void MainWindow::appendMessage(QString mes, quint16 type)
 {
-    if (mes.isEmpty()) mes = connection->getMessage();
-    if (displayTimeAction->isChecked()) mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
+    if (mes.isEmpty() && type==0)
+    {
+        mes = connection->getMessage();
+        type = connection->getMessageType();
+    }
+
+    QStringList splitted;
+    switch (type)
+    {
+    case SC_PUBMSG:
+        if (settings->getDisplayColors()) {
+            splitted = mes.split(":");
+            if (connection->getIdByNick(splitted[0]) == 0) splitted[0] = "<span style=\"color:"+nickColors->at(0)+";font-weight:bold;\">"+splitted[0]+"</span>";
+            else splitted[0] = "<span style=\"color:"+nickColors->at(connection->getIdByNick(splitted[0])%(nickColors->length()-1)+1)+";\">"+splitted[0]+"</span>";
+            mes = splitted.join(":");
+        }
+        mes = "<span style=\"color:black;font-weight:normal;font-style:normal\">"+mes+"</span>";
+    case SC_EVENT:
+        mes = "<span style=\"color:orange;font-weight:bold;font-style:italic;\">"+mes+"</span>";
+    case SC_JOIN:
+        mes = "<span style=\"color:green;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_PART:
+        mes = "<span style=\"color:brown;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_PRIVMSG:
+        mes = "<span style=\"color:blue;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_NICKINUSE:
+    case SC_ERRONEOUSNICK:
+        mes = "<span style=\"color:red;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+    default:
+        mes = "<span style=\"color:black;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+    }
+
+    if (settings->getDisplayTime()) mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
     chatZone->append(mes);
 }
 

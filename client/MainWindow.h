@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
     private slots:
         void about();
         void openSettingsWindow();
-        void appendMessage(QString mes = "");
+        void appendMessage(QString mes = "",quint16 = 0);
         void updateList();
 
         void on_connectAction_triggered();
@@ -43,6 +43,7 @@ class MainWindow : public QMainWindow
         QLineEdit *whisper;
         QComboBox *whisperSelector;
         SettingsWindow *settings;
+        QStringList *nickColors;
 
         QAction *quitAction;
         QAction *settingsAction;

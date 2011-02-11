@@ -33,8 +33,6 @@ private:
 
 
 private:
-    QTimer *paintTimer;
-
     Ogre::Root         *ogreRoot;
     Ogre::SceneManager *ogreSceneMgr;
     Ogre::RenderWindow *ogreRenderWindow;

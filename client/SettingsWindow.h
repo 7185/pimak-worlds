@@ -15,6 +15,9 @@ class SettingsWindow : public QWidget
          QString getHost();
          QString getNickname();
          int getPort();
+         int getFps();
+         bool getDisplayTime();
+         bool getDisplayColors();
 
     public slots:
          void applyEvent();
@@ -24,9 +27,13 @@ class SettingsWindow : public QWidget
 
     private:
          QSettings *settings;
+
          QLineEdit *nickname;
          QLineEdit *host;
          QSpinBox *port;
+         QSpinBox *fps;
+         QCheckBox *displayTime;
+         QCheckBox *displayColors;
 
 };
 
