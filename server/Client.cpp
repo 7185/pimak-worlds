@@ -7,15 +7,14 @@ QMap<quint16,Client*> Client::clients;
 
 Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageSize(0)
 {
-    // QTcpSocket must be destroyed with Client
-    tcp->setParent(this);
+    tcp->setParent(this); // QTcpSocket must be destroyed with Client
 
     connect(clientTcp,SIGNAL(disconnected()), SLOT(clientDisconnect()));
     connect(clientTcp,SIGNAL(readyRead()), SLOT(dataRecv()));
     
     nickname = new QString;
 
-    for (quint16 i=0;i<clients.size()+1;i++) {
+    for (quint16 i=1;i<=clients.size()+1;i++) {
         if (!clients.contains(i)) id=i;
     }
 

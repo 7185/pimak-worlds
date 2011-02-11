@@ -15,10 +15,6 @@ OgreWidget::OgreWidget(QWidget *parent) :
     ogreSceneMgr = NULL;
     ogreListener = NULL;
     activeCamera = NULL;
-
-    paintTimer = new QTimer;
-    paintTimer->start(20); //ton oeil en voit que 10 par seconde pd
-    connect(paintTimer,SIGNAL(timeout()),this,SLOT(update()));
 }
 
 OgreWidget::~OgreWidget()

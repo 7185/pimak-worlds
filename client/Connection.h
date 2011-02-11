@@ -17,11 +17,12 @@ class Connection : public QObject
     void dataHandler(quint16, QString);
     void socketError(QAbstractSocket::SocketError);
 
-    void displayData(QString);
+    void displayData(QString,quint16 = 0);
 
     public:
     QTcpSocket* getSocket();
     QString getMessage();
+    quint16 getMessageType();
     QMap<quint16, User*>* getUsers();
     quint16 getIdByNick(QString);
     void clearUserlist();
@@ -34,7 +35,9 @@ class Connection : public QObject
     QMap<quint16, User*> *users;
     QTcpSocket *socket; // server
     quint16 messageSize;
+
     QString *message;
+    quint16 messageType;
 };
 
 #endif // CONNECTION_H
