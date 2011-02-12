@@ -12,10 +12,10 @@ class SettingsWindow : public QWidget
          explicit SettingsWindow(QWidget *parent = 0);
          void readSettings();
          void writeSettings();
-         QString getHost();
-         QString getNickname();
-         int getPort();
-         int getFps();
+         QLineEdit* getHost();
+         QLineEdit* getNickname();
+         QSpinBox* getPort();
+         QSpinBox* getFps();
          bool getDisplayTime();
          bool getDisplayColors();
 
