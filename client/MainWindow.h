@@ -24,6 +24,7 @@ class MainWindow : public QMainWindow
         void openSettingsWindow();
         void appendMessage(QString mes = "",quint16 = 0);
         void updateList();
+        void updateTimer(int);
 
         void on_connectAction_triggered();
         void on_disconnectAction_triggered();
@@ -46,6 +47,7 @@ class MainWindow : public QMainWindow
         QComboBox *whisperSelector;
         SettingsWindow *settings;
         QStringList *nickColors;
+        QTimer *paintTimer; // FPS
 
         QAction *quitAction;
         QAction *settingsAction;

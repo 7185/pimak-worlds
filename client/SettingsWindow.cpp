@@ -113,17 +113,17 @@ void SettingsWindow::closeEvent(QCloseEvent *event) {
     event->accept();
 }
 
-QString SettingsWindow::getHost()
-{ return host->text(); }
+QLineEdit* SettingsWindow::getHost()
+{ return host; }
 
-QString SettingsWindow::getNickname()
-{ return nickname->text(); }
+QLineEdit* SettingsWindow::getNickname()
+{ return nickname; }
 
-int SettingsWindow::getPort()
-{ return port->value(); }
+QSpinBox* SettingsWindow::getPort()
+{ return port; }
 
-int SettingsWindow::getFps()
-{ return fps->value(); }
+QSpinBox* SettingsWindow::getFps()
+{ return fps; }
 
 bool SettingsWindow::getDisplayTime()
 { return displayTime->isChecked(); }

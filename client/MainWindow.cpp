@@ -71,9 +71,10 @@ MainWindow::MainWindow()
     nickColors->append("#00FFFF");
     nickColors->append("#8000FF");
 
-    QTimer *paintTimer = new QTimer;
-    int updateInterval = 1000/settings->getFps();
-    paintTimer->start(updateInterval); //ton oeil en voit que 10 par seconde pd
+    paintTimer = new QTimer;
+    paintTimer->start(1000/settings->getFps()->value()); //ton oeil en voit que 10 par seconde pd
+
+    connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
     connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
 
     connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
@@ -194,9 +195,9 @@ void MainWindow::on_thirdCamAct_toggled(bool checked)
 
 void MainWindow::on_connectAction_triggered()
 {
-    appendMessage(tr("Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("..."));
+    appendMessage(tr("Connecting to ")+settings->getHost()->text()+":"+QString::number(settings->getPort()->value())+tr("..."));
     connection->getSocket()->abort(); // Closing old connexions
-    connection->getSocket()->connectToHost(settings->getHost(), settings->getPort());
+    connection->getSocket()->connectToHost(settings->getHost()->text(), settings->getPort()->value());
 }
 
 void MainWindow::on_disconnectAction_triggered()
@@ -206,7 +207,7 @@ void MainWindow::on_disconnectAction_triggered()
 
 void MainWindow::on_message_returnPressed()
 {
-    appendMessage(settings->getNickname()+": "+message->text(),SC_PUBMSG);
+    appendMessage(settings->getNickname()->text()+": "+message->text(),SC_PUBMSG);
     connection->dataSend(CS_PUBMSG, message->text());
     message->clear();
     message->setFocus();
@@ -222,7 +223,7 @@ void MainWindow::on_whisper_returnPressed()
 
 void MainWindow::clientConnect()
 {
-    connection->dataSend(CS_AUTH,settings->getNickname());
+    connection->dataSend(CS_AUTH,settings->getNickname()->text());
     appendMessage(tr("Connection successful"));
     connectAction->setEnabled(false);
     disconnectAction->setEnabled(true);
@@ -296,6 +297,12 @@ void MainWindow::updateList()
         whisper->setEnabled(true);
         whisperSelector->setEnabled(true);
     }
+}
+
+void MainWindow::updateTimer(int i)
+{
+    paintTimer->stop();
+    paintTimer->start(1000/i);
 }
 
 void MainWindow::showRenderZone()
