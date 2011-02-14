@@ -249,6 +249,7 @@ void OgreWidget::setActiveCam(bool cam)
 void OgreWidget::moveCamera()
 {
     Ogre::Real pitchAngle = 2*Ogre::Degree(Ogre::Math::ACos(cameraPitchNode->getOrientation().w)).valueDegrees();
+    Ogre::Real pitchAngleSign = cameraPitchNode->getOrientation().x;
 
     // Should not be frame based
     if (ogreListener->ogreControls[CTRL]) turbo = 5;
@@ -266,15 +267,10 @@ void OgreWidget::moveCamera()
         if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z,0,-cameraNode->getOrientation().zAxis().x));
         else cameraNode->yaw(turbo*Ogre::Radian(-0.05));
     }
-    if (ogreListener->ogreControls[PGUP]) cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
-    if (ogreListener->ogreControls[PGDOWN]) cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
-
-    if (pitchAngle > 90.0f)
-    {
-        Ogre::Real pitchAngleSign = cameraPitchNode->getOrientation().x;
-        if (pitchAngleSign > 0) cameraPitchNode->setOrientation(Ogre::Quaternion(Ogre::Math::Sqrt(0.5f),Ogre::Math::Sqrt(0.5f),0,0));
-        else cameraPitchNode->setOrientation(Ogre::Quaternion(Ogre::Math::Sqrt(0.5f),-Ogre::Math::Sqrt(0.5f),0,0));
-    }
+    if (ogreListener->ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
+        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
+    if (ogreListener->ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
+        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
 
     ogreThirdCamera->lookAt(cameraNode->getPosition());
 }
