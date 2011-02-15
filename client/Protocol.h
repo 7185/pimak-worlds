@@ -20,13 +20,13 @@
 #define CS_USERLIST   6
 
 // Server -> Client
-#define SC_NICKINUSE  0
 #define SC_PUBMSG     1
 #define SC_PRIVMSG    2
 #define SC_EVENT      3
 #define SC_JOIN       4
 #define SC_PART       5
 #define SC_USERLIST   6
-#define SC_ERRONEOUSNICK 7
+#define SC_NICKINUSE  7
+#define SC_ERRONEOUSNICK 8
 
 #endif

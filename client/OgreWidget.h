@@ -13,13 +13,7 @@ class OgreWidget : public QWidget
 public:
     OgreWidget(QWidget *parent = 0);
     ~OgreWidget();
-
-public slots:
-    void setCameraPosition(const Ogre::Vector3 &pos);
-    void setCameraPitch(const Ogre::Radian &ang);
-    void setCameraYaw(const Ogre::Radian &ang);
-signals:
-    void cameraPositionChanged(const Ogre::Vector3 &pos);
+    void setActiveCam(bool); //0: First, 1:Third
 
 protected:
     virtual void moveEvent(QMoveEvent *e);
@@ -27,6 +21,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *e);
     virtual void showEvent(QShowEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
+    virtual void keyReleaseEvent(QKeyEvent *e);
     virtual QPaintEngine* paintEngine() const;
     
 private:
@@ -35,14 +30,35 @@ private:
     void createCamera();
     void createViewport();
     void createScene();
+    void moveCamera();
 
 private:
     Ogre::Root         *ogreRoot;
     Ogre::SceneManager *ogreSceneMgr;
     Ogre::RenderWindow *ogreRenderWindow;
     Ogre::Viewport     *ogreViewport;
-    Ogre::Camera       *ogreCamera;
+    Ogre::Camera       *ogreFirstCamera;
+    Ogre::Camera       *ogreThirdCamera; // 3rd view cam
+    Ogre::Camera       *activeCamera; // Current cam
+    Ogre::SceneNode    *cameraNode;      // Camera node
+    Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
+    Ogre::Entity       *avatar;
     OgreFrameListener  *ogreListener;
+
+    int turbo;
+    enum keys
+    {
+        UP=0,
+        RIGHT,
+        DOWN,
+        LEFT,
+        PGUP,
+        PGDOWN,
+        PLUS,
+        MINUS,
+        CTRL,
+        SHIFT
+    };
 };
 
 #endif // OGREWIDGET_H

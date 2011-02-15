@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtNetwork>
 #include <QtGui>
 #include "SettingsWindow.h"
 #include "OgreWidget.h"
+#include "Connection.h"
 
 
 class MainWindow : public QMainWindow
@@ -22,31 +22,32 @@ class MainWindow : public QMainWindow
     private slots:
         void about();
         void openSettingsWindow();
-        void appendData(QString);
+        void appendMessage(QString mes = "",quint16 = 0);
+        void updateList();
+        void updateTimer(int);
 
         void on_connectAction_triggered();
         void on_disconnectAction_triggered();
         void on_message_returnPressed();
         void on_whisper_returnPressed();
-        void on_displayWhisperAction_toggled(bool checked);
+        void on_displayWhisperAction_toggled(bool);
+        void on_firstCamAct_toggled(bool);
+        void on_thirdCamAct_toggled(bool);
 
-        void dataRecv();
-        void dataSend(quint16,QString = "");
-        void dataHandler(quint16 dataCode, QString data);
         void clientConnect();
         void clientDisconnect();
-        void socketError(QAbstractSocket::SocketError erreur);
 
     private:
-        QTcpSocket *socket; // server
-        quint16 messageSize;
+        Connection *connection;
+
         OgreWidget *renderZone;
         QTextEdit *chatZone;
         QLineEdit *message;
         QLineEdit *whisper;
-        QComboBox *users;
+        QComboBox *whisperSelector;
         SettingsWindow *settings;
-
+        QStringList *nickColors;
+        QTimer *paintTimer; // FPS
 
         QAction *quitAction;
         QAction *settingsAction;
@@ -55,6 +56,9 @@ class MainWindow : public QMainWindow
         QAction *aboutAction;
         QAction *connectAction;
         QAction *disconnectAction;
+
+        QAction *firstCamAct;
+        QAction *thirdCamAct;
 
 };
 

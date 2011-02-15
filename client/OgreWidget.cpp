@@ -4,16 +4,17 @@
 #include "OgreWidget.h"
 
 OgreWidget::OgreWidget(QWidget *parent) :
-    QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreCamera(0)
+    QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreFirstCamera(0)
 {
     setAttribute(Qt::WA_OpaquePaintEvent,true);
     setAttribute(Qt::WA_PaintOnScreen,true);
-    setMinimumSize(320,240);
+    setMinimumSize(96,96);
     setFocusPolicy(Qt::ClickFocus);
 
     ogreRoot = NULL;
     ogreSceneMgr = NULL;
     ogreListener = NULL;
+    activeCamera = NULL;
 }
 
 OgreWidget::~OgreWidget()
@@ -48,12 +49,9 @@ void OgreWidget::moveEvent(QMoveEvent *e)
 
 void OgreWidget::paintEvent(QPaintEvent *e)
 {
-    ogreRoot->_fireFrameStarted();
+    moveCamera();
+    ogreRoot->renderOneFrame();
     ogreRenderWindow->update();
-    ogreRoot->_fireFrameEnded();
- 
-    //update();
- 
     e->accept();
 }
 
@@ -69,21 +67,17 @@ void OgreWidget::resizeEvent(QResizeEvent *e)
             ogreRenderWindow->resize(newSize.width(), newSize.height());
             ogreRenderWindow->windowMovedOrResized();
         }
-        if(ogreCamera)
+        if(activeCamera)
         {
             Ogre::Real aspectRatio = Ogre::Real(newSize.width()) / Ogre::Real(newSize.height());
-            ogreCamera->setAspectRatio(aspectRatio);
+            activeCamera->setAspectRatio(aspectRatio);
         }
     }
 }
 
 void OgreWidget::showEvent(QShowEvent *e)
 {
-    if(!ogreRoot)
-    {
-        initOgreSystem();
-    }
-    
+    if(!ogreRoot) initOgreSystem();
     QWidget::showEvent(e);
 }
 
@@ -97,8 +91,6 @@ void OgreWidget::initOgreSystem()
 
     ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
     
-    ogreListener = new OgreFrameListener();
-    ogreRoot->addFrameListener(ogreListener);
 
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
@@ -122,8 +114,6 @@ void OgreWidget::initOgreSystem()
     createCamera();
     createViewport();
     createScene();
-
-   // TODO: ogreRoot->startRendering();
 }
 
 void OgreWidget::setupNLoadResources()
@@ -164,18 +154,24 @@ void OgreWidget::setupNLoadResources()
 
 void OgreWidget::createCamera()
 {
-    ogreCamera = ogreSceneMgr->createCamera("MyCamera1");
-    ogreCamera->setPosition(0,10,100);
-    ogreCamera->lookAt(0,0,0);
-    ogreCamera->setNearClipDistance(5);
-    //ogreCamera->setPolygonMode(Ogre::PM_WIREFRAME);
+    ogreFirstCamera = ogreSceneMgr->createCamera("FirstView");
+    ogreFirstCamera->setNearClipDistance(5);
+    
+    ogreThirdCamera = ogreSceneMgr->createCamera("ThirdView");
+    ogreThirdCamera->setNearClipDistance(5);
+
+    cameraNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
+    cameraPitchNode = cameraNode->createChildSceneNode();
 }
 
 void OgreWidget::createViewport()
 {
-    ogreViewport = ogreRenderWindow->addViewport(ogreCamera);
+    //activeCamera = ogreFirstCamera;
+    activeCamera = ogreFirstCamera;
+    ogreViewport = ogreRenderWindow->addViewport(activeCamera);
     ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
-    ogreCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
+    activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
+    // activeCamera->setPolygonMode(Ogre::PM_WIREFRAME);
 }
 
 void OgreWidget::createScene()
@@ -200,83 +196,83 @@ void OgreWidget::createScene()
     light->setDiffuseColour(Ogre::ColourValue(1.0f,1.0f,1.0f));
     light->setDirection(Ogre::Vector3(1,-1,0));
 
+
     Ogre::Entity* Sinbad =  ogreSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
     Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
-
-    SinbadNode->setScale(3.0f,3.0f,3.0f);
-    SinbadNode->setPosition(Ogre::Vector3(0.0f,5.0f,0.0f));
+    SinbadNode->setScale(5.0f,5.0f,5.0f);
+    SinbadNode->setPosition(Ogre::Vector3(0.0f,15.0f,0.0f));
     SinbadNode->attachObject(Sinbad);
 
+
+    avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
+    
+    ogreListener = new OgreFrameListener(avatar);
+    ogreRoot->addFrameListener(ogreListener);
+    
+    Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("AvatarNode");
+    avatarNode->setPosition(Ogre::Vector3(0.0f,-5.0f,0.0f));
+    avatarNode->yaw(Ogre::Degree(180.0f)); // 3rd view avatar 180° offset
+    avatarNode->attachObject(avatar);
+    cameraPitchNode->attachObject(ogreFirstCamera);
+    
+    Ogre::SceneNode* nodeThirdView = cameraNode->createChildSceneNode("nodeThirdView");
+    nodeThirdView->attachObject(ogreThirdCamera);
+    nodeThirdView->setPosition(Ogre::Vector3(0.0f,-1.0f,26.0f));
+    
     ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
-}
-
-
-void OgreWidget::setCameraPosition(const Ogre::Vector3 &pos)
-{
-    ogreCamera->setPosition(pos);
-    update();
-    emit cameraPositionChanged(pos);
-}
-
-void OgreWidget::setCameraYaw(const Ogre::Radian &ang)
-{
-    ogreCamera->yaw(ang);
-    update();
-}
-
-void OgreWidget::setCameraPitch(const Ogre::Radian &ang)
-{
-    ogreCamera->pitch(ang);
-    update();
 }
 
 void OgreWidget::keyPressEvent(QKeyEvent *e)
 {
-        static QMap<int, Ogre::Vector3> keyCoordModificationMapping;
-        static QMap<int, Ogre::Radian> keyYawModificationMapping;
-        static QMap<int, Ogre::Radian> keyPitchModificationMapping;
-        static bool mappingInitialised = false;
+   if (e->isAutoRepeat()) return;
+   ogreListener->handleKeys(e->key(),true);
+   e->accept();
+}
 
-        if(!mappingInitialised)
-        {
-            keyCoordModificationMapping[Qt::Key_Up]    = Ogre::Vector3( 0, 0,-5);
-            keyCoordModificationMapping[Qt::Key_Down]  = Ogre::Vector3( 0, 0, 5);
-            keyCoordModificationMapping[Qt::Key_Plus]  = Ogre::Vector3( 0, 5, 0);
-            keyCoordModificationMapping[Qt::Key_Minus] = Ogre::Vector3( 0,-5, 0);
 
-            keyYawModificationMapping[Qt::Key_Left]  = Ogre::Radian(0.1);
-            keyYawModificationMapping[Qt::Key_Right] = Ogre::Radian(-0.1);
+void OgreWidget::keyReleaseEvent(QKeyEvent *e)
+{
+   if (e->isAutoRepeat()) return;
+   ogreListener->handleKeys(e->key(),false);
+   e->accept();
+}
 
-            keyPitchModificationMapping[Qt::Key_PageUp]  = Ogre::Radian(0.1);
-            keyPitchModificationMapping[Qt::Key_PageDown] = Ogre::Radian(-0.1);
+void OgreWidget::setActiveCam(bool cam)
+{
+    if (cam) activeCamera = ogreThirdCamera;
+    else activeCamera = ogreFirstCamera;
+    activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
+    ogreViewport->setCamera(activeCamera);
 
-            mappingInitialised = true;
-        }
+}
 
-        QMap<int, Ogre::Vector3>::iterator keyCoordPressed = keyCoordModificationMapping.find(e->key());
-        QMap<int, Ogre::Radian>::iterator keyYawPressed = keyYawModificationMapping.find(e->key());
-        QMap<int, Ogre::Radian>::iterator keyPitchPressed = keyPitchModificationMapping.find(e->key());
+void OgreWidget::moveCamera()
+{
+    Ogre::Real pitchAngle = 2*Ogre::Degree(Ogre::Math::ACos(cameraPitchNode->getOrientation().w)).valueDegrees();
+    Ogre::Real pitchAngleSign = cameraPitchNode->getOrientation().x;
 
-        if(keyCoordPressed != keyCoordModificationMapping.end() && ogreCamera)
-        {
-                const Ogre::Vector3 &actualCamPos = ogreCamera->getPosition();
-                setCameraPosition(actualCamPos + keyCoordPressed.value());
-                e->accept();
-        }
-        if(keyYawPressed != keyYawModificationMapping.end() && ogreCamera)
-        {
-                setCameraYaw(keyYawPressed.value());
-                e->accept();
-        }
-        if(keyPitchPressed != keyPitchModificationMapping.end() && ogreCamera)
-        {
-                setCameraPitch(keyPitchPressed.value());
-                e->accept();
-        }
-    else
-    {
-        e->ignore();
+    // Should not be frame based
+    if (ogreListener->ogreControls[CTRL]) turbo = 5;
+    else turbo = 1;
+    if (ogreListener->ogreControls[UP]) cameraNode->translate(turbo*-Ogre::Vector3(cameraNode->getOrientation().zAxis().x,0,cameraNode->getOrientation().zAxis().z));
+    if (ogreListener->ogreControls[DOWN]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().x,0,cameraNode->getOrientation().zAxis().z));
+    if (ogreListener->ogreControls[PLUS]) cameraNode->translate(turbo*Ogre::Vector3( 0, 1, 0));
+    if (ogreListener->ogreControls[MINUS]) cameraNode->translate(turbo*Ogre::Vector3( 0, -1, 0));
+
+    if (ogreListener->ogreControls[LEFT]) {
+        if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(-cameraNode->getOrientation().zAxis().z,0,cameraNode->getOrientation().zAxis().x));
+        else cameraNode->yaw(turbo*Ogre::Radian(0.05));
     }
+    if (ogreListener->ogreControls[RIGHT]) {
+        if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z,0,-cameraNode->getOrientation().zAxis().x));
+        else cameraNode->yaw(turbo*Ogre::Radian(-0.05));
+    }
+    if (ogreListener->ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
+        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
+    if (ogreListener->ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
+        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
+
+    ogreThirdCamera->lookAt(cameraNode->getPosition());
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const

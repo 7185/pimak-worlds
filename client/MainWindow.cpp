@@ -5,10 +5,17 @@
 MainWindow::MainWindow()
 {
     setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle("Pimak Worlds");
+    setWindowTitle(tr("Pimak Worlds"));
+    resize(800,600);
 
     initActions();
     initMenus();
+
+    // Toolbar
+    QToolBar *toolB = addToolBar(tr("Toolbar"));
+    toolB->setIconSize(QSize(16,16));
+    toolB->addAction(firstCamAct);
+    toolB->addAction(thirdCamAct);
 
     // Statusbar
     QStatusBar *statusB = statusBar();
@@ -19,6 +26,7 @@ MainWindow::MainWindow()
 
     // Main window
     QWidget *mainHolder = new QWidget;
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     QSplitter *renderSplitter = new QSplitter;
     renderSplitter->setOrientation(Qt::Vertical);
@@ -34,16 +42,17 @@ MainWindow::MainWindow()
     message->setEnabled(false);
 
     QHBoxLayout *whisperLayout = new QHBoxLayout;
-    users = new QComboBox;
+    whisperSelector = new QComboBox;
     whisper = new QLineEdit;
     whisper->setObjectName("whisper");
     whisper->setEnabled(false);
-    users->setEnabled(false);
-    whisperLayout->addWidget(users);
+    whisperSelector->setEnabled(false);
+    whisperLayout->addWidget(whisperSelector);
     whisperLayout->addWidget(whisper);
 
     renderSplitter->addWidget(renderZone);
     renderSplitter->addWidget(chatZone);
+    renderSplitter->setCollapsible(0,false);
 
     mainLayout->addWidget(renderSplitter);
     mainLayout->addWidget(message);
@@ -52,16 +61,28 @@ MainWindow::MainWindow()
     mainHolder->setLayout(mainLayout);
     setCentralWidget(mainHolder);
 
-    socket = new QTcpSocket(this);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(dataRecv()));
-    connect(socket, SIGNAL(connected()), this, SLOT(clientConnect()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    connection = new Connection;
+    nickColors = new QStringList;
+    nickColors->append("#666666");
+    nickColors->append("#0080FF");
+    nickColors->append("#00FF00");
+    nickColors->append("#FF8000");
+    nickColors->append("#FF0080");
+    nickColors->append("#00FFFF");
+    nickColors->append("#8000FF");
 
-    messageSize = 0;
+    paintTimer = new QTimer;
+    paintTimer->start(1000/settings->getFps()->value()); //ton oeil en voit que 10 par seconde pd
+
+    connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
+    connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
+
+    connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
+    connect(connection->getSocket(), SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
+    connect(connection,SIGNAL(messageChanged()),this, SLOT(appendMessage()));
+    connect(connection,SIGNAL(listChanged()),this, SLOT(updateList()));
 
     QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
-
 }
 
 void MainWindow::initActions()
@@ -93,15 +114,23 @@ void MainWindow::initActions()
     displayWhisperAction->setCheckable(true);
     displayWhisperAction->setChecked(true);
 
-    displayTimeAction = new QAction(tr("Time"),this);
-    displayTimeAction->setObjectName("displayTimeAction");
-    displayTimeAction->setCheckable(true);
-    displayTimeAction->setChecked(false);
-
     aboutAction = new QAction(tr("About Pimak Worlds..."),this);
     aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
     aboutAction->setStatusTip(tr("Information about the application"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+    // Camera actions
+    firstCamAct = new QAction(tr("First person camera"),this);
+    firstCamAct->setIcon(QIcon(":/img/eyes.png"));
+    firstCamAct->setCheckable(true);
+    firstCamAct->setChecked(true);
+    firstCamAct->setObjectName("firstCamAct");
+
+    thirdCamAct = new QAction(tr("Third person camera"),this);
+    thirdCamAct->setIcon(QIcon(":/img/camera-video.png"));
+    thirdCamAct->setCheckable(true);
+    thirdCamAct->setChecked(false);
+    thirdCamAct->setObjectName("thirdCamAct");
 
 }
 
@@ -114,7 +143,6 @@ void MainWindow::initMenus()
     fileMenu->addAction(quitAction);
     QMenu *displayMenu = menuBar()->addMenu(tr("View"));
     displayMenu->addAction(displayWhisperAction);
-    displayMenu->addAction(displayTimeAction);
     QMenu *toolsMenu = menuBar()->addMenu(tr("Tools"));
     toolsMenu->addAction(settingsAction);
     QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
@@ -147,202 +175,134 @@ void MainWindow::about()
 
 }
 
-/* lolcopter
-   void MainWindow::on_chatZone_textChanged()
-{
-    chatZone->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-}
-*/
-
 void MainWindow::on_displayWhisperAction_toggled(bool checked)
 {
-    if (checked) {
-        users->show();
-        whisper->show();
-    }
-    else {
-        users->hide();
-        whisper->hide();
-    }
+    whisperSelector->setVisible(checked);
+    whisper->setVisible(checked);
+}
+
+void MainWindow::on_firstCamAct_toggled(bool checked)
+{
+    if (checked) renderZone->setActiveCam(false);
+    thirdCamAct->setChecked(!checked);
+}
+
+void MainWindow::on_thirdCamAct_toggled(bool checked)
+{
+    if (checked) renderZone->setActiveCam(true);
+    firstCamAct->setChecked(!checked);
 }
 
 void MainWindow::on_connectAction_triggered()
 {
-    chatZone->append(tr("<strong>Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("...</strong>"));
-    socket->abort(); // Closing old connexions
-    socket->connectToHost(settings->getHost(), settings->getPort());
+    appendMessage(tr("Connecting to ")+settings->getHost()->text()+":"+QString::number(settings->getPort()->value())+tr("..."));
+    connection->getSocket()->abort(); // Closing old connexions
+    connection->getSocket()->connectToHost(settings->getHost()->text(), settings->getPort()->value());
 }
 
 void MainWindow::on_disconnectAction_triggered()
 {
-    socket->disconnectFromHost();
+    connection->getSocket()->disconnectFromHost();
 }
 
 void MainWindow::on_message_returnPressed()
 {
-    appendData("<span style=\"color:black;\">"+settings->getNickname()+": "+message->text()+"</span>");
-    dataSend(CS_PUBMSG, message->text());
+    appendMessage(settings->getNickname()->text()+": "+message->text(),SC_PUBMSG);
+    connection->dataSend(CS_PUBMSG, message->text());
     message->clear();
     message->setFocus();
 }
+
 void MainWindow::on_whisper_returnPressed()
 {
-    appendData("<span style=\"color:blue;\"><em>("+tr("to: ")+users->currentText()+") "+whisper->text()+"</em></span>");
-    dataSend(CS_PRIVMSG, users->currentText()+":"+whisper->text());
+    appendMessage("("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text(),SC_PRIVMSG);
+    connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(whisperSelector->currentText()))+":"+whisper->text());
     whisper->clear();
     whisper->setFocus();
 }
 
-
-
-void MainWindow::dataSend(quint16 msgCode, QString msgToSend)
-{
-    QByteArray packet;
-    QDataStream out(&packet, QIODevice::WriteOnly);
-
-    out << (quint16) 0;
-    out << (quint16) msgCode;
-    out << msgToSend;
-    out.device()->seek(0);
-    out << (quint16) (packet.size()-sizeof(quint16));
-
-    socket->write(packet);
-
-}
-
-void MainWindow::dataRecv()
-{
-    forever {
-    QDataStream in(socket);
-    if (messageSize == 0)
-    {
-        if (socket->bytesAvailable() < (int)sizeof(quint16))
-             return;
-        in >> messageSize;
-    }
-
-    if (socket->bytesAvailable() < messageSize)
-        return; // we wait for the end of the message
-
-    quint16 messageCode;
-    in >> messageCode;
-
-    QString messageText;
-    in >> messageText;
-
-    dataHandler(messageCode,messageText);
-
-    // we reset the messageSize to 0, waiting for next data
-    messageSize = 0;
-}
-}
-
-void MainWindow::dataHandler(quint16 dataCode, QString data)
-{
-    QStringList split;
-    QString sender;
-    switch (dataCode) {
-    case SC_PUBMSG:
-        split=data.split(":");
-        sender=split[0];
-        split.removeAt(0);
-        data = "<span style=\"color:black;\">"+sender+": "+split.join(":")+"</span>";
-        appendData(data);
-        break;
-    case SC_NICKINUSE:
-        data = "<span style=\"color:red;\"><strong>"+tr("This nick is already used. Please retry with another one")+"</strong></span>";
-        appendData(data);
-        socket->disconnectFromHost(); // FIXME: should be managed by the server
-        break;
-    case SC_ERRONEOUSNICK:
-        data = "<span style=\"color:red;\"><strong>"+tr("Erroneous nickname. Please retry with another one")+"</strong></span>";
-        appendData(data);
-        socket->disconnectFromHost(); // FIXME: should be managed by the server
-        break;
-    case SC_EVENT:
-        data = "<em>"+data+"</em>";
-        appendData(data);
-        break;
-    case SC_JOIN:
-        dataSend(CS_USERLIST);
-        data = "<span style=\"color:green;\"><em>"+data+tr(" just log in")+"</em></span>";
-        appendData(data);
-        break;
-    case SC_PART:
-        dataSend(CS_USERLIST);
-        data = "<span style=\"color:brown;\"><em>"+data+tr(" has quit")+"</em></span>";
-        appendData(data);
-        break;
-    case SC_USERLIST:
-        users->clear();
-        if (!data.isEmpty()) {
-            whisper->setEnabled(true);
-            foreach(QString nick, data.split(":")) {
-                users->addItem(nick);
-            }
-        }
-        else {
-            whisper->setEnabled(false);
-            users->setEnabled(false);
-        }
-
-        break;
-    case SC_PRIVMSG:
-        split = data.split(":");
-        sender=split[0];
-        split.removeAt(0);
-        data = "<span style=\"color:blue;\"><em>"+sender+": "+split.join(":")+"</em></span>";
-        appendData(data);
-        break;
-    default:
-        appendData(tr("Unknown message received"));
-    }
-}
-
-void MainWindow::appendData(QString data)
-{
-    if (displayTimeAction->isChecked()) data = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+data;
-    chatZone->append(data);
-}
-
 void MainWindow::clientConnect()
 {
-    dataSend(CS_AUTH,settings->getNickname());
-    chatZone->append(tr("<strong>Connection successful</strong>"));
+    connection->dataSend(CS_AUTH,settings->getNickname()->text());
+    appendMessage(tr("Connection successful"));
     connectAction->setEnabled(false);
     disconnectAction->setEnabled(true);
     message->setEnabled(true);
-    whisper->setEnabled(true);
-    users->setEnabled(true);
 }
 
 void MainWindow::clientDisconnect()
 {
-    chatZone->append(tr("<strong>Disconnected from the server</strong>"));
+    connection->clearUserlist();
+    appendMessage(tr("Disconnected from the server"));
     connectAction->setEnabled(true);
     disconnectAction->setEnabled(false);
     message->setEnabled(false);
     whisper->setEnabled(false);
-    users->clear();
-    users->setEnabled(false);
+    whisperSelector->clear();
+    whisperSelector->setEnabled(false);
 }
 
-void MainWindow::socketError(QAbstractSocket::SocketError erreur)
+void MainWindow::appendMessage(QString mes, quint16 type)
 {
-    switch(erreur)
+    if (mes.isEmpty() && type==0)
     {
-        case QAbstractSocket::HostNotFoundError:
-            chatZone->append(tr("<strong>ERROR : host not found</strong>"));
-            break;
-        case QAbstractSocket::ConnectionRefusedError:
-            chatZone->append(tr("<strong>ERROR : connection refused. Is the server launched?</strong>"));
-            break;
-        case QAbstractSocket::RemoteHostClosedError:
-            chatZone->append(tr("<strong>ERROR : connection closed by remote host</strong>"));
-            break;
-        default:
-            chatZone->append(tr("<strong>ERROR : ") + socket->errorString() + tr("</strong>"));
+        mes = connection->getMessage();
+        type = connection->getMessageType();
     }
+
+    QStringList splitted;
+    switch (type)
+    {
+    case SC_PUBMSG:
+        if (settings->getDisplayColors()) {
+            splitted = mes.split(":");
+            if (connection->getIdByNick(splitted[0]) == 0) splitted[0] = "<span style=\"color:"+nickColors->at(0)+";font-weight:bold;\">"+splitted[0]+"</span>";
+            else splitted[0] = "<span style=\"color:"+nickColors->at(connection->getIdByNick(splitted[0])%(nickColors->length()-1)+1)+";\">"+splitted[0]+"</span>";
+            mes = splitted.join(":");
+        }
+        mes = "<span style=\"color:black;font-weight:normal;font-style:normal\">"+mes+"</span>";
+    case SC_EVENT:
+        mes = "<span style=\"color:orange;font-weight:bold;font-style:italic;\">"+mes+"</span>";
+    case SC_JOIN:
+        mes = "<span style=\"color:green;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_PART:
+        mes = "<span style=\"color:brown;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_PRIVMSG:
+        mes = "<span style=\"color:blue;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+    case SC_NICKINUSE:
+    case SC_ERRONEOUSNICK:
+        mes = "<span style=\"color:red;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+    default:
+        mes = "<span style=\"color:black;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+    }
+
+    if (settings->getDisplayTime()) mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
+    chatZone->append(mes);
+}
+
+void MainWindow::updateList()
+{
+    whisperSelector->clear();
+    if(connection->getUsers()->keys().isEmpty())
+    {
+        whisper->setEnabled(false);
+        whisperSelector->setEnabled(false);
+    }
+    else
+    {
+        foreach(quint16 userid, connection->getUsers()->keys())
+        {
+            whisperSelector->addItem(connection->getUsers()->value(userid)->getNickname());
+        }
+        whisper->setEnabled(true);
+        whisperSelector->setEnabled(true);
+    }
+}
+
+void MainWindow::updateTimer(int i)
+{
+    paintTimer->stop();
+    paintTimer->start(1000/i);
 }
 
 void MainWindow::showRenderZone()
