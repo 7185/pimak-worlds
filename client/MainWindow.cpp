@@ -88,36 +88,36 @@ MainWindow::MainWindow()
 void MainWindow::initActions()
 {
     // Actions - don't forget to declare them
-    connectAction = new QAction(tr("Connect"),this);
-    connectAction->setObjectName("connectAction");
-    connectAction->setIcon(QIcon(":/img/gtk-connect.png"));
+    connectAct = new QAction(tr("&Connect"),this);
+    connectAct->setObjectName("connectAct");
+    connectAct->setIcon(QIcon(":/img/gtk-connect.png"));
 
-    disconnectAction = new QAction(tr("Disconnect"),this);
-    disconnectAction->setObjectName("disconnectAction");
-    disconnectAction->setIcon(QIcon(":/img/gtk-disconnect.png"));
-    disconnectAction->setEnabled(false);
+    disconnectAct = new QAction(tr("&Disconnect"),this);
+    disconnectAct->setObjectName("disconnectAct");
+    disconnectAct->setIcon(QIcon(":/img/gtk-disconnect.png"));
+    disconnectAct->setEnabled(false);
 
-    quitAction = new QAction(tr("Quit"),this);
-    quitAction->setShortcut(QKeySequence(tr("Ctrl+Q")));
-    quitAction->setIcon(QIcon(":/img/application-exit.png"));
-    quitAction->setStatusTip(tr("Close the application"));
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    quitAct = new QAction(tr("&Quit"),this);
+    quitAct->setShortcut(QKeySequence(tr("Ctrl+Q")));
+    quitAct->setIcon(QIcon(":/img/application-exit.png"));
+    quitAct->setStatusTip(tr("Close the application"));
+    connect(quitAct, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    settingsAction = new QAction(tr("Settings..."),this);
-    settingsAction->setShortcut(QKeySequence("Ctrl+P"));
-    settingsAction->setIcon(QIcon(":/img/preferences-desktop.png"));
-    settingsAction->setStatusTip(tr("Application settings"));
-    connect(settingsAction, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
+    settingsAct = new QAction(tr("&Settings..."),this);
+    settingsAct->setShortcut(QKeySequence("Ctrl+P"));
+    settingsAct->setIcon(QIcon(":/img/preferences-desktop.png"));
+    settingsAct->setStatusTip(tr("Application settings"));
+    connect(settingsAct, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
 
-    displayWhisperAction = new QAction(tr("Whisper"),this);
-    displayWhisperAction->setObjectName("displayWhisperAction");
-    displayWhisperAction->setCheckable(true);
-    displayWhisperAction->setChecked(true);
+    displayWhisperAct = new QAction(tr("&Whisper"),this);
+    displayWhisperAct->setObjectName("displayWhisperAct");
+    displayWhisperAct->setCheckable(true);
+    displayWhisperAct->setChecked(true);
 
-    aboutAction = new QAction(tr("About Pimak Worlds..."),this);
-    aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
-    aboutAction->setStatusTip(tr("Information about the application"));
-    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+    aboutAct = new QAction(tr("&About Pimak Worlds..."),this);
+    aboutAct->setIcon(QIcon(":/img/gtk-about.png"));
+    aboutAct->setStatusTip(tr("Information about the application"));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     // Camera actions
     firstCamAct = new QAction(tr("First person camera"),this);
@@ -137,16 +137,16 @@ void MainWindow::initActions()
 void MainWindow::initMenus()
 {
     // Menus
-    QMenu *fileMenu = menuBar()->addMenu(tr("File"));
-    fileMenu->addAction(connectAction);
-    fileMenu->addAction(disconnectAction);
-    fileMenu->addAction(quitAction);
-    QMenu *displayMenu = menuBar()->addMenu(tr("View"));
-    displayMenu->addAction(displayWhisperAction);
-    QMenu *toolsMenu = menuBar()->addMenu(tr("Tools"));
-    toolsMenu->addAction(settingsAction);
-    QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
-    helpMenu->addAction(aboutAction);
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(connectAct);
+    fileMenu->addAction(disconnectAct);
+    fileMenu->addAction(quitAct);
+    QMenu *displayMenu = menuBar()->addMenu(tr("&View"));
+    displayMenu->addAction(displayWhisperAct);
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(settingsAct);
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(aboutAct);
 }
 
 void MainWindow::openSettingsWindow()
@@ -175,7 +175,7 @@ void MainWindow::about()
 
 }
 
-void MainWindow::on_displayWhisperAction_toggled(bool checked)
+void MainWindow::on_displayWhisperAct_toggled(bool checked)
 {
     whisperSelector->setVisible(checked);
     whisper->setVisible(checked);
@@ -193,14 +193,14 @@ void MainWindow::on_thirdCamAct_toggled(bool checked)
     firstCamAct->setChecked(!checked);
 }
 
-void MainWindow::on_connectAction_triggered()
+void MainWindow::on_connectAct_triggered()
 {
     appendMessage(tr("Connecting to ")+settings->getHost()->text()+":"+QString::number(settings->getPort()->value())+tr("..."));
     connection->getSocket()->abort(); // Closing old connexions
     connection->getSocket()->connectToHost(settings->getHost()->text(), settings->getPort()->value());
 }
 
-void MainWindow::on_disconnectAction_triggered()
+void MainWindow::on_disconnectAct_triggered()
 {
     connection->getSocket()->disconnectFromHost();
 }
@@ -225,8 +225,8 @@ void MainWindow::clientConnect()
 {
     connection->dataSend(CS_AUTH,settings->getNickname()->text());
     appendMessage(tr("Connection successful"));
-    connectAction->setEnabled(false);
-    disconnectAction->setEnabled(true);
+    connectAct->setEnabled(false);
+    disconnectAct->setEnabled(true);
     message->setEnabled(true);
 }
 
@@ -234,8 +234,8 @@ void MainWindow::clientDisconnect()
 {
     connection->clearUserlist();
     appendMessage(tr("Disconnected from the server"));
-    connectAction->setEnabled(true);
-    disconnectAction->setEnabled(false);
+    connectAct->setEnabled(true);
+    disconnectAct->setEnabled(false);
     message->setEnabled(false);
     whisper->setEnabled(false);
     whisperSelector->clear();
