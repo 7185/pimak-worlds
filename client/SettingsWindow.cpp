@@ -4,7 +4,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
         QWidget(parent)
 {
     setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle(tr("Pimak Worlds - Settings"));
+    setWindowTitle(tr("Settings"));
 
     // Settings window
     settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
@@ -12,8 +12,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     QGridLayout *settingsBoxLayout = new QGridLayout;
     QTabWidget *tabs = new QTabWidget;
 
-    QPushButton *buttonApply = new QPushButton(tr("Apply"));
-    QPushButton *buttonCancel = new QPushButton(tr("Cancel"));
+    QPushButton *buttonApply = new QPushButton(tr("&Apply"));
+    QPushButton *buttonCancel = new QPushButton(tr("&Cancel"));
     buttonApply->setIcon(QIcon(":/img/dialog-apply.png"));
     buttonCancel->setIcon(QIcon(":/img/dialog-cancel.png"));
 

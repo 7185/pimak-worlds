@@ -61,122 +61,122 @@
         <translation>Pimak Worlds</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="14"/>
+        <location filename="MainWindow.cpp" line="15"/>
         <source>Toolbar</source>
         <translation>Barre d&apos;outils</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="89"/>
-        <source>Connect</source>
-        <translation>Se connecter</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="93"/>
-        <source>Disconnect</source>
-        <translation>Se déconnecter</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="98"/>
-        <source>Quit</source>
-        <translation>Quitter</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="99"/>
+        <location filename="MainWindow.cpp" line="101"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="101"/>
+        <location filename="MainWindow.cpp" line="103"/>
         <source>Close the application</source>
         <translation>Quitter l&apos;application</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="104"/>
-        <source>Settings...</source>
-        <translation>Options...</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="107"/>
+        <location filename="MainWindow.cpp" line="109"/>
         <source>Application settings</source>
         <translation>Options du programme</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="110"/>
-        <source>Whisper</source>
-        <translation>Murmurer</translation>
+        <location filename="MainWindow.cpp" line="91"/>
+        <source>&amp;Connect</source>
+        <translation>Se &amp;connecter</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="121"/>
+        <location filename="MainWindow.cpp" line="95"/>
+        <source>&amp;Disconnect</source>
+        <translation>Se &amp;déconnecter</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="100"/>
+        <source>&amp;Quit</source>
+        <translation>&amp;Quitter</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="106"/>
+        <source>&amp;Settings...</source>
+        <translation>O&amp;ptions...</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="112"/>
+        <source>&amp;Whisper</source>
+        <translation>&amp;Murmurer</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="117"/>
+        <source>&amp;About Pimak Worlds...</source>
+        <translation>À &amp;propos de Pimak Worlds...</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="123"/>
         <source>First person camera</source>
         <translation>Caméra première personne</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="127"/>
+        <location filename="MainWindow.cpp" line="129"/>
         <source>Third person camera</source>
         <translation>Caméra troisième personne</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="196"/>
+        <location filename="MainWindow.cpp" line="140"/>
+        <source>&amp;File</source>
+        <translation>&amp;Fichier</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="144"/>
+        <source>&amp;View</source>
+        <translation>&amp;Affichage</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="146"/>
+        <source>&amp;Tools</source>
+        <translation>&amp;Outils</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="148"/>
+        <source>&amp;Help</source>
+        <translation>A&amp;ide</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.cpp" line="198"/>
         <source>Connecting to </source>
         <translation>Connexion à </translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="196"/>
+        <location filename="MainWindow.cpp" line="198"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="225"/>
+        <location filename="MainWindow.cpp" line="227"/>
         <source>Connection successful</source>
         <translation>Connexion réussie</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="234"/>
+        <location filename="MainWindow.cpp" line="236"/>
         <source>Disconnected from the server</source>
         <translation>Déconnecté du serveur</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="115"/>
-        <source>About Pimak Worlds...</source>
-        <translation>À propos de Pimak Worlds...</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="117"/>
+        <location filename="MainWindow.cpp" line="119"/>
         <source>Information about the application</source>
         <translation>Informations à propos du programme</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="138"/>
-        <source>File</source>
-        <translation>Fichier</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="142"/>
-        <source>View</source>
-        <translation>Affichage</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="144"/>
-        <source>Tools</source>
-        <translation>Outils</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="146"/>
-        <source>Help</source>
-        <translation>Aide</translation>
-    </message>
-    <message>
-        <location filename="MainWindow.cpp" line="159"/>
+        <location filename="MainWindow.cpp" line="161"/>
         <source>&lt;h1&gt;Pimak Worlds 0.0.1a&lt;/h1&gt;&lt;h3&gt;Version numbers are useless&lt;/h3&gt;&lt;p&gt;Client based on Qt 4.7.0&lt;/p&gt;</source>
         <translation>&lt;h1&gt;Pimak Worlds 0.0.1a&lt;/h1&gt;&lt;h3&gt;Les numéros de version ne servent à rien&lt;/h3&gt;&lt;p&gt;Client basé sur Qt 4.7.0&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="160"/>
+        <location filename="MainWindow.cpp" line="162"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="216"/>
+        <location filename="MainWindow.cpp" line="218"/>
         <source>to: </source>
         <translation>à: </translation>
     </message>
@@ -185,18 +185,20 @@
     <name>SettingsWindow</name>
     <message>
         <location filename="SettingsWindow.cpp" line="7"/>
-        <source>Pimak Worlds - Settings</source>
-        <translation>Pimak Worlds - Options</translation>
+        <source>Settings</source>
+        <translation>Options</translation>
     </message>
     <message>
         <location filename="SettingsWindow.cpp" line="15"/>
-        <source>Apply</source>
-        <translation>Appliquer</translation>
+        <source>&amp;Apply</source>
+        <oldsource>Apply</oldsource>
+        <translation>&amp;Appliquer</translation>
     </message>
     <message>
         <location filename="SettingsWindow.cpp" line="16"/>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <source>&amp;Cancel</source>
+        <oldsource>Cancel</oldsource>
+        <translation>A&amp;nnuler</translation>
     </message>
     <message>
         <location filename="SettingsWindow.cpp" line="25"/>

@@ -26,11 +26,11 @@ class MainWindow : public QMainWindow
         void updateList();
         void updateTimer(int);
 
-        void on_connectAction_triggered();
-        void on_disconnectAction_triggered();
+        void on_connectAct_triggered();
+        void on_disconnectAct_triggered();
         void on_message_returnPressed();
         void on_whisper_returnPressed();
-        void on_displayWhisperAction_toggled(bool);
+        void on_displayWhisperAct_toggled(bool);
         void on_firstCamAct_toggled(bool);
         void on_thirdCamAct_toggled(bool);
 
@@ -49,13 +49,13 @@ class MainWindow : public QMainWindow
         QStringList *nickColors;
         QTimer *paintTimer; // FPS
 
-        QAction *quitAction;
-        QAction *settingsAction;
-        QAction *displayWhisperAction;
-        QAction *displayTimeAction;
-        QAction *aboutAction;
-        QAction *connectAction;
-        QAction *disconnectAction;
+        QAction *quitAct;
+        QAction *settingsAct;
+        QAction *displayWhisperAct;
+        QAction *displayTimeAct;
+        QAction *aboutAct;
+        QAction *connectAct;
+        QAction *disconnectAct;
 
         QAction *firstCamAct;
         QAction *thirdCamAct;
