@@ -2,7 +2,6 @@
 #define USER_H
 
 #include <QtNetwork>
-#include <iostream>
 
 class User : public QObject
 {

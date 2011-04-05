@@ -11,7 +11,7 @@ class OgreWidget : public QWidget
     Q_OBJECT
     
 public:
-    OgreWidget(QWidget *parent = 0);
+    OgreWidget(QWidget *parent=0);
     ~OgreWidget();
     void setActiveCam(bool); //0: First, 1:Third
 
@@ -39,26 +39,14 @@ private:
     Ogre::Viewport     *ogreViewport;
     Ogre::Camera       *ogreFirstCamera;
     Ogre::Camera       *ogreThirdCamera; // 3rd view cam
-    Ogre::Camera       *activeCamera; // Current cam
+    Ogre::Camera       *activeCamera;    // Current cam
     Ogre::SceneNode    *cameraNode;      // Camera node
     Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
     Ogre::Entity       *avatar;
     OgreFrameListener  *ogreListener;
 
     int turbo;
-    enum keys
-    {
-        UP=0,
-        RIGHT,
-        DOWN,
-        LEFT,
-        PGUP,
-        PGDOWN,
-        PLUS,
-        MINUS,
-        CTRL,
-        SHIFT
-    };
+    enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 };
 
 #endif // OGREWIDGET_H

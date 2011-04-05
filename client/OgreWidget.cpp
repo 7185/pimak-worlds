@@ -19,18 +19,12 @@ OgreWidget::OgreWidget(QWidget *parent) :
 
 OgreWidget::~OgreWidget()
 {
-    if(ogreRenderWindow)
-    {
-        ogreRenderWindow->removeAllViewports();
-    }
+    if(ogreRenderWindow) ogreRenderWindow->removeAllViewports();
     
     if(ogreRoot)
     {
         ogreRoot->detachRenderTarget(ogreRenderWindow);
-        if(ogreSceneMgr)
-        {
-            ogreRoot->destroySceneManager(ogreSceneMgr);
-        }
+        if(ogreSceneMgr) ogreRoot->destroySceneManager(ogreSceneMgr);
     }
     delete ogreListener;
     delete ogreRoot;
@@ -64,7 +58,7 @@ void OgreWidget::resizeEvent(QResizeEvent *e)
         const QSize &newSize = e->size();
         if(ogreRenderWindow)
         {
-            ogreRenderWindow->resize(newSize.width(), newSize.height());
+            ogreRenderWindow->resize(newSize.width(),newSize.height());
             ogreRenderWindow->windowMovedOrResized();
         }
         if(activeCamera)
@@ -90,7 +84,6 @@ void OgreWidget::initOgreSystem()
     ogreRoot->initialise(false);
 
     ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
-    
 
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
@@ -98,13 +91,12 @@ void OgreWidget::initOgreSystem()
 #ifdef Q_WS_WIN
     widgetHandle = Ogre::StringConverter::toString((size_t)((HWND)winId()));
 #else
-
     QWidget *q_parent = dynamic_cast <QWidget *> (parent());
     QX11Info xInfo = x11Info();
 
-    widgetHandle = Ogre::StringConverter::toString ((unsigned long)xInfo.display()) +
-        ":" + Ogre::StringConverter::toString ((unsigned int)xInfo.screen()) +
-        ":" + Ogre::StringConverter::toString ((unsigned long)q_parent->winId());
+    widgetHandle = Ogre::StringConverter::toString((unsigned long)xInfo.display()) +
+        ":" + Ogre::StringConverter::toString((unsigned int)xInfo.screen()) +
+        ":" + Ogre::StringConverter::toString((unsigned long)q_parent->winId());
 #endif
 
     viewConfig["externalWindowHandle"] = widgetHandle;
@@ -243,7 +235,6 @@ void OgreWidget::setActiveCam(bool cam)
     else activeCamera = ogreFirstCamera;
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
     ogreViewport->setCamera(activeCamera);
-
 }
 
 void OgreWidget::moveCamera()
@@ -275,7 +266,4 @@ void OgreWidget::moveCamera()
     ogreThirdCamera->lookAt(cameraNode->getPosition());
 }
 
-QPaintEngine *OgreWidget:: paintEngine() const
-{
-    return 0;
-}
+QPaintEngine *OgreWidget:: paintEngine() const { return 0; }
