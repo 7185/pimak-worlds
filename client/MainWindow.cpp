@@ -4,26 +4,6 @@
 
 MainWindow::MainWindow()
 {
-    setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle(tr("Pimak Worlds"));
-    resize(800,600);
-
-    initActions();
-    initMenus();
-
-    // Toolbar
-    QToolBar *toolB = addToolBar(tr("Toolbar"));
-    toolB->setIconSize(QSize(16,16));
-    toolB->addAction(firstCamAct);
-    toolB->addAction(thirdCamAct);
-
-    // Statusbar
-    QStatusBar *statusB = statusBar();
-    statusB->show();
-
-    // Settings window
-    settings = new SettingsWindow;
-
     // Main window
     QWidget *mainHolder = new QWidget;
 
@@ -61,6 +41,7 @@ MainWindow::MainWindow()
     mainHolder->setLayout(mainLayout);
     setCentralWidget(mainHolder);
 
+    settings = new SettingsWindow;
     connection = new Connection;
     nickColors = new QStringList;
     nickColors->append("#666666");
@@ -72,17 +53,23 @@ MainWindow::MainWindow()
     nickColors->append("#8000FF");
 
     paintTimer = new QTimer;
-    paintTimer->start(1000/settings->getFps()->value()); //ton oeil en voit que 10 par seconde pd
+    paintTimer->start(1000/settings->getFps()->value()); // ton oeil en voit que 10 par seconde pd
 
-    connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
-    connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
+    initActions();
+    initMenus();
+    initConnect();
 
-    connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
-    connect(connection->getSocket(), SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
-    connect(connection,SIGNAL(messageChanged()),this, SLOT(appendMessage()));
-    connect(connection,SIGNAL(listChanged()),this, SLOT(updateList()));
+    // Bars
+    QToolBar *toolB = addToolBar(tr("Toolbar"));
+    toolB->setIconSize(QSize(16,16));
+    toolB->addAction(firstCamAct);
+    toolB->addAction(thirdCamAct);
+    QStatusBar *statusB = statusBar();
+    statusB->show();
 
-    QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
+    setWindowIcon(QIcon(":/img/icon.png"));
+    setWindowTitle(tr("Pimak Worlds"));
+    resize(800,600);
 }
 
 void MainWindow::initActions()
@@ -131,7 +118,6 @@ void MainWindow::initActions()
     thirdCamAct->setCheckable(true);
     thirdCamAct->setChecked(false);
     thirdCamAct->setObjectName("thirdCamAct");
-
 }
 
 void MainWindow::initMenus()
@@ -149,8 +135,18 @@ void MainWindow::initMenus()
     helpMenu->addAction(aboutAct);
 }
 
-void MainWindow::openSettingsWindow()
-{   settings->show();  }
+void MainWindow::initConnect()
+{
+    connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
+    connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
+    connect(connection->getSocket(), SIGNAL(disconnected()), this,SLOT(clientDisconnect()));
+    connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
+    connect(connection,SIGNAL(listChanged()),this,SLOT(updateList()));
+    connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
+    QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
+}
+
+void MainWindow::openSettingsWindow() { settings->show(); }
 
 void MainWindow::about()
 {
@@ -158,21 +154,20 @@ void MainWindow::about()
     QDialog *aboutBox = new QDialog(this);
     QGridLayout *aboutBoxLayout = new QGridLayout;
     QLabel *logo = new QLabel(aboutBox);
-    QLabel *texte = new QLabel(tr("<h1>Pimak Worlds 0.0.1a</h1><h3>Version numbers are useless</h3><p>Client based on Qt 4.7.0</p>"));
+    QLabel *text = new QLabel(tr("<h1>Pimak Worlds 0.0.1a</h1><h3>Version numbers are useless</h3><p>Client based on Qt 4.7.0</p>"));
     QPushButton *buttonClose = new QPushButton(tr("Close"));
     logo->setPixmap(QPixmap(":/img/pimak.png"));
-    texte->setAlignment(Qt::AlignHCenter);
+    text->setAlignment(Qt::AlignHCenter);
     logo->setAlignment(Qt::AlignHCenter);
     buttonClose->setIcon(QIcon(":/img/dialog-close.png"));
 
     connect(buttonClose,SIGNAL(clicked()),aboutBox,SLOT(close()));
     aboutBoxLayout->addWidget(logo,0,0,1,3);
-    aboutBoxLayout->addWidget(texte,4,0,1,3);
+    aboutBoxLayout->addWidget(text,4,0,1,3);
     aboutBoxLayout->addWidget(buttonClose,5,2);
 
     aboutBox->setLayout(aboutBoxLayout);
     aboutBox->show();
-
 }
 
 void MainWindow::on_displayWhisperAct_toggled(bool checked)
@@ -305,7 +300,4 @@ void MainWindow::updateTimer(int i)
     paintTimer->start(1000/i);
 }
 
-void MainWindow::showRenderZone()
-{
-    renderZone->show();
-}
+void MainWindow::showRenderZone() { renderZone->show(); }

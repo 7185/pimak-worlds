@@ -18,11 +18,12 @@ class MainWindow : public QMainWindow
     private:
         void initActions();
         void initMenus();
+        void initConnect();
 
     private slots:
         void about();
         void openSettingsWindow();
-        void appendMessage(QString mes = "",quint16 = 0);
+        void appendMessage(QString="",quint16=0);
         void updateList();
         void updateTimer(int);
 

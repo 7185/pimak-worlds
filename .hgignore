@@ -1,0 +1,5 @@
+client/client
+client/Makefile
+client/Ogre.log
+server/server
+server/Makefile
