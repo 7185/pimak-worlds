@@ -46,6 +46,8 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     moveCamera();
     ogreRoot->renderOneFrame();
     ogreRenderWindow->update();
+    QString str = QString::number(ogreRenderWindow->getAverageFPS())+" FPS";
+    emit dispAverageFps(str);
     e->accept();
 }
 
@@ -189,11 +191,11 @@ void OgreWidget::createScene()
     light->setDirection(Ogre::Vector3(1,-1,0));
 
 
-    Ogre::Entity* Sinbad =  ogreSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
-    Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
-    SinbadNode->setScale(5.0f,5.0f,5.0f);
-    SinbadNode->setPosition(Ogre::Vector3(0.0f,15.0f,0.0f));
-    SinbadNode->attachObject(Sinbad);
+    Ogre::Entity* House =  ogreSceneMgr->createEntity("House", "House.mesh");
+    Ogre::SceneNode* HouseNode = node->createChildSceneNode("HouseNode");
+    HouseNode->setScale(0.1f,0.1f,0.1f);
+    HouseNode->setPosition(Ogre::Vector3(0.0f,45.0f,0.0f));
+    HouseNode->attachObject(House);
 
 
     avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
@@ -252,16 +254,16 @@ void OgreWidget::moveCamera()
 
     if (ogreListener->ogreControls[LEFT]) {
         if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(-cameraNode->getOrientation().zAxis().z,0,cameraNode->getOrientation().zAxis().x));
-        else cameraNode->yaw(turbo*Ogre::Radian(0.05));
+        else cameraNode->yaw(turbo*Ogre::Radian(0.05f));
     }
     if (ogreListener->ogreControls[RIGHT]) {
         if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z,0,-cameraNode->getOrientation().zAxis().x));
-        else cameraNode->yaw(turbo*Ogre::Radian(-0.05));
+        else cameraNode->yaw(turbo*Ogre::Radian(-0.05f));
     }
     if (ogreListener->ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
-        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
+        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05f));
     if (ogreListener->ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
-        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
+        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05f));
 
     ogreThirdCamera->lookAt(cameraNode->getPosition());
 }

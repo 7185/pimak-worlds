@@ -112,7 +112,7 @@ void Connection::dataHandler(quint16 dataCode, QString data)
 
                 if (!users->contains(newId)) { // Creating user
                     users->insert(newId, new User(newId, newNickname));
-                    std::cout << "Creating user " << newId << std::endl;
+                    qDebug() << "Creating user " << newId;
                 }
             }
         }
@@ -120,7 +120,7 @@ void Connection::dataHandler(quint16 dataCode, QString data)
             if (!usersInList.contains(userId)) { // Deleting user
                delete users->value(userId);
                users->remove(userId);
-               std::cout << "Deleting user " << userId << std::endl;
+               qDebug() << "Deleting user " << userId;
             }
         }
 

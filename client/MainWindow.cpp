@@ -57,15 +57,8 @@ MainWindow::MainWindow()
 
     initActions();
     initMenus();
+    initBars();
     initConnect();
-
-    // Bars
-    QToolBar *toolB = addToolBar(tr("Toolbar"));
-    toolB->setIconSize(QSize(16,16));
-    toolB->addAction(firstCamAct);
-    toolB->addAction(thirdCamAct);
-    QStatusBar *statusB = statusBar();
-    statusB->show();
 
     setWindowIcon(QIcon(":/img/icon.png"));
     setWindowTitle(tr("Pimak Worlds"));
@@ -135,6 +128,16 @@ void MainWindow::initMenus()
     helpMenu->addAction(aboutAct);
 }
 
+void MainWindow::initBars()
+{
+    toolB = addToolBar(tr("Toolbar"));
+    toolB->setIconSize(QSize(16,16));
+    toolB->addAction(firstCamAct);
+    toolB->addAction(thirdCamAct);
+    statusB = statusBar();
+    statusB->show();
+}
+
 void MainWindow::initConnect()
 {
     connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
@@ -143,6 +146,7 @@ void MainWindow::initConnect()
     connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
     connect(connection,SIGNAL(listChanged()),this,SLOT(updateList()));
     connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
+    connect(renderZone,SIGNAL(dispAverageFps(QString)),statusB,SLOT(showMessage(QString)));
     QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
 }
 
