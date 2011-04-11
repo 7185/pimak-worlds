@@ -18,6 +18,7 @@ class MainWindow : public QMainWindow
     private:
         void initActions();
         void initMenus();
+        void initBars();
         void initConnect();
 
     private slots:
@@ -40,6 +41,9 @@ class MainWindow : public QMainWindow
 
     private:
         Connection *connection;
+
+        QToolBar *toolB;
+        QStatusBar *statusB;
 
         OgreWidget *renderZone;
         QTextEdit *chatZone;

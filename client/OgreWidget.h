@@ -15,6 +15,9 @@ public:
     ~OgreWidget();
     void setActiveCam(bool); //0: First, 1:Third
 
+signals:
+    void dispAverageFps(QString);
+
 protected:
     virtual void moveEvent(QMoveEvent *e);
     virtual void paintEvent(QPaintEvent *e);
