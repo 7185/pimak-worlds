@@ -134,7 +134,13 @@ void MainWindow::initBars()
     toolB->setIconSize(QSize(16,16));
     toolB->addAction(firstCamAct);
     toolB->addAction(thirdCamAct);
+    fpsLbl = new QLabel;
+    fpsLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    posLbl = new QLabel;
+    posLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
     statusB = statusBar();
+    statusB->addPermanentWidget(posLbl);
+    statusB->addPermanentWidget(fpsLbl);
     statusB->show();
 }
 
@@ -146,7 +152,9 @@ void MainWindow::initConnect()
     connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
     connect(connection,SIGNAL(listChanged()),this,SLOT(updateList()));
     connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
-    connect(renderZone,SIGNAL(dispAverageFps(QString)),statusB,SLOT(showMessage(QString)));
+    connect(renderZone,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
+    connect(renderZone,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
+
     QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
 }
 

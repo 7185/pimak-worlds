@@ -17,6 +17,7 @@ public:
 
 signals:
     void dispAverageFps(QString);
+    void dispPosition(QString);
 
 protected:
     virtual void moveEvent(QMoveEvent *e);

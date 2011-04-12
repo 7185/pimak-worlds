@@ -266,6 +266,8 @@ void OgreWidget::moveCamera()
         cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05f));
 
     ogreThirdCamera->lookAt(cameraNode->getPosition());
+
+    emit dispPosition("x:"+QString::number(cameraNode->getPosition().x)+" y:"+QString::number(cameraNode->getPosition().y)+" z:"+QString::number(cameraNode->getPosition().z));
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const { return 0; }
