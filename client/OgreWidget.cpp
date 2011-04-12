@@ -46,7 +46,7 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     moveCamera();
     ogreRoot->renderOneFrame();
     ogreRenderWindow->update();
-    QString str = QString::number(ogreRenderWindow->getAverageFPS())+" FPS";
+    QString str = QString::number(ogreRenderWindow->getAverageFPS(),'f',2)+" FPS";
     emit dispAverageFps(str);
     e->accept();
 }
@@ -267,7 +267,7 @@ void OgreWidget::moveCamera()
 
     ogreThirdCamera->lookAt(cameraNode->getPosition());
 
-    emit dispPosition("x:"+QString::number(cameraNode->getPosition().x)+" y:"+QString::number(cameraNode->getPosition().y)+" z:"+QString::number(cameraNode->getPosition().z));
+    emit dispPosition("x:"+QString::number(cameraNode->getPosition().x,'f',0)+" y:"+QString::number(cameraNode->getPosition().y,'f',0)+" z:"+QString::number(cameraNode->getPosition().z,'f',0));
 }
 
 QPaintEngine *OgreWidget:: paintEngine() const { return 0; }
