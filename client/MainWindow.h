@@ -44,6 +44,8 @@ class MainWindow : public QMainWindow
 
         QToolBar *toolB;
         QStatusBar *statusB;
+        QLabel *fpsLbl;
+        QLabel *posLbl;
 
         OgreWidget *renderZone;
         QTextEdit *chatZone;
