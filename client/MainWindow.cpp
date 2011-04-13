@@ -29,6 +29,15 @@ MainWindow::MainWindow(QWidget *parent) :
     nickColors->append("#FF0080");
     nickColors->append("#00FFFF");
     nickColors->append("#8000FF");
+
+    fpsLbl = new QLabel;
+    fpsLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    posLbl = new QLabel;
+    posLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    ui->statusBar->addPermanentWidget(posLbl);
+    ui->statusBar->addPermanentWidget(fpsLbl);
+    connect(ui->renderZone,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
+    connect(ui->renderZone,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
 }
 
 MainWindow::~MainWindow()

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 #include "SettingsWindow.h"
 #include "AboutWindow.h"
 #include "Connection.h"
@@ -43,6 +44,8 @@ private:
     QTimer *paintTimer;
     Connection *connection;
     QStringList *nickColors;
+    QLabel *fpsLbl;
+    QLabel *posLbl;
 };
 
 #endif // MAINWINDOW_H
