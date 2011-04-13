@@ -13,11 +13,11 @@ class Connection : public QObject
 
     public slots:
     void dataRecv();
-    void dataSend(quint16, QString = "");
+    void dataSend(quint16, QString="");
     void dataHandler(quint16, QString);
     void socketError(QAbstractSocket::SocketError);
 
-    void displayData(QString,quint16 = 0);
+    void displayData(QString,quint16=0);
 
     public:
     QTcpSocket* getSocket();

@@ -1,67 +1,26 @@
 #include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include "Protocol.h"
 
-
-MainWindow::MainWindow()
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
-    setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle(tr("Pimak Worlds"));
-    resize(800,600);
-
-    initActions();
-    initMenus();
-
-    // Toolbar
-    QToolBar *toolB = addToolBar(tr("Toolbar"));
-    toolB->setIconSize(QSize(16,16));
-    toolB->addAction(firstCamAct);
-    toolB->addAction(thirdCamAct);
-
-    // Statusbar
-    QStatusBar *statusB = statusBar();
-    statusB->show();
-
-    // Settings window
+    ui->setupUi(this);
+    ui->renderZone->hide();
     settings = new SettingsWindow;
-
-    // Main window
-    QWidget *mainHolder = new QWidget;
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    QSplitter *renderSplitter = new QSplitter;
-    renderSplitter->setOrientation(Qt::Vertical);
-
-    renderZone = new OgreWidget(renderSplitter);
-    renderZone->hide();
-
-    chatZone = new QTextEdit;
-    chatZone->setReadOnly(true);
-
-    message = new QLineEdit;
-    message->setObjectName("message");
-    message->setEnabled(false);
-
-    QHBoxLayout *whisperLayout = new QHBoxLayout;
-    whisperSelector = new QComboBox;
-    whisper = new QLineEdit;
-    whisper->setObjectName("whisper");
-    whisper->setEnabled(false);
-    whisperSelector->setEnabled(false);
-    whisperLayout->addWidget(whisperSelector);
-    whisperLayout->addWidget(whisper);
-
-    renderSplitter->addWidget(renderZone);
-    renderSplitter->addWidget(chatZone);
-    renderSplitter->setCollapsible(0,false);
-
-    mainLayout->addWidget(renderSplitter);
-    mainLayout->addWidget(message);
-    mainLayout->addLayout(whisperLayout);
-
-    mainHolder->setLayout(mainLayout);
-    setCentralWidget(mainHolder);
-
+    about = new AboutWindow;
     connection = new Connection;
+    connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
+    connect(connection->getSocket(), SIGNAL(disconnected()), this,SLOT(clientDisconnect()));;;
+    connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
+    connect(connection,SIGNAL(listChanged()),this,SLOT(updateList()));
+
+    paintTimer = new QTimer;
+    paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd
+    connect(paintTimer,SIGNAL(timeout()),ui->renderZone,SLOT(update()));
+    connect(settings,SIGNAL(fpsChanged(int)),this,SLOT(updateTimer(int)));
+
     nickColors = new QStringList;
     nickColors->append("#666666");
     nickColors->append("#0080FF");
@@ -70,176 +29,118 @@ MainWindow::MainWindow()
     nickColors->append("#FF0080");
     nickColors->append("#00FFFF");
     nickColors->append("#8000FF");
-
-    paintTimer = new QTimer;
-    paintTimer->start(1000/settings->getFps()->value()); //ton oeil en voit que 10 par seconde pd
-
-    connect(settings->getFps(),SIGNAL(valueChanged(int)),this,SLOT(updateTimer(int)));
-    connect(paintTimer,SIGNAL(timeout()),renderZone,SLOT(update()));
-
-    connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
-    connect(connection->getSocket(), SIGNAL(disconnected()), this, SLOT(clientDisconnect()));
-    connect(connection,SIGNAL(messageChanged()),this, SLOT(appendMessage()));
-    connect(connection,SIGNAL(listChanged()),this, SLOT(updateList()));
-
-    QMetaObject::connectSlotsByName(this); // NOTE: define objects' names to connect before calling this
 }
 
-void MainWindow::initActions()
+MainWindow::~MainWindow()
 {
-    // Actions - don't forget to declare them
-    connectAction = new QAction(tr("Connect"),this);
-    connectAction->setObjectName("connectAction");
-    connectAction->setIcon(QIcon(":/img/gtk-connect.png"));
-
-    disconnectAction = new QAction(tr("Disconnect"),this);
-    disconnectAction->setObjectName("disconnectAction");
-    disconnectAction->setIcon(QIcon(":/img/gtk-disconnect.png"));
-    disconnectAction->setEnabled(false);
-
-    quitAction = new QAction(tr("Quit"),this);
-    quitAction->setShortcut(QKeySequence(tr("Ctrl+Q")));
-    quitAction->setIcon(QIcon(":/img/application-exit.png"));
-    quitAction->setStatusTip(tr("Close the application"));
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-
-    settingsAction = new QAction(tr("Settings..."),this);
-    settingsAction->setShortcut(QKeySequence("Ctrl+P"));
-    settingsAction->setIcon(QIcon(":/img/preferences-desktop.png"));
-    settingsAction->setStatusTip(tr("Application settings"));
-    connect(settingsAction, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
-
-    displayWhisperAction = new QAction(tr("Whisper"),this);
-    displayWhisperAction->setObjectName("displayWhisperAction");
-    displayWhisperAction->setCheckable(true);
-    displayWhisperAction->setChecked(true);
-
-    aboutAction = new QAction(tr("About Pimak Worlds..."),this);
-    aboutAction->setIcon(QIcon(":/img/gtk-about.png"));
-    aboutAction->setStatusTip(tr("Information about the application"));
-    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
-
-    // Camera actions
-    firstCamAct = new QAction(tr("First person camera"),this);
-    firstCamAct->setIcon(QIcon(":/img/eyes.png"));
-    firstCamAct->setCheckable(true);
-    firstCamAct->setChecked(true);
-    firstCamAct->setObjectName("firstCamAct");
-
-    thirdCamAct = new QAction(tr("Third person camera"),this);
-    thirdCamAct->setIcon(QIcon(":/img/camera-video.png"));
-    thirdCamAct->setCheckable(true);
-    thirdCamAct->setChecked(false);
-    thirdCamAct->setObjectName("thirdCamAct");
-
+    delete ui;
 }
 
-void MainWindow::initMenus()
+void MainWindow::showRenderZone()
 {
-    // Menus
-    QMenu *fileMenu = menuBar()->addMenu(tr("File"));
-    fileMenu->addAction(connectAction);
-    fileMenu->addAction(disconnectAction);
-    fileMenu->addAction(quitAction);
-    QMenu *displayMenu = menuBar()->addMenu(tr("View"));
-    displayMenu->addAction(displayWhisperAction);
-    QMenu *toolsMenu = menuBar()->addMenu(tr("Tools"));
-    toolsMenu->addAction(settingsAction);
-    QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
-    helpMenu->addAction(aboutAction);
+    ui->renderZone->show();
 }
 
-void MainWindow::openSettingsWindow()
-{   settings->show();  }
-
-void MainWindow::about()
+void MainWindow::updateTimer(int i)
 {
-    // About Dialog
-    QDialog *aboutBox = new QDialog(this);
-    QGridLayout *aboutBoxLayout = new QGridLayout;
-    QLabel *logo = new QLabel(aboutBox);
-    QLabel *texte = new QLabel(tr("<h1>Pimak Worlds 0.0.1a</h1><h3>Version numbers are useless</h3><p>Client based on Qt 4.7.0</p>"));
-    QPushButton *buttonClose = new QPushButton(tr("Close"));
-    logo->setPixmap(QPixmap(":/img/pimak.png"));
-    texte->setAlignment(Qt::AlignHCenter);
-    logo->setAlignment(Qt::AlignHCenter);
-    buttonClose->setIcon(QIcon(":/img/dialog-close.png"));
-
-    connect(buttonClose,SIGNAL(clicked()),aboutBox,SLOT(close()));
-    aboutBoxLayout->addWidget(logo,0,0,1,3);
-    aboutBoxLayout->addWidget(texte,4,0,1,3);
-    aboutBoxLayout->addWidget(buttonClose,5,2);
-
-    aboutBox->setLayout(aboutBoxLayout);
-    aboutBox->show();
-
+    paintTimer->stop();
+    paintTimer->start(1000/i);
 }
 
-void MainWindow::on_displayWhisperAction_toggled(bool checked)
+void MainWindow::on_actQuit_triggered()
 {
-    whisperSelector->setVisible(checked);
-    whisper->setVisible(checked);
+    qApp->quit();
 }
 
-void MainWindow::on_firstCamAct_toggled(bool checked)
+void MainWindow::on_actSettings_triggered()
 {
-    if (checked) renderZone->setActiveCam(false);
-    thirdCamAct->setChecked(!checked);
+    settings->show();
 }
 
-void MainWindow::on_thirdCamAct_toggled(bool checked)
+void MainWindow::on_actAbout_triggered()
 {
-    if (checked) renderZone->setActiveCam(true);
-    firstCamAct->setChecked(!checked);
+    about->show();
 }
 
-void MainWindow::on_connectAction_triggered()
+void MainWindow::on_actFirstCam_toggled(bool checked)
 {
-    appendMessage(tr("Connecting to ")+settings->getHost()->text()+":"+QString::number(settings->getPort()->value())+tr("..."));
-    connection->getSocket()->abort(); // Closing old connexions
-    connection->getSocket()->connectToHost(settings->getHost()->text(), settings->getPort()->value());
+    if (checked) ui->renderZone->setActiveCam(false);
+    ui->actThirdCam->setChecked(!checked);
 }
 
-void MainWindow::on_disconnectAction_triggered()
+
+void MainWindow::on_actThirdCam_toggled(bool checked)
 {
-    connection->getSocket()->disconnectFromHost();
+    if (checked) ui->renderZone->setActiveCam(true);
+    ui->actFirstCam->setChecked(!checked);
 }
 
 void MainWindow::on_message_returnPressed()
 {
-    appendMessage(settings->getNickname()->text()+": "+message->text(),SC_PUBMSG);
-    connection->dataSend(CS_PUBMSG, message->text());
-    message->clear();
-    message->setFocus();
+    appendMessage(settings->getNickname()+": "+ui->message->text(),SC_PUBMSG);
+    connection->dataSend(CS_PUBMSG, ui->message->text());
+    ui->message->clear();
+    ui->message->setFocus();
 }
 
 void MainWindow::on_whisper_returnPressed()
 {
-    appendMessage("("+tr("to: ")+whisperSelector->currentText()+") "+whisper->text(),SC_PRIVMSG);
-    connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(whisperSelector->currentText()))+":"+whisper->text());
-    whisper->clear();
-    whisper->setFocus();
+    appendMessage("("+tr("to: ")+ui->whisperSelector->currentText()+") "+ui->whisper->text(),SC_PRIVMSG);
+    connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
+    ui->whisper->clear();
+    ui->whisper->setFocus();
+}
+
+void MainWindow::on_actConnect_triggered()
+{
+    appendMessage(tr("Connecting to ")+settings->getHost()+":"+QString::number(settings->getPort())+tr("..."));
+    connection->getSocket()->abort(); // Closing old connexions
+    connection->getSocket()->connectToHost(settings->getHost(), settings->getPort());
+}
+
+void MainWindow::on_actDisconnect_triggered()
+{
+    connection->getSocket()->disconnectFromHost();
 }
 
 void MainWindow::clientConnect()
 {
-    connection->dataSend(CS_AUTH,settings->getNickname()->text());
+    connection->dataSend(CS_AUTH,settings->getNickname());
     appendMessage(tr("Connection successful"));
-    connectAction->setEnabled(false);
-    disconnectAction->setEnabled(true);
-    message->setEnabled(true);
+    ui->actConnect->setEnabled(false);
+    ui->actDisconnect->setEnabled(true);
+    ui->message->setEnabled(true);
 }
 
 void MainWindow::clientDisconnect()
 {
     connection->clearUserlist();
     appendMessage(tr("Disconnected from the server"));
-    connectAction->setEnabled(true);
-    disconnectAction->setEnabled(false);
-    message->setEnabled(false);
-    whisper->setEnabled(false);
-    whisperSelector->clear();
-    whisperSelector->setEnabled(false);
+    ui->actConnect->setEnabled(true);
+    ui->actDisconnect->setEnabled(false);
+    ui->message->setEnabled(false);
+    ui->whisper->setEnabled(false);
+    ui->whisperSelector->clear();
+    ui->whisperSelector->setEnabled(false);
+}
+
+void MainWindow::updateList()
+{
+    ui->whisperSelector->clear();
+    if(connection->getUsers()->keys().isEmpty())
+    {
+        ui->whisper->setEnabled(false);
+        ui->whisperSelector->setEnabled(false);
+    }
+    else
+    {
+        foreach(quint16 userid, connection->getUsers()->keys())
+        {
+            ui->whisperSelector->addItem(connection->getUsers()->value(userid)->getNickname());
+        }
+        ui->whisper->setEnabled(true);
+        ui->whisperSelector->setEnabled(true);
+    }
 }
 
 void MainWindow::appendMessage(QString mes, quint16 type)
@@ -277,35 +178,11 @@ void MainWindow::appendMessage(QString mes, quint16 type)
     }
 
     if (settings->getDisplayTime()) mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
-    chatZone->append(mes);
+    ui->chatZone->append(mes);
 }
 
-void MainWindow::updateList()
+void MainWindow::on_actWhisper_toggled(bool checked)
 {
-    whisperSelector->clear();
-    if(connection->getUsers()->keys().isEmpty())
-    {
-        whisper->setEnabled(false);
-        whisperSelector->setEnabled(false);
-    }
-    else
-    {
-        foreach(quint16 userid, connection->getUsers()->keys())
-        {
-            whisperSelector->addItem(connection->getUsers()->value(userid)->getNickname());
-        }
-        whisper->setEnabled(true);
-        whisperSelector->setEnabled(true);
-    }
-}
-
-void MainWindow::updateTimer(int i)
-{
-    paintTimer->stop();
-    paintTimer->start(1000/i);
-}
-
-void MainWindow::showRenderZone()
-{
-    renderZone->show();
+    ui->whisperSelector->setVisible(checked);
+    ui->whisper->setVisible(checked);
 }

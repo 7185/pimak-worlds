@@ -1,21 +1,21 @@
-#include <QApplication>
+#include <QtGui/QApplication>
 #include "MainWindow.h"
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-
-    QApplication app(argc, argv);
-
     QString locale = QLocale::system().name().split('_')[0];
+
     QTranslator t;
-    t.load(QString("client_") + locale);
-    app.installTranslator(&t);
+    t.load(QString("pwclient_") + locale);
 
-    MainWindow window;
-    window.show();
-    window.showRenderZone();
+    QApplication a(argc, argv);
+    a.installTranslator(&t);
 
-    return app.exec();
+    MainWindow w;
+    w.show();
+    w.showRenderZone();
+
+    return a.exec();
 }

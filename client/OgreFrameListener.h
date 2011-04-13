@@ -7,7 +7,7 @@
 class OgreFrameListener : public Ogre::FrameListener
 {
    public:
-       OgreFrameListener(Ogre::Entity* ent);
+       OgreFrameListener(Ogre::Entity*);
        ~OgreFrameListener();
        bool frameStarted(const Ogre::FrameEvent &);
        bool frameEnded(const Ogre::FrameEvent &);
@@ -15,26 +15,14 @@ class OgreFrameListener : public Ogre::FrameListener
 
        void handleKeys(int, bool);
 
-       enum keys
-       {
-           UP=0,
-           RIGHT,
-           DOWN,
-           LEFT,
-           PGUP,
-           PGDOWN,
-           PLUS,
-           MINUS,
-           CTRL,
-           SHIFT
-       };
+       enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
        bool *ogreControls;
 
     private:
        bool running;
-       Ogre::Entity* _ent;
-       Ogre::AnimationState* _aniStateBase;
-       Ogre::AnimationState* _aniStateTop;
+       Ogre::Entity* ent;
+       Ogre::AnimationState* aniStateBase;
+       Ogre::AnimationState* aniStateTop;
 };
 
 #endif // OGREFRAMELISTENER_H
