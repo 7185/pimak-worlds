@@ -1,40 +1,42 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
 
-#include <QtGui>
-#include <QWidget>
+#include <QDialog>
+#include <QSettings>
+#include <QCloseEvent>
 
-class SettingsWindow : public QWidget
+namespace Ui {
+    class SettingsWindow;
+}
+
+class SettingsWindow : public QDialog
 {
     Q_OBJECT
 
-    public:
-         explicit SettingsWindow(QWidget *parent = 0);
-         void readSettings();
-         void writeSettings();
-         QLineEdit* getHost();
-         QLineEdit* getNickname();
-         QSpinBox* getPort();
-         QSpinBox* getFps();
-         bool getDisplayTime();
-         bool getDisplayColors();
+public:
+    explicit SettingsWindow(QWidget *parent = 0);
+    ~SettingsWindow();
+    void readSettings();
+    void writeSettings();
 
-    public slots:
-         void applyEvent();
+    QString getHost();
+    QString getNickname();
+    int getPort();
+    int getFps();
+    bool getDisplayTime();
+    bool getDisplayColors();
+signals:
+    void fpsChanged(int);
 
-    protected:
-         void closeEvent(QCloseEvent *event);
+private slots:
+     void on_buttonBox_accepted();
+     void on_buttonBox_rejected();
+protected:
+     void closeEvent(QCloseEvent *event);
 
-    private:
-         QSettings *settings;
-
-         QLineEdit *nickname;
-         QLineEdit *host;
-         QSpinBox *port;
-         QSpinBox *fps;
-         QCheckBox *displayTime;
-         QCheckBox *displayColors;
-
+private:
+    Ui::SettingsWindow *ui;
+    QSettings *settings;
 };
 
 #endif // SETTINGSWINDOW_H
