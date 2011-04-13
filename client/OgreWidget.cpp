@@ -19,18 +19,12 @@ OgreWidget::OgreWidget(QWidget *parent) :
 
 OgreWidget::~OgreWidget()
 {
-    if(ogreRenderWindow)
-    {
-        ogreRenderWindow->removeAllViewports();
-    }
+    if(ogreRenderWindow) ogreRenderWindow->removeAllViewports();
     
     if(ogreRoot)
     {
         ogreRoot->detachRenderTarget(ogreRenderWindow);
-        if(ogreSceneMgr)
-        {
-            ogreRoot->destroySceneManager(ogreSceneMgr);
-        }
+        if(ogreSceneMgr) ogreRoot->destroySceneManager(ogreSceneMgr);
     }
     delete ogreListener;
     delete ogreRoot;
@@ -52,6 +46,8 @@ void OgreWidget::paintEvent(QPaintEvent *e)
     moveCamera();
     ogreRoot->renderOneFrame();
     ogreRenderWindow->update();
+    QString str = QString::number(ogreRenderWindow->getAverageFPS(),'f',2)+" FPS";
+    emit dispAverageFps(str);
     e->accept();
 }
 
@@ -64,7 +60,7 @@ void OgreWidget::resizeEvent(QResizeEvent *e)
         const QSize &newSize = e->size();
         if(ogreRenderWindow)
         {
-            ogreRenderWindow->resize(newSize.width(), newSize.height());
+            ogreRenderWindow->resize(newSize.width(),newSize.height());
             ogreRenderWindow->windowMovedOrResized();
         }
         if(activeCamera)
@@ -90,7 +86,6 @@ void OgreWidget::initOgreSystem()
     ogreRoot->initialise(false);
 
     ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
-    
 
     Ogre::NameValuePairList viewConfig;
     Ogre::String widgetHandle;
@@ -98,13 +93,12 @@ void OgreWidget::initOgreSystem()
 #ifdef Q_WS_WIN
     widgetHandle = Ogre::StringConverter::toString((size_t)((HWND)winId()));
 #else
-
     QWidget *q_parent = dynamic_cast <QWidget *> (parent());
     QX11Info xInfo = x11Info();
 
-    widgetHandle = Ogre::StringConverter::toString ((unsigned long)xInfo.display()) +
-        ":" + Ogre::StringConverter::toString ((unsigned int)xInfo.screen()) +
-        ":" + Ogre::StringConverter::toString ((unsigned long)q_parent->winId());
+    widgetHandle = Ogre::StringConverter::toString((unsigned long)xInfo.display()) +
+        ":" + Ogre::StringConverter::toString((unsigned int)xInfo.screen()) +
+        ":" + Ogre::StringConverter::toString((unsigned long)q_parent->winId());
 #endif
 
     viewConfig["externalWindowHandle"] = widgetHandle;
@@ -197,11 +191,11 @@ void OgreWidget::createScene()
     light->setDirection(Ogre::Vector3(1,-1,0));
 
 
-    Ogre::Entity* Sinbad =  ogreSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
-    Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
-    SinbadNode->setScale(5.0f,5.0f,5.0f);
-    SinbadNode->setPosition(Ogre::Vector3(0.0f,15.0f,0.0f));
-    SinbadNode->attachObject(Sinbad);
+    Ogre::Entity* House =  ogreSceneMgr->createEntity("House", "House.mesh");
+    Ogre::SceneNode* HouseNode = node->createChildSceneNode("HouseNode");
+    HouseNode->setScale(0.1f,0.1f,0.1f);
+    HouseNode->setPosition(Ogre::Vector3(0.0f,45.0f,0.0f));
+    HouseNode->attachObject(House);
 
 
     avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
@@ -243,7 +237,6 @@ void OgreWidget::setActiveCam(bool cam)
     else activeCamera = ogreFirstCamera;
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
     ogreViewport->setCamera(activeCamera);
-
 }
 
 void OgreWidget::moveCamera()
@@ -261,21 +254,20 @@ void OgreWidget::moveCamera()
 
     if (ogreListener->ogreControls[LEFT]) {
         if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(-cameraNode->getOrientation().zAxis().z,0,cameraNode->getOrientation().zAxis().x));
-        else cameraNode->yaw(turbo*Ogre::Radian(0.05));
+        else cameraNode->yaw(turbo*Ogre::Radian(0.05f));
     }
     if (ogreListener->ogreControls[RIGHT]) {
         if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z,0,-cameraNode->getOrientation().zAxis().x));
-        else cameraNode->yaw(turbo*Ogre::Radian(-0.05));
+        else cameraNode->yaw(turbo*Ogre::Radian(-0.05f));
     }
     if (ogreListener->ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
-        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05));
+        cameraPitchNode->pitch(turbo*Ogre::Radian(0.05f));
     if (ogreListener->ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
-        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05));
+        cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05f));
 
     ogreThirdCamera->lookAt(cameraNode->getPosition());
+
+    emit dispPosition("x:"+QString::number(cameraNode->getPosition().x,'f',0)+" y:"+QString::number(cameraNode->getPosition().y,'f',0)+" z:"+QString::number(cameraNode->getPosition().z,'f',0));
 }
 
-QPaintEngine *OgreWidget:: paintEngine() const
-{
-    return 0;
-}
+QPaintEngine *OgreWidget:: paintEngine() const { return 0; }

@@ -1,132 +1,62 @@
 #include "SettingsWindow.h"
+#include "ui_SettingsWindow.h"
 
 SettingsWindow::SettingsWindow(QWidget *parent) :
-        QWidget(parent)
+    QDialog(parent),
+    ui(new Ui::SettingsWindow)
 {
-    setWindowIcon(QIcon(":/img/icon.png"));
-    setWindowTitle(tr("Pimak Worlds - Settings"));
+    ui->setupUi(this);
 
-    // Settings window
     settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
-
-    QGridLayout *settingsBoxLayout = new QGridLayout;
-    QTabWidget *tabs = new QTabWidget;
-
-    QPushButton *buttonApply = new QPushButton(tr("Apply"));
-    QPushButton *buttonCancel = new QPushButton(tr("Cancel"));
-    buttonApply->setIcon(QIcon(":/img/dialog-apply.png"));
-    buttonCancel->setIcon(QIcon(":/img/dialog-cancel.png"));
-
-    // Connection tab
-    QWidget *tabConnection = new QWidget;
-    QVBoxLayout *layConnection = new QVBoxLayout;
-    QFormLayout *layServer = new QFormLayout;
-    QFormLayout *layIdent = new QFormLayout;
-    QGroupBox *gbServer = new QGroupBox(tr("Server"));
-    QGroupBox *gbIdent = new QGroupBox(tr("Identity"));
-
-    host = new QLineEdit;
-    port = new QSpinBox;
-    port->setMaximum(65535);
-    nickname = new QLineEdit;
-
-    layServer->addRow(tr("Host :"),host);
-    layServer->addRow(tr("Port :"),port);
-    layIdent->addRow(tr("Nickname :"),nickname);
-
-    gbServer->setLayout(layServer);
-    gbIdent->setLayout(layIdent);
-
-    layConnection->addWidget(gbServer);
-    layConnection->addWidget(gbIdent);
-    tabConnection->setLayout(layConnection);
-
-    // Display tab
-    QWidget *tabDisplay = new QWidget;
-    QVBoxLayout *layDisplay = new QVBoxLayout;
-    QFormLayout *layVideo = new QFormLayout;
-    QFormLayout *layChat = new QFormLayout;
-    QGroupBox *gbVideo = new QGroupBox(tr("Video"));
-    QGroupBox *gbChat = new QGroupBox(tr("Chat"));
-
-    fps = new QSpinBox;
-    fps->setMinimum(5);
-    fps->setMaximum(500);
-    layVideo->addRow(tr("Frame/sec."),fps);
-
-    displayTime = new QCheckBox(tr("Display time"));
-    displayColors = new QCheckBox(tr("Colored nicks"));
-    layChat->addRow(displayTime);
-    layChat->addRow(displayColors);
-
-    gbVideo->setLayout(layVideo);
-    gbChat->setLayout(layChat);
-
-    layDisplay->addWidget(gbVideo);
-    layDisplay->addWidget(gbChat);
-    tabDisplay->setLayout(layDisplay);
-
-    //
-
-    tabs->addTab(tabConnection,tr("Connection"));
-    tabs->addTab(tabDisplay,tr("Display"));
-
-    settingsBoxLayout->addWidget(tabs,0,0,2,4);
-    settingsBoxLayout->addWidget(buttonCancel,5,2);
-    settingsBoxLayout->addWidget(buttonApply,5,3);
-
-    connect(buttonCancel,SIGNAL(clicked()),this,SLOT(close()));
-    connect(buttonApply,SIGNAL(clicked()),this,SLOT(applyEvent()));
-
-    setLayout(settingsBoxLayout);
-
     readSettings();
+    connect(ui->framesSecSpinBox,SIGNAL(valueChanged(int)),this,SIGNAL(fpsChanged(int)));
+}
+
+SettingsWindow::~SettingsWindow()
+{
+    delete ui;
 }
 
 void SettingsWindow::readSettings()
 {
-    nickname->setText(settings->value("account/name").toString());
-    host->setText(settings->value("server/host").toString());
-    port->setValue(settings->value("server/port").toInt());
-    fps->setValue(settings->value("video/fps").toInt());
-    displayColors->setChecked(settings->value("misc/colorednicks").toBool());
-    displayTime->setChecked(settings->value("misc/displaytime").toBool());
+    ui->nicknameLineEdit->setText(settings->value("account/name").toString());
+    ui->adressLineEdit->setText(settings->value("server/host").toString());
+    ui->portSpinBox->setValue(settings->value("server/port").toInt());
+    ui->framesSecSpinBox->setValue(settings->value("video/fps").toInt());
+    ui->coloredNicksCheckBox->setChecked(settings->value("misc/colorednicks").toBool());
+    ui->displayTimeCheckBox->setChecked(settings->value("misc/displaytime").toBool());
 }
 
 void SettingsWindow::writeSettings()
 {
-    settings->setValue("account/name",nickname->text());
-    settings->setValue("server/host",host->text());
-    settings->setValue("server/port",port->value());
-    settings->setValue("video/fps",fps->value());
-    settings->setValue("misc/colorednicks",displayColors->isChecked());
-    settings->setValue("misc/displaytime",displayTime->isChecked());
+    settings->setValue("account/name",ui->nicknameLineEdit->text());
+    settings->setValue("server/host",ui->adressLineEdit->text());
+    settings->setValue("server/port",ui->portSpinBox->value());
+    settings->setValue("video/fps",ui->framesSecSpinBox->value());
+    settings->setValue("misc/colorednicks",ui->coloredNicksCheckBox->isChecked());
+    settings->setValue("misc/displaytime",ui->displayTimeCheckBox->isChecked());
 }
 
-void SettingsWindow::applyEvent() {
-    writeSettings();
-    close();
-}
+QString SettingsWindow::getHost() { return ui->adressLineEdit->text(); }
+QString SettingsWindow::getNickname() { return ui->nicknameLineEdit->text(); }
+int SettingsWindow::getPort() { return ui->portSpinBox->value(); }
+int SettingsWindow::getFps() { return ui->framesSecSpinBox->value(); }
+bool SettingsWindow::getDisplayTime() { return ui->displayTimeCheckBox->isChecked(); }
+bool SettingsWindow::getDisplayColors() { return ui->coloredNicksCheckBox->isChecked(); }
 
-void SettingsWindow::closeEvent(QCloseEvent *event) {
+void SettingsWindow::closeEvent(QCloseEvent *event)
+{
     readSettings();
     event->accept();
 }
 
-QLineEdit* SettingsWindow::getHost()
-{ return host; }
+void SettingsWindow::on_buttonBox_accepted()
+{
+    writeSettings();
+    close();
+}
 
-QLineEdit* SettingsWindow::getNickname()
-{ return nickname; }
-
-QSpinBox* SettingsWindow::getPort()
-{ return port; }
-
-QSpinBox* SettingsWindow::getFps()
-{ return fps; }
-
-bool SettingsWindow::getDisplayTime()
-{ return displayTime->isChecked(); }
-
-bool SettingsWindow::getDisplayColors()
-{ return displayColors->isChecked(); }
+void SettingsWindow::on_buttonBox_rejected()
+{
+    close();
+}
