@@ -176,7 +176,7 @@ void OgreWidget::createScene()
 
     Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node1");
     ogreSceneMgr->getRootSceneNode()->addChild(node);
-
+/*
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
     Ogre::MeshManager::getSingleton().createPlane("plane",
      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
@@ -184,6 +184,66 @@ void OgreWidget::createScene()
     Ogre::Entity* ent = ogreSceneMgr->createEntity("LightPlaneEntity","plane");
     ogreSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
     ent->setMaterialName("grass");
+*/
+    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
+
+    Ogre::Vector3 lightdir(0.55f, -0.3f, 0.75f);
+    Ogre::Light* terLight = ogreSceneMgr->createLight("terrainLight");
+    terLight->setType(Ogre::Light::LT_DIRECTIONAL);
+    terLight->setDirection(lightdir);
+    terLight->setDiffuseColour(Ogre::ColourValue::White);
+    terLight->setSpecularColour(Ogre::ColourValue(0.4f, 0.4f, 0.4f));
+
+    ogreTerrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
+    ogreTerrainGlobals->setMaxPixelError(8);
+    ogreTerrainGlobals->setLightMapDirection(terLight->getDerivedDirection());
+    ogreTerrainGlobals->setCompositeMapDistance(3000);
+    ogreTerrainGlobals->setCompositeMapAmbient(ogreSceneMgr->getAmbientLight());
+    ogreTerrainGlobals->setCompositeMapDiffuse(terLight->getDiffuseColour());
+
+    ogreTerrain = OGRE_NEW Ogre::Terrain(ogreSceneMgr);
+    Ogre::Image img;
+    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    Ogre::Terrain::ImportData imp;
+    imp.inputImage = &img;
+    imp.terrainSize = img.getWidth();
+    imp.worldSize = 8000;
+    imp.inputScale = 600;
+    imp.minBatchSize = 33;
+    imp.maxBatchSize = 65;
+    imp.layerList.resize(3);
+    imp.layerList[0].worldSize = 100;
+    imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
+    imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
+    imp.layerList[1].worldSize = 30;
+    imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+    imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+    imp.layerList[2].worldSize = 200;
+    imp.layerList[2].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+    imp.layerList[2].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+    ogreTerrain->prepare(imp);
+    ogreTerrain->load();
+
+    Ogre::TerrainLayerBlendMap* blendMap1 = ogreTerrain->getLayerBlendMap(1);
+    float* pBlend1 = blendMap1->getBlendPointer();
+    for (Ogre::uint16 y=0;y<ogreTerrain->getLayerBlendMapSize();++y)
+    {
+        for (Ogre::uint16 x=0;x<ogreTerrain->getLayerBlendMapSize();++x)
+        {
+            Ogre::Real terrainX, terrainY;
+            blendMap1->convertImageToTerrainSpace(x, y, &terrainX, &terrainY);
+            Ogre::Real height = ogreTerrain->getHeightAtTerrainPosition(terrainX, terrainY);
+            if(height < 200) *pBlend1 = 1;
+            *pBlend1++;
+        }
+    }
+    blendMap1->dirty();
+    blendMap1->update();
+
+    ogreTerrain->freeTemporaryResources();
+
 
     Ogre::Light* light = ogreSceneMgr->createLight("Light1");
     light->setType(Ogre::Light::LT_DIRECTIONAL);

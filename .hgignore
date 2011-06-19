@@ -1,5 +1,10 @@
-client/client
-client/Makefile
-client/Ogre.log
-server/server
-server/Makefile
+syntax: glob
+*.o
+moc_*
+ui_*
+qrc_*
+pwclient
+pwserver
+Makefile
+*.log
+*.pro.user
