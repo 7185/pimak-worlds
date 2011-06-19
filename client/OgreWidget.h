@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <Ogre.h>
+#include <OGRE/Terrain/OgreTerrain.h>
 
 #include "OgreFrameListener.h"
 
@@ -37,10 +38,12 @@ private:
     void moveCamera();
 
 private:
-    Ogre::Root         *ogreRoot;
-    Ogre::SceneManager *ogreSceneMgr;
-    Ogre::RenderWindow *ogreRenderWindow;
-    Ogre::Viewport     *ogreViewport;
+    Ogre::Root                 *ogreRoot;
+    Ogre::SceneManager         *ogreSceneMgr;
+    Ogre::RenderWindow         *ogreRenderWindow;
+    Ogre::Viewport             *ogreViewport;
+    Ogre::Terrain              *ogreTerrain;
+    Ogre::TerrainGlobalOptions *ogreTerrainGlobals;
     Ogre::Camera       *ogreFirstCamera;
     Ogre::Camera       *ogreThirdCamera; // 3rd view cam
     Ogre::Camera       *activeCamera;    // Current cam

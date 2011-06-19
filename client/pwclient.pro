@@ -10,7 +10,7 @@ TARGET = pwclient
 TEMPLATE = app
 
 INCLUDEPATH += . /usr/include/OGRE
-LIBS += -lOgreMain
+LIBS += -lOgreMain -lOgreTerrain
 
 SOURCES += main.cpp\
         MainWindow.cpp \
