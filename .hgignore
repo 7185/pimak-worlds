@@ -7,4 +7,5 @@ pwclient
 pwserver
 Makefile
 *.log
+*.ini
 *.pro.user
