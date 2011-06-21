@@ -26,6 +26,8 @@ OgreWidget::~OgreWidget()
         ogreRoot->detachRenderTarget(ogreRenderWindow);
         if(ogreSceneMgr) ogreRoot->destroySceneManager(ogreSceneMgr);
     }
+    OGRE_DELETE ogreTerrain;
+    OGRE_DELETE ogreTerrainGlobals;
     delete ogreListener;
     delete ogreRoot;
 }
@@ -188,10 +190,9 @@ void OgreWidget::createScene()
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
     Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
 
-    Ogre::Vector3 lightdir(0.55f, -0.3f, 0.75f);
     Ogre::Light* terLight = ogreSceneMgr->createLight("terrainLight");
     terLight->setType(Ogre::Light::LT_DIRECTIONAL);
-    terLight->setDirection(lightdir);
+    terLight->setDirection(Ogre::Vector3(0.55f,-0.3f,0.75f));
     terLight->setDiffuseColour(Ogre::ColourValue::White);
     terLight->setSpecularColour(Ogre::ColourValue(0.4f, 0.4f, 0.4f));
 
@@ -244,26 +245,18 @@ void OgreWidget::createScene()
 
     ogreTerrain->freeTemporaryResources();
 
-
-    Ogre::Light* light = ogreSceneMgr->createLight("Light1");
-    light->setType(Ogre::Light::LT_DIRECTIONAL);
-    light->setDiffuseColour(Ogre::ColourValue(1.0f,1.0f,1.0f));
-    light->setDirection(Ogre::Vector3(1,-1,0));
-
-
     Ogre::Entity* House =  ogreSceneMgr->createEntity("House", "House.mesh");
     Ogre::SceneNode* HouseNode = node->createChildSceneNode("HouseNode");
     HouseNode->setScale(0.1f,0.1f,0.1f);
-    HouseNode->setPosition(Ogre::Vector3(0.0f,45.0f,0.0f));
+    HouseNode->setPosition(Ogre::Vector3(1400.0f,55.0f,1020.0f));
     HouseNode->attachObject(House);
-
 
     avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
     
     ogreListener = new OgreFrameListener(avatar);
     ogreRoot->addFrameListener(ogreListener);
     
-    Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("AvatarNode");
+    Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("avatarNode");
     avatarNode->setPosition(Ogre::Vector3(0.0f,-5.0f,0.0f));
     avatarNode->yaw(Ogre::Degree(180.0f)); // 3rd view avatar 180° offset
     avatarNode->attachObject(avatar);
@@ -271,8 +264,7 @@ void OgreWidget::createScene()
     
     Ogre::SceneNode* nodeThirdView = cameraNode->createChildSceneNode("nodeThirdView");
     nodeThirdView->attachObject(ogreThirdCamera);
-    nodeThirdView->setPosition(Ogre::Vector3(0.0f,-1.0f,26.0f));
-    
+    nodeThirdView->setPosition(avatarNode->getPosition()+Ogre::Vector3(0.0f,4.0f,26.0));
 }
 
 void OgreWidget::keyPressEvent(QKeyEvent *e)
