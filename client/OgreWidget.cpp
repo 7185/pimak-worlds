@@ -112,37 +112,37 @@ void OgreWidget::initOgreSystem()
 
 void OgreWidget::setupNLoadResources()
 {
-        // Load resource paths from config file
-        Ogre::ConfigFile cf;
-        cf.load("resources.cfg");
+    // Load resource paths from config file
+    Ogre::ConfigFile cf;
+    cf.load("resources.cfg");
 
-        // Go through all sections & settings in the file
-        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    // Go through all sections & settings in the file
+    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-        Ogre::String secName, typeName, archName;
-        while (seci.hasMoreElements())
+    Ogre::String secName, typeName, archName;
+    while (seci.hasMoreElements())
+    {
+        secName = seci.peekNextKey();
+        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        Ogre::ConfigFile::SettingsMultiMap::iterator i;
+        for (i = settings->begin(); i != settings->end(); ++i)
         {
-                secName = seci.peekNextKey();
-                Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-                Ogre::ConfigFile::SettingsMultiMap::iterator i;
-                for (i = settings->begin(); i != settings->end(); ++i)
-                {
-                        typeName = i->first;
-                        archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                        // OS X does not set the working directory relative to the app,
-                        // In order to make things portable on OS X we need to provide
-                        // the loading with it's own bundle path location
-                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(Ogre::String(macBundlePath()
-                                                                              + "/" + archName), typeName, secName);
-#else
-                        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
-#endif
-                }
+            typeName = i->first;
+            archName = i->second;
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            // OS X does not set the working directory relative to the app,
+            // In order to make things portable on OS X we need to provide
+            // the loading with it's own bundle path location
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(Ogre::String(macBundlePath()
+                                                                      + "/" + archName), typeName, secName);
+    #else
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
+    #endif
         }
+    }
 
-        // Initialise, parse scripts etc
-        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    // Initialise, parse scripts etc
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
 
@@ -170,7 +170,7 @@ void OgreWidget::createViewport()
 
 void OgreWidget::createScene()
 {
-
+    ogreSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
     ogreSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1));
     ogreSceneMgr->setSkyDome(true,"CloudySky");
 
@@ -273,7 +273,6 @@ void OgreWidget::createScene()
     nodeThirdView->attachObject(ogreThirdCamera);
     nodeThirdView->setPosition(Ogre::Vector3(0.0f,-1.0f,26.0f));
     
-    ogreSceneMgr->setShadowTechnique(Ogre:: SHADOWTYPE_STENCIL_ADDITIVE);
 }
 
 void OgreWidget::keyPressEvent(QKeyEvent *e)
