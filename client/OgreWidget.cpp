@@ -109,6 +109,7 @@ void OgreWidget::initOgreSystem()
     setupNLoadResources();
     createCamera();
     createViewport();
+    createTerrain();
     createScene();
 }
 
@@ -162,22 +163,18 @@ void OgreWidget::createCamera()
 
 void OgreWidget::createViewport()
 {
-    //activeCamera = ogreFirstCamera;
     activeCamera = ogreFirstCamera;
     ogreViewport = ogreRenderWindow->addViewport(activeCamera);
-    ogreViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
+    ogreViewport->setBackgroundColour(Ogre::ColourValue(0.9,0.9,0.9));
     activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) / Ogre::Real(ogreViewport->getActualHeight()));
     // activeCamera->setPolygonMode(Ogre::PM_WIREFRAME);
 }
 
-void OgreWidget::createScene()
+void OgreWidget::createTerrain()
 {
     ogreSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
     ogreSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1));
     ogreSceneMgr->setSkyDome(true,"CloudySky");
-
-    Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node1");
-    ogreSceneMgr->getRootSceneNode()->addChild(node);
 /*
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
     Ogre::MeshManager::getSingleton().createPlane("plane",
@@ -244,12 +241,18 @@ void OgreWidget::createScene()
     blendMap1->update();
 
     ogreTerrain->freeTemporaryResources();
+}
 
-    Ogre::Entity* House =  ogreSceneMgr->createEntity("House", "House.mesh");
-    Ogre::SceneNode* HouseNode = node->createChildSceneNode("HouseNode");
-    HouseNode->setScale(0.1f,0.1f,0.1f);
-    HouseNode->setPosition(Ogre::Vector3(1400.0f,55.0f,1020.0f));
-    HouseNode->attachObject(House);
+void OgreWidget::createScene()
+{
+    Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node");
+    ogreSceneMgr->getRootSceneNode()->addChild(node);
+
+    Ogre::Entity* house =  ogreSceneMgr->createEntity("House", "House.mesh");
+    Ogre::SceneNode* houseNode = node->createChildSceneNode("HouseNode");
+    houseNode->setScale(0.1f,0.1f,0.1f);
+    houseNode->setPosition(Ogre::Vector3(1400.0f,55.0f,1020.0f));
+    houseNode->attachObject(house);
 
     avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
     

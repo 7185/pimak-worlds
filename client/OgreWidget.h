@@ -34,6 +34,7 @@ private:
     void setupNLoadResources();
     void createCamera();
     void createViewport();
+    void createTerrain();
     void createScene();
     void moveCamera();
 
