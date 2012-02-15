@@ -74,12 +74,10 @@ void Connection::dataHandler(quint16 dataCode, QString data)
     case SC_NICKINUSE:
         data = tr("This nick is already used. Please retry with another one");
         displayData(data,dataCode);
-        socket->disconnectFromHost(); // FIXME: should be managed by the server
         break;
     case SC_ERRONEOUSNICK:
         data = tr("Erroneous nickname. Please retry with another one");
         displayData(data,dataCode);
-        socket->disconnectFromHost(); // FIXME: should be managed by the server
         break;
     case SC_EVENT:
         displayData(data,dataCode);
