@@ -75,11 +75,13 @@ void Client::dataHandler(quint16 dataCode, QString data)
         }
         if (nickInUse) {
             sendTo(id,SC_NICKINUSE);
+            emit clientDisconnect();
             break;
         }
         else if (data.contains(":"))
         {
             sendTo(id,SC_ERRONEOUSNICK);
+            emit clientDisconnect();
             break;
         }
         else

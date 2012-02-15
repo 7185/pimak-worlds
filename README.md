@@ -1,5 +1,3 @@
-<!-- -*- markdown -*- -->
-
 Pimak Worlds
 ============
 
