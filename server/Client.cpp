@@ -135,7 +135,7 @@ void Client::sendList()
     {
         if (client->getId() != id) userlist.append(QString::number(client->getId())+":"+client->getNickname());
     }
-    std::cout << "[to: " << id << "] list " << userlist.join(";").toStdString() << std::endl;
+    std::cout << "[To: " << id << "] list " << userlist.join(";").toStdString() << std::endl;
     emit sendTo(id,SC_USERLIST,userlist.join(";"));
 }
 
@@ -166,12 +166,14 @@ void Client::sendTo(quint16 uid,const quint16 &messageCode, const QString &messa
     out << (quint16) (packet.size() - sizeof(quint16));
 
     clients[uid]->sendPacket(packet);
+    std::cout << "[To: " << uid << "] (" << messageCode << ") " << message.toStdString() << std::endl;
 }
 
 
 void Client::sendPacket(const QByteArray &packet)
 {
     clientTcp->write(packet);
+    clientTcp->waitForBytesWritten(500);
 }
 
 QString Client::getNickname()
