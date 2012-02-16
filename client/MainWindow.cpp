@@ -160,6 +160,8 @@ void MainWindow::appendMessage(QString mes, quint16 type)
         type = connection->getMessageType();
     }
 
+    mes = Qt::escape(mes);
+
     QStringList splitted;
     switch (type)
     {
