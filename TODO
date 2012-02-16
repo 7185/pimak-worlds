@@ -1,16 +1,16 @@
 TODO: Protocol 
 --------------
-* gestion des pings
-* interdire les ":" dans les nicks dans le qlinedit (ce qui autorise les espaces)
-  -- qvalidator ? inputmask ?
+* gestion des pings ?
+* gestion des déplacements
 
 TODO: Client
 ------------
+* entities pour les utilisateurs présents
 
 TODO: Server
 ------------
-* tester la synchronisation sur l'Internet
 * plus de robustesse (le client doit être incapable de le planter)
+  -> comment le planter actuellement ?
 
 Sur un plus long terme
 ----------------------
