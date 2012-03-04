@@ -173,7 +173,7 @@ void Client::sendTo(quint16 uid,const quint16 &messageCode, const QString &messa
 void Client::sendPacket(const QByteArray &packet)
 {
     clientTcp->write(packet);
-    clientTcp->waitForBytesWritten(500);
+    if (clientTcp->state() == QAbstractSocket::ConnectedState) clientTcp->waitForBytesWritten(500);
 }
 
 QString Client::getNickname()
