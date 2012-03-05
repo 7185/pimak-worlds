@@ -12,7 +12,22 @@ import io
 from ctypes import c_uint16, c_uint32
 import struct
 import binascii
-from collections import Callable
+
+
+# Client -> Server
+CS_AUTH = 0
+CS_PUBMSG = 1
+CS_PRIVMSG = 2
+CS_USERLIST = 6
+# Server -> Client
+SC_PUBMSG = 1
+SC_PRIVMSG = 2
+SC_EVENT = 3
+SC_JOIN = 4
+SC_PART = 5
+SC_USERLIST = 6
+SC_NICKINUSE = 7
+SC_ERRONEOUSNICK = 8
 
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), errors='backslashreplace', line_buffering=True)
 
@@ -77,29 +92,43 @@ class PW(object):
         l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c+s))))[0])
         self.raw(l+c+s)
 
-    def quit(self, reason=''):
-        self.send('QUIT', last=reason)
+    def auth(self, nick='Bot'):
+        self.send(CS_AUTH, nick)
+
+    def message(self, msg=''):
+        self.send(CS_PUBMSG, msg)
+        self._callback('on_self_message', msg)
 
 
     def _callback(self, name, *parameters):
         for inst in [self] + list(self.handlers.values()):
             f = getattr(inst, name, None)
-            if not isinstance(f, Callable):
+            if not hasattr(f, '__call__'):
                 continue
             self.log('calling %s() on instance %r' % (name, inst))
             f(*parameters)
 
     def _process_message(self, b):
+        self.log('!< '+ str(binascii.hexlify(b)))
         mlength = struct.unpack('>H',b[0:2])[0]
         code = struct.unpack('>H',b[2:4])[0]
-        ok = False 
-        if (code == 1):
+        if (code == SC_PUBMSG):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
                 params = s.split(':')
                 self._callback('on_message', params[0], params[1])
-                ok = True
+        elif (code == SC_PRIVMSG):
+            pass
+        elif (code == SC_JOIN):
+            slength = struct.unpack('>L',b[4:8])[0]
+            s = b[8:].decode('utf-16-be')
+            if len(s)*2 == slength:
+                self._callback('on_join', s)
+        elif (code == SC_PART):
+            slength = struct.unpack('>L',b[4:8])[0]
+            s = b[8:].decode('utf-16-be')
+            if len(s)*2 == slength:
+                self._callback('on_part', s)
             
-        if not ok:
-            self.log('!< '+ str(binascii.hexlify(b)))
+ 
