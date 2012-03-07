@@ -19,15 +19,17 @@ OgreWidget::OgreWidget(QWidget *parent) :
 
 OgreWidget::~OgreWidget()
 {
-    if(ogreRenderWindow) ogreRenderWindow->removeAllViewports();
-    
+    if(ogreTerrain)
+    {
+        OGRE_DELETE ogreTerrain;
+        OGRE_DELETE ogreTerrainGlobals;
+    }
+    if(ogreRenderWindow) ogreRenderWindow->removeAllViewports();    
     if(ogreRoot)
     {
         ogreRoot->detachRenderTarget(ogreRenderWindow);
         if(ogreSceneMgr) ogreRoot->destroySceneManager(ogreSceneMgr);
     }
-    OGRE_DELETE ogreTerrain;
-    OGRE_DELETE ogreTerrainGlobals;
     delete ogreListener;
     delete ogreRoot;
 }
@@ -270,6 +272,19 @@ void OgreWidget::createScene()
     nodeThirdView->setPosition(avatarNode->getPosition()+Ogre::Vector3(0.0f,4.0f,26.0));
 }
 
+void OgreWidget::createAvatar(User *u)
+{
+    if (ogreSceneMgr->hasEntity("Avatar_"+u->getNickname().toStdString()))
+            ogreSceneMgr->destroyEntity("Avatar_"+u->getNickname().toStdString());
+    u->avatar = ogreSceneMgr->createEntity("Avatar_"+u->getNickname().toStdString(), "Sinbad.mesh");
+    u->node = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
+    u->node->attachObject(u->avatar);
+}
+void OgreWidget::destroyAvatar(User *u)
+{
+    ogreSceneMgr->getRootSceneNode()->removeChild(u->node);
+    ogreSceneMgr->destroyEntity(u->avatar);
+}
 void OgreWidget::keyPressEvent(QKeyEvent *e)
 {
    if (e->isAutoRepeat()) return;

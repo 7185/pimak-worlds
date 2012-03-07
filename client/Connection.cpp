@@ -69,7 +69,7 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         split.removeAt(0);
         data = sender+": "+split.join(":");
         displayData(data,dataCode);
-        emit listChanged();
+        // emit listChanged();
         break;
     case SC_NICKINUSE:
         data = tr("This nick is already used. Please retry with another one");
@@ -109,16 +109,18 @@ void Connection::dataHandler(quint16 dataCode, QString data)
                  */
 
                 if (!users->contains(newId)) { // Creating user
-                    users->insert(newId, new User(newId, newNickname));
-                    qDebug() << "Creating user " << newId;
+                    User *newUser = new User(newId, newNickname);
+                    emit userCreated(newUser);
+                    users->insert(newId, newUser);
                 }
             }
         }
         foreach(quint16 userId, users->keys()) { // Finding users to delete
             if (!usersInList.contains(userId)) { // Deleting user
-               delete users->value(userId);
-               users->remove(userId);
-               qDebug() << "Deleting user " << userId;
+                User *oldUser = users->value(userId);
+                emit userDeleted(oldUser);
+                delete oldUser;
+                users->remove(userId);
             }
         }
 
@@ -165,7 +167,9 @@ void Connection::clearUserlist()
 {
     foreach(quint16 id, users->keys())
     {
-        delete users->value(id);
+        User *oldUser = users->value(id);
+        emit userDeleted(oldUser);
+        delete oldUser;
         users->remove(id);
     }
 }

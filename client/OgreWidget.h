@@ -6,6 +6,7 @@
 #include <OGRE/Terrain/OgreTerrain.h>
 
 #include "OgreFrameListener.h"
+#include "User.h"
 
 class OgreWidget : public QWidget
 {
@@ -15,6 +16,10 @@ public:
     OgreWidget(QWidget *parent=0);
     ~OgreWidget();
     void setActiveCam(bool); //0: First, 1:Third
+
+public slots:
+        void createAvatar(User *u);
+        void destroyAvatar(User *u);
 
 signals:
     void dispAverageFps(QString);
