@@ -14,7 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(connection->getSocket(), SIGNAL(connected()), this, SLOT(clientConnect()));
     connect(connection->getSocket(), SIGNAL(disconnected()), this,SLOT(clientDisconnect()));;;
     connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
-    connect(connection,SIGNAL(listChanged()),this,SLOT(updateList()));
+    connect(connection,SIGNAL(listChanged()),this,SLOT(updateWhisperList()));
+    connect(connection,SIGNAL(userCreated(User*)),ui->renderZone,SLOT(createAvatar(User*)));
+    connect(connection,SIGNAL(userDeleted(User*)),ui->renderZone,SLOT(destroyAvatar(User*)));
 
     paintTimer = new QTimer;
     paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd
@@ -98,6 +100,7 @@ void MainWindow::on_whisper_returnPressed()
     connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
     ui->whisper->clear();
     ui->whisper->setFocus();
+    ui->renderZone->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
 }
 
 void MainWindow::on_actConnect_triggered()
@@ -133,7 +136,7 @@ void MainWindow::clientDisconnect()
     ui->whisperSelector->setEnabled(false);
 }
 
-void MainWindow::updateList()
+void MainWindow::updateWhisperList()
 {
     ui->whisperSelector->clear();
     if(connection->getUsers()->keys().isEmpty())

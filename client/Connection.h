@@ -16,7 +16,6 @@ class Connection : public QObject
     void dataSend(quint16, QString="");
     void dataHandler(quint16, QString);
     void socketError(QAbstractSocket::SocketError);
-
     void displayData(QString,quint16=0);
 
     public:
@@ -30,6 +29,8 @@ class Connection : public QObject
     signals:
     void messageChanged();
     void listChanged();
+    void userCreated(User*);
+    void userDeleted(User*);
 
     private:
     QMap<quint16, User*> *users;

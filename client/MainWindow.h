@@ -25,7 +25,7 @@ private slots:
     void on_actSettings_triggered();
     void on_actAbout_triggered();
     void updateTimer(int);
-    void updateList();
+    void updateWhisperList();
     void clientConnect();
     void clientDisconnect();
     void on_actFirstCam_toggled(bool );

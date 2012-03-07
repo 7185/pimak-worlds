@@ -2,6 +2,7 @@
 #define USER_H
 
 #include <QtNetwork>
+#include <Ogre.h>
 
 class User : public QObject
 {
@@ -12,6 +13,9 @@ class User : public QObject
         QString getNickname();
         quint16 getId();
 
+    public:
+        Ogre::Entity *avatar;
+        Ogre::SceneNode *node;
     private:
         QString *nickname;
         quint16 id;
