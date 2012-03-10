@@ -12,25 +12,17 @@ import io
 from ctypes import c_uint16, c_uint32
 import struct
 import binascii
-
-
-# Client -> Server
-CS_AUTH = 0
-CS_PUBMSG = 1
-CS_PRIVMSG = 2
-CS_USERLIST = 6
-# Server -> Client
-SC_PUBMSG = 1
-SC_PRIVMSG = 2
-SC_EVENT = 3
-SC_JOIN = 4
-SC_PART = 5
-SC_USERLIST = 6
-SC_NICKINUSE = 7
-SC_ERRONEOUSNICK = 8
+from protocol import *
 
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), errors='backslashreplace', line_buffering=True)
 
+def update_protocol(filename='../server/Protocol.h'):
+    '''python -c "import pwlib; pwlib.update_protocol()" > protocol.py'''
+    f = open(filename, 'r')
+    for line in f.readlines():
+        l = list(filter(None, line.split(' ')))
+        if l[0] == '#define' and len(l)==3:
+            print(l[1]+'='+l[2][:-1])
 
 def qstring(string):
     msg = bytes(string,'utf-16-be')
@@ -43,7 +35,11 @@ class PW(object):
 
         self.connected = False
         self.enabled = True
-
+        self.x = 0
+        self.y = 0
+        self.w = 0
+        self.pitch = 0
+        self.yaw = 0
         self.handlers = {}
 
     def connect(self, host, port = 6667, use_ssl=False):
@@ -95,10 +91,13 @@ class PW(object):
     def auth(self, nick='Bot'):
         self.send(CS_AUTH, nick)
 
-    def message(self, msg=''):
-        self.send(CS_PUBMSG, msg)
-        self._callback('on_self_message', msg)
+    def message_public(self, msg=''):
+        self.send(CS_MSG_PUBLIC, msg)
+        self._callback('on_self_message_public', msg)
 
+    def message_private(self, user, msg=''):
+        self.send(CS_MSG_PRIVATE, '3:'+msg) #TODO: Userlist
+        self._callback('on_self_message_public', msg)
 
     def _callback(self, name, *parameters):
         for inst in [self] + list(self.handlers.values()):
@@ -112,23 +111,33 @@ class PW(object):
         self.log('!< '+ str(binascii.hexlify(b)))
         mlength = struct.unpack('>H',b[0:2])[0]
         code = struct.unpack('>H',b[2:4])[0]
-        if (code == SC_PUBMSG):
+        if (code == SC_ER_NICKINUSE):
+            self._callback('on_connect_error',SC_ER_NICKINUSE)
+        elif (code == SC_ER_ERRONEOUSNICK):
+            self._callback('on_connect_error',SC_ER_ERRONEOUSNICK)
+        elif (code == SC_MSG_PUBLIC):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
                 params = s.split(':')
-                self._callback('on_message', params[0], params[1])
-        elif (code == SC_PRIVMSG):
-            pass
-        elif (code == SC_JOIN):
+                self._callback('on_message_public', params[0], ':'.join(params[1:]))
+        elif (code == SC_MSG_PRIVATE):
+            slength = struct.unpack('>L',b[4:8])[0]
+            s = b[8:].decode('utf-16-be')
+            if len(s)*2 == slength:
+                params = s.split(':')
+                self._callback('on_message_private', params[0], ':'.join(params[1:]))
+        elif (code == SC_USER_JOIN):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
                 self._callback('on_join', s)
-        elif (code == SC_PART):
+        elif (code == SC_USER_PART):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
                 self._callback('on_part', s)
+        else:
+            self.log("Can't handle packet.")
             
  

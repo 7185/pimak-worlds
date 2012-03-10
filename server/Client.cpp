@@ -45,15 +45,45 @@ void Client::dataRecv()
         quint16 messageCode;
         in >> messageCode;
 
-        QString message;
-        in >> message;
+        if (messageCode < 0x10)
+        {
+            QString message;
+            in >> message;
 
-        if (nickname->isEmpty())
-            std::cout << "[From: " << id << "] (" << messageCode << ") " << message.toStdString() << std::endl;
+            if (nickname->isEmpty())
+                std::cout << "[From: " << id << "] (" << messageCode << ") " << message.toStdString() << std::endl;
+            else
+                std::cout << "[From: " << id << " (" << nickname->toStdString() << ")] (" << messageCode << ") " << message.toStdString() << std::endl;
+            dataHandler(messageCode, message);
+        }
         else
-            std::cout << "[From: " << id << " (" << nickname->toStdString() << ")] (" << messageCode << ") " << message.toStdString() << std::endl;
-        dataHandler(messageCode, message);
+        {
+            in >> x;
+            in >> y;
+            in >> z;
+            in >> pitch;
+            in >> yaw;
 
+            dataHandler(messageCode);
+        }
+    }
+}
+
+void Client::dataHandler(quint16 dataCode)
+{
+    switch (dataCode) {
+    case CS_AVATAR_POSITION:
+//TODO: timer
+        foreach (quint16 userId, clients.keys())
+        {
+            if (userId != id) emit sendDataTo(userId,SC_AVATAR_POSITION);
+        }
+        break;
+    default:
+        if (nickname->isEmpty())
+            std::cout << "UID " << id << " sent an unknown request!" << std::endl;
+        else
+            std::cout << "UID " << id << " (" << nickname->toStdString() << ") sent an unknown request!" << std::endl;
     }
 }
 
@@ -74,40 +104,43 @@ void Client::dataHandler(quint16 dataCode, QString data)
             }
         }
         if (nickInUse) {
-            sendTo(id,SC_NICKINUSE);
+            sendTo(id,SC_ER_NICKINUSE);
             emit clientDisconnect();
             break;
         }
         else if (data.contains(":"))
         {
-            sendTo(id,SC_ERRONEOUSNICK);
+            sendTo(id,SC_ER_ERRONEOUSNICK);
             emit clientDisconnect();
             break;
         }
         else
         {
             *nickname=data;
-            sendToAll(SC_JOIN,*nickname);
+            sendToAll(SC_USER_JOIN,*nickname);
             break;
         }
-    case CS_PUBMSG:
+    case CS_MSG_PUBLIC:
         foreach (quint16 userId, clients.keys())
         {
-            if (userId != id) emit sendTo(userId,SC_PUBMSG,*nickname+":"+data);
+            if (userId != id) emit sendTo(userId,SC_MSG_PUBLIC,*nickname+":"+data);
         }
         break;
-    case CS_USERLIST:
+    case CS_USER_LIST:
         emit sendList();
         break;
-    case CS_PRIVMSG:
+    case CS_MSG_PRIVATE:
         splitted=data.split(":");
         receiver=splitted[0];
-        foreach (Client *client, clients)
+        if (receiver.toUShort()!=id) // prevent self private messages
         {
-            if (client->getId() == receiver.toUShort())
+            foreach (Client *client, clients)
             {
-                splitted[0] = *nickname; // set the sender name
-                sendTo(client->getId(),SC_PRIVMSG,splitted.join(":"));
+                if (client->getId() == receiver.toUShort())
+                {
+                    splitted[0] = *nickname; // replace by the sender name
+                    sendTo(client->getId(),SC_MSG_PRIVATE,splitted.join(":"));
+                }
             }
         }
         break;
@@ -123,7 +156,7 @@ void Client::dataHandler(quint16 dataCode, QString data)
 
 void Client::clientDisconnect()
 {
-    if (!nickname->isEmpty()) emit sendToAll(SC_PART,*nickname);
+    if (!nickname->isEmpty()) emit sendToAll(SC_USER_PART,*nickname);
     // We let the Client delete itself
     deleteLater();
 }
@@ -136,7 +169,7 @@ void Client::sendList()
         if (client->getId() != id) userlist.append(QString::number(client->getId())+":"+client->getNickname());
     }
     std::cout << "[To: " << id << "] list " << userlist.join(";").toStdString() << std::endl;
-    emit sendTo(id,SC_USERLIST,userlist.join(";"));
+    emit sendTo(id,SC_USER_LIST,userlist.join(";"));
 }
 
 void Client::sendToAll(const quint16 &messageCode, const QString &message)
@@ -169,6 +202,22 @@ void Client::sendTo(quint16 uid,const quint16 &messageCode, const QString &messa
     std::cout << "[To: " << uid << "] (" << messageCode << ") " << message.toStdString() << std::endl;
 }
 
+void Client::sendDataTo(quint16 uid,const quint16 &messageCode)
+{
+    QByteArray packet;
+    QDataStream out(&packet, QIODevice::WriteOnly);
+    out << (quint16) 0;
+    out << (quint16) messageCode;
+    out << x;
+    out << y;
+    out << z;
+    out << pitch;
+    out << yaw;
+    out.device()->seek(0);
+    out << (quint16) (packet.size() - sizeof(quint16));
+
+    clients[uid]->sendPacket(packet);
+}
 
 void Client::sendPacket(const QByteArray &packet)
 {

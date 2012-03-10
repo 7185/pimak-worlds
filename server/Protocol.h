@@ -1,33 +1,25 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-/******************************************************
- * Packet
- *
- *    quint16     quint16            QString
- * +-----------+-----------+------------------------+
- * |messageSize|messageCode|         message        |
- * +-----------+-----------+------------------------+
- *       |
- *       +---->[     sizeof(messageCode+message)    ]
- *
- ******************************************************/
-
 // Client -> Server
-#define CS_AUTH       0
-#define CS_PUBMSG     1
-#define CS_PRIVMSG    2
-#define CS_USERLIST   6
+#define CS_AUTH             0x00
+#define CS_MSG_PUBLIC       0x01
+#define CS_MSG_PRIVATE      0x02
+#define CS_HEARTBEAT        0x04
+#define CS_USER_LIST        0x06
+
+#define CS_AVATAR_POSITION  0x10
 
 // Server -> Client
-#define SC_PUBMSG     1
-#define SC_PRIVMSG    2
-#define SC_EVENT      3
-#define SC_JOIN       4
-#define SC_PART       5
-#define SC_USERLIST   6
-#define SC_NICKINUSE  7
-#define SC_ERRONEOUSNICK 8
+#define SC_MSG_PUBLIC       0x01
+#define SC_MSG_PRIVATE      0x02
+#define SC_MSG_EVENT        0x03
+#define SC_USER_JOIN        0x04
+#define SC_USER_PART        0x05
+#define SC_USER_LIST        0x06
+#define SC_ER_NICKINUSE     0x07
+#define SC_ER_ERRONEOUSNICK 0x08
 
+#define SC_AVATAR_POSITION  0x10
 
 #endif

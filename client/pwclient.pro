@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     Connection.cpp \
     User.cpp
 
-HEADERS  += MainWindow.h \
+HEADERS  += Protocol.h \
+    MainWindow.h \
     OgreWidget.h \
     OgreFrameListener.h \
     SettingsWindow.h \

@@ -63,7 +63,7 @@ void Connection::dataHandler(quint16 dataCode, QString data)
     QList<quint16> usersInList;
 
     switch (dataCode) {
-    case SC_PUBMSG:
+    case SC_MSG_PUBLIC:
         split=data.split(":");
         sender=split[0];
         split.removeAt(0);
@@ -71,28 +71,28 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         displayData(data,dataCode);
         // emit listChanged();
         break;
-    case SC_NICKINUSE:
+    case SC_ER_NICKINUSE:
         data = tr("This nick is already used. Please retry with another one");
         displayData(data,dataCode);
         break;
-    case SC_ERRONEOUSNICK:
+    case SC_ER_ERRONEOUSNICK:
         data = tr("Erroneous nickname. Please retry with another one");
         displayData(data,dataCode);
         break;
-    case SC_EVENT:
+    case SC_MSG_EVENT:
         displayData(data,dataCode);
         break;
-    case SC_JOIN:
-        dataSend(CS_USERLIST);
+    case SC_USER_JOIN:
+        dataSend(CS_USER_LIST);
         data = data+tr(" just log in");
         displayData(data,dataCode);
         break;
-    case SC_PART:
-        dataSend(CS_USERLIST);
+    case SC_USER_PART:
+        dataSend(CS_USER_LIST);
         data = data+tr(" has quit");
         displayData(data,dataCode);
         break;
-    case SC_USERLIST:
+    case SC_USER_LIST:
         if (!data.isEmpty()) {
             foreach(QString pair, data.split(";")) {
                 quint16 newId = pair.split(":").at(0).toUShort();
@@ -126,7 +126,7 @@ void Connection::dataHandler(quint16 dataCode, QString data)
 
         emit listChanged();
         break;
-    case SC_PRIVMSG:
+    case SC_MSG_PRIVATE:
         split = data.split(":");
         sender=split[0];
         split.removeAt(0);
