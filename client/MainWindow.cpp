@@ -88,16 +88,16 @@ void MainWindow::on_actThirdCam_toggled(bool checked)
 
 void MainWindow::on_message_returnPressed()
 {
-    appendMessage(settings->getNickname()+": "+ui->message->text(),SC_PUBMSG);
-    connection->dataSend(CS_PUBMSG, ui->message->text());
+    appendMessage(settings->getNickname()+": "+ui->message->text(),SC_MSG_PUBLIC);
+    connection->dataSend(CS_MSG_PUBLIC, ui->message->text());
     ui->message->clear();
     ui->message->setFocus();
 }
 
 void MainWindow::on_whisper_returnPressed()
 {
-    appendMessage("("+tr("to: ")+ui->whisperSelector->currentText()+") "+ui->whisper->text(),SC_PRIVMSG);
-    connection->dataSend(CS_PRIVMSG,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
+    appendMessage("("+tr("to: ")+ui->whisperSelector->currentText()+") "+ui->whisper->text(),SC_MSG_PRIVATE);
+    connection->dataSend(CS_MSG_PRIVATE,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
     ui->whisper->clear();
     ui->whisper->setFocus();
     ui->renderZone->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
@@ -168,7 +168,7 @@ void MainWindow::appendMessage(QString mes, quint16 type)
     QStringList splitted;
     switch (type)
     {
-    case SC_PUBMSG:
+    case SC_MSG_PUBLIC:
         if (settings->getDisplayColors()) {
             splitted = mes.split(":");
             if (connection->getIdByNick(splitted[0]) == 0) splitted[0] = "<span style=\"color:"+nickColors->at(0)+";font-weight:bold;\">"+splitted[0]+"</span>";
@@ -176,16 +176,16 @@ void MainWindow::appendMessage(QString mes, quint16 type)
             mes = splitted.join(":");
         }
         mes = "<span style=\"color:black;font-weight:normal;font-style:normal\">"+mes+"</span>";
-    case SC_EVENT:
+    case SC_MSG_EVENT:
         mes = "<span style=\"color:orange;font-weight:bold;font-style:italic;\">"+mes+"</span>";
-    case SC_JOIN:
+    case SC_USER_JOIN:
         mes = "<span style=\"color:green;font-weight:normal;font-style:italic;\">"+mes+"</span>";
-    case SC_PART:
+    case SC_USER_PART:
         mes = "<span style=\"color:brown;font-weight:normal;font-style:italic;\">"+mes+"</span>";
-    case SC_PRIVMSG:
+    case SC_MSG_PRIVATE:
         mes = "<span style=\"color:blue;font-weight:normal;font-style:italic;\">"+mes+"</span>";
-    case SC_NICKINUSE:
-    case SC_ERRONEOUSNICK:
+    case SC_ER_NICKINUSE:
+    case SC_ER_ERRONEOUSNICK:
         mes = "<span style=\"color:red;font-weight:bold;font-style:normal;\">"+mes+"</span>";
     default:
         mes = "<span style=\"color:black;font-weight:bold;font-style:normal;\">"+mes+"</span>";
