@@ -279,11 +279,16 @@ void OgreWidget::createAvatar(User *u)
     u->avatar = ogreSceneMgr->createEntity("Avatar_"+u->getNickname().toStdString(), "Sinbad.mesh");
     u->node = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
     u->node->attachObject(u->avatar);
+    u->node->setPosition(1430.0f,10.0f,820.0f);
 }
 void OgreWidget::destroyAvatar(User *u)
 {
     ogreSceneMgr->getRootSceneNode()->removeChild(u->node);
     ogreSceneMgr->destroyEntity(u->avatar);
+}
+void OgreWidget::moveAvatar(User *u)
+{
+    u->node->setPosition(u->x,u->y,u->z);
 }
 void OgreWidget::keyPressEvent(QKeyEvent *e)
 {

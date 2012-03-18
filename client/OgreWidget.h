@@ -18,8 +18,9 @@ public:
     void setActiveCam(bool); //0: First, 1:Third
 
 public slots:
-        void createAvatar(User *u);
-        void destroyAvatar(User *u);
+     void createAvatar(User *u);
+     void destroyAvatar(User *u);
+     void moveAvatar(User *u);
 
 signals:
     void dispAverageFps(QString);

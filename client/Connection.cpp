@@ -46,11 +46,27 @@ void Connection::dataRecv()
     quint16 messageCode;
     in >> messageCode;
 
-    QString messageText;
-    in >> messageText;
+    if (messageCode < 0x10)
+    {
+        QString messageText;
+        in >> messageText;
 
-    dataHandler(messageCode,messageText);
-
+        dataHandler(messageCode,messageText);
+    }
+    else
+    {
+        quint16 id;
+        float x,y,z,pitch,yaw;
+        in >> id;
+        in >> x;
+        in >> y;
+        in >> z;
+        in >> pitch;
+        in >> yaw;
+        User *u = users->value(id);
+        u->setPosition(x,y,z,pitch,yaw);
+        emit userPosition(u);
+    }
     // we reset the messageSize to 0, waiting for next data
     messageSize = 0;
     }
@@ -69,7 +85,6 @@ void Connection::dataHandler(quint16 dataCode, QString data)
         split.removeAt(0);
         data = sender+": "+split.join(":");
         displayData(data,dataCode);
-        // emit listChanged();
         break;
     case SC_ER_NICKINUSE:
         data = tr("This nick is already used. Please retry with another one");
@@ -123,7 +138,6 @@ void Connection::dataHandler(quint16 dataCode, QString data)
                 users->remove(userId);
             }
         }
-
         emit listChanged();
         break;
     case SC_MSG_PRIVATE:

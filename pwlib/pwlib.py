@@ -9,7 +9,7 @@ import socket
 import threading
 import sys
 import io
-from ctypes import c_uint16, c_uint32
+from ctypes import c_uint16, c_uint32, c_float
 import struct
 import binascii
 from protocol import *
@@ -29,18 +29,29 @@ def qstring(string):
     l = struct.pack('<I',struct.unpack('>I',bytes(c_uint32(len(msg))))[0])
     return l+msg
 
-class PW(object):
-    def __init__(self, loggingEnabled = True):
-        self.loggingEnabled = loggingEnabled
-
-        self.connected = False
-        self.enabled = True
+class User(object):
+    def __init__(self, nick=""):
+        self.nickname = nick
         self.x = 0
         self.y = 0
-        self.w = 0
+        self.z = 0
         self.pitch = 0
         self.yaw = 0
+    def setposition(self,x,y,z,pitch,yaw):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.pitch = pitch
+        self.yaw = yaw
+
+class PW(User):
+    def __init__(self, loggingEnabled = True):
+        super(PW,self).__init__()
+        self.loggingEnabled = loggingEnabled
+        self.connected = False
+        self.enabled = True
         self.handlers = {}
+        self.userlist = {}
 
     def connect(self, host, port = 6667, use_ssl=False):
         '''Etablish a connection to a server'''
@@ -60,7 +71,7 @@ class PW(object):
     def run(self):
         while self.enabled:
             recv = self.sk.recv(0x100)
-            self._process_message(recv)
+            self._process_packet(recv)
 
         self.connected = False
         self.log('@ Disconnected')
@@ -73,6 +84,11 @@ class PW(object):
         thread.start()
         return thread
 
+    def getidbynick(self,nick):
+        for i in self.userlist.items():
+            if i[1].nickname == nick:
+                return i[0]
+
     def log(self, txt):
         if self.loggingEnabled:
             print(txt)
@@ -81,23 +97,38 @@ class PW(object):
         self.sk.send(b)
         self.log('> ' + str(binascii.hexlify(b)))
 
-
     def send(self,code,msg):
         c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(code)))[0])
         s = qstring(msg)
         l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c+s))))[0])
         self.raw(l+c+s)
 
-    def auth(self, nick='Bot'):
-        self.send(CS_AUTH, nick)
+    def asklist(self):
+        c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(CS_USER_LIST)))[0])
+        l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c))))[0])
+        self.raw(l+c)
+
+    def sendposition(self):
+        c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(CS_AVATAR_POSITION)))[0])
+        x = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.x)))[0])
+        y = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.y)))[0])
+        z = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.z)))[0])
+        pi = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.pitch)))[0])
+        ya = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.yaw)))[0])
+        l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c+x+y+z+pi+ya))))[0])
+        self.raw(l+c+x+y+z+pi+ya)
+        
+
+    def auth(self):
+        self.send(CS_AUTH, self.nickname)
 
     def message_public(self, msg=''):
         self.send(CS_MSG_PUBLIC, msg)
         self._callback('on_self_message_public', msg)
 
     def message_private(self, user, msg=''):
-        self.send(CS_MSG_PRIVATE, '3:'+msg) #TODO: Userlist
-        self._callback('on_self_message_public', msg)
+        self.send(CS_MSG_PRIVATE, str(user)+':'+msg)
+        self._callback('on_self_message_public', user, msg)
 
     def _callback(self, name, *parameters):
         for inst in [self] + list(self.handlers.values()):
@@ -107,9 +138,9 @@ class PW(object):
             self.log('calling %s() on instance %r' % (name, inst))
             f(*parameters)
 
-    def _process_message(self, b):
-        self.log('!< '+ str(binascii.hexlify(b)))
-        mlength = struct.unpack('>H',b[0:2])[0]
+    def _process_packet(self, b):
+        self.log('< '+ str(binascii.hexlify(b)))
+        plength = struct.unpack('>H',b[0:2])[0]
         code = struct.unpack('>H',b[2:4])[0]
         if (code == SC_ER_NICKINUSE):
             self._callback('on_connect_error',SC_ER_NICKINUSE)
@@ -127,17 +158,38 @@ class PW(object):
             if len(s)*2 == slength:
                 params = s.split(':')
                 self._callback('on_message_private', params[0], ':'.join(params[1:]))
+        elif (code == SC_USER_LIST): 
+            slength = struct.unpack('>L',b[4:8])[0]
+            s = b[8:].decode('utf-16-be')
+            if len(s)*2 == slength:
+                l = s.split(';')
+                self.userlist.clear()
+                for c in l:
+                    self.userlist[c.split(':')[0]]=User(c.split(':')[1])
+                self._callback('on_user_list')
+        elif (code == SC_AVATAR_POSITION):
+            u = struct.unpack('>H',b[4:6])[0]
+            x = struct.unpack('>f',b[6:8])[0]
+            y = struct.unpack('>f',b[8:10])[0]
+            z = struct.unpack('>f',b[10:12])[0]
+            pitch = struct.unpack('>f',b[12:14])[0]
+            yaw = struct.unpack('>f',b[14:16])[0]
+            if u in self.userlist:
+                self.userlist[u].setposition(x,y,z,pitch,yaw)
+                self._callback('on_avatar_position',x,y,z,pitch,yaw)
         elif (code == SC_USER_JOIN):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
-                self._callback('on_join', s)
+                self.asklist()
+                self._callback('on_user_join', s)
         elif (code == SC_USER_PART):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
-                self._callback('on_part', s)
+                self.asklist()
+                self._callback('on_user_part', s)
         else:
-            self.log("Can't handle packet.")
+            self.log("! Can't handle packet.")
             
  
