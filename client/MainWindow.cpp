@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(connection,SIGNAL(listChanged()),this,SLOT(updateWhisperList()));
     connect(connection,SIGNAL(userCreated(User*)),ui->renderZone,SLOT(createAvatar(User*)));
     connect(connection,SIGNAL(userDeleted(User*)),ui->renderZone,SLOT(destroyAvatar(User*)));
+    connect(connection,SIGNAL(userPosition(User*)),ui->renderZone,SLOT(moveAvatar(User*)));
 
     paintTimer = new QTimer;
     paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd

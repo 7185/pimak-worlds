@@ -208,6 +208,7 @@ void Client::sendDataTo(quint16 uid,const quint16 &messageCode)
     QDataStream out(&packet, QIODevice::WriteOnly);
     out << (quint16) 0;
     out << (quint16) messageCode;
+    out << id;
     out << x;
     out << y;
     out << z;

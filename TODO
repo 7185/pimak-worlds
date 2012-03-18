@@ -1,17 +1,20 @@
-TODO: Protocol 
+TODO: Protocol
 --------------
-* gestion des pings ?
-* gestion des déplacements
+* gestion du HEARTBEAT (timeout sur socket)
+* grosse révision du protocole : éviter les split()
+  - utilisation des id dans les MSG_XXX
+  - SC_USER_LIST : listsize//id1//nickname1//id2//nickname2
 
 TODO: Client
 ------------
-* entities pour les utilisateurs présents
+* TEST :-)
 
 TODO: Server
 ------------
-* plus de robustesse (le client doit être incapable de le planter)
-  -> comment le planter actuellement ?
+* TEST :-)
 
 Sur un plus long terme
 ----------------------
 * vraie base de données pour les clients
+* interaction objets
+* persistance http (ressources sur serveur + cache local)

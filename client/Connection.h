@@ -31,6 +31,7 @@ class Connection : public QObject
     void listChanged();
     void userCreated(User*);
     void userDeleted(User*);
+    void userPosition(User*);
 
     private:
     QMap<quint16, User*> *users;
