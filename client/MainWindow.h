@@ -42,6 +42,7 @@ private:
     SettingsWindow *settings;
     AboutWindow *about;
     QTimer *paintTimer;
+    QTimer *posTimer;
     Connection *connection;
     QStringList *nickColors;
     QLabel *fpsLbl;

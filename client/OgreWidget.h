@@ -21,10 +21,12 @@ public slots:
      void createAvatar(User *u);
      void destroyAvatar(User *u);
      void moveAvatar(User *u);
+     void posSend();
 
 signals:
     void dispAverageFps(QString);
     void dispPosition(QString);
+    void positionSend(float,float,float,float,float);
 
 protected:
     virtual void moveEvent(QMoveEvent *e);

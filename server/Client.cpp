@@ -216,7 +216,6 @@ void Client::sendDataTo(quint16 uid,const quint16 &messageCode)
     out << yaw;
     out.device()->seek(0);
     out << (quint16) (packet.size() - sizeof(quint16));
-
     clients[uid]->sendPacket(packet);
 }
 

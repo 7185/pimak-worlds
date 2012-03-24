@@ -289,7 +289,18 @@ void OgreWidget::destroyAvatar(User *u)
 void OgreWidget::moveAvatar(User *u)
 {
     u->node->setPosition(u->x,u->y,u->z);
+    u->node->setOrientation(Ogre::Quaternion());
+    u->node->yaw(Ogre::Degree(180.0f));
+    u->node->yaw(Ogre::Radian(u->yaw));
+    u->node->pitch(Ogre::Radian(u->pitch));
 }
+void OgreWidget::posSend()
+{
+    emit positionSend(cameraNode->getPosition().x,cameraNode->getPosition().y,cameraNode->getPosition().z,
+                      cameraNode->getOrientation().getPitch().valueRadians(),
+                      cameraNode->getOrientation().getYaw().valueRadians());
+}
+
 void OgreWidget::keyPressEvent(QKeyEvent *e)
 {
    if (e->isAutoRepeat()) return;
