@@ -7,9 +7,9 @@ from time import strftime
 class Bot(PW):
     def __init__(self, *args, **kwargs):
         super(Bot, self).__init__(*args, **kwargs)
-        self.loggingEnabled = True
-        self.nickname = 'bobinota'
-        self.connect('heldroe.org',1338)
+        self.loggingEnabled = False
+        self.nickname = 'bobinot'
+        self.connect('localhost',1338)
 
     def on_connected(self):
         self.auth()
@@ -23,22 +23,25 @@ class Bot(PW):
         m = msg.split()
         if 'alo' in m: 
             self.message_public(user+': slt')
+        elif '!loc' in m:  
+            self.message_public(user+'')
         elif '!list' in m:
             s = ''
             for u in self.userlist:
-                s+=u+':'+self.userlist[u].nickname+' '
+                s+=str(u)+':'+self.userlist[u].nickname+' '
             self.message_public(s)
-        elif 'viens' in m:
-            u = self.userlist[self.getidbynick(user)]
-            self.setposition(u.x,u.y,u.z,u.pitch,u.yaw)
-            self.message_public('je vais en : '+str(u.x)+', '+str(u.y)+', '+str(u.z))
-            self.sendposition()
-
+        elif '!follow' in m:
+            u = self.getidbynick(user)
+            self.userlist[u].following = not self.userlist[u].following
     def on_message_private(self,user,msg):
         self.display('-'+user+'- '+msg)
         if 'alo' in msg.split(): 
             self.message_private(user,'slt')
-
+    def on_avatar_position(self,user,x,y,z,pi,ya):
+        u = self.userlist[user]
+        if u.following:
+            self.setposition(u.x,u.y,u.z,u.pitch,u.yaw)
+            self.sendposition()
     def on_user_join(self,user):
         self.display('* '+user+' has joined')
 

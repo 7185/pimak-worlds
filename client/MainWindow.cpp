@@ -24,6 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(paintTimer,SIGNAL(timeout()),ui->renderZone,SLOT(update()));
     connect(settings,SIGNAL(fpsChanged(int)),this,SLOT(updateTimer(int)));
 
+    posTimer = new QTimer;
+    posTimer->start(1000/5);
+    connect(posTimer,SIGNAL(timeout()),ui->renderZone,SLOT(posSend()));
+    connect(ui->renderZone,SIGNAL(positionSend(float,float,float,float,float)),connection,SLOT(positionSend(float,float,float,float,float)));
+
     nickColors = new QStringList;
     nickColors->append("#666666");
     nickColors->append("#0080FF");

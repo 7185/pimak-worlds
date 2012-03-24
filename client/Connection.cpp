@@ -29,6 +29,24 @@ void Connection::dataSend(quint16 msgCode, QString msgToSend)
 
 }
 
+void Connection::positionSend(float x, float y, float z, float pitch, float yaw)
+{
+    QByteArray packet;
+    QDataStream out(&packet, QIODevice::WriteOnly);
+
+    out << (quint16) 0;
+    out << (quint16) CS_AVATAR_POSITION;
+    out << x;
+    out << y;
+    out << z;
+    out << pitch;
+    out << yaw;
+    out.device()->seek(0);
+    out << (quint16) (packet.size()-sizeof(quint16));
+
+    socket->write(packet);
+}
+
 void Connection::dataRecv()
 {
     forever {

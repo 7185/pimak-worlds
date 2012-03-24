@@ -9,7 +9,7 @@ import socket
 import threading
 import sys
 import io
-from ctypes import c_uint16, c_uint32, c_float
+from ctypes import c_uint16, c_uint32, c_double
 import struct
 import binascii
 from protocol import *
@@ -37,6 +37,7 @@ class User(object):
         self.z = 0
         self.pitch = 0
         self.yaw = 0
+        self.following = False
     def setposition(self,x,y,z,pitch,yaw):
         self.x = x
         self.y = y
@@ -110,11 +111,11 @@ class PW(User):
 
     def sendposition(self):
         c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(CS_AVATAR_POSITION)))[0])
-        x = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.x)))[0])
-        y = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.y)))[0])
-        z = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.z)))[0])
-        pi = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.pitch)))[0])
-        ya = struct.pack('<f',struct.unpack('>f',bytes(c_float(self.yaw)))[0])
+        x = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.x)))[0])
+        y = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.y)))[0])
+        z = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.z)))[0])
+        pi = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.pitch)))[0])
+        ya = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.yaw)))[0])
         l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c+x+y+z+pi+ya))))[0])
         self.raw(l+c+x+y+z+pi+ya)
         
@@ -139,7 +140,7 @@ class PW(User):
             f(*parameters)
 
     def _process_packet(self, b):
-        self.log('< '+ str(binascii.hexlify(b)))
+        self.log('< '+ str(b))
         plength = struct.unpack('>H',b[0:2])[0]
         code = struct.unpack('>H',b[2:4])[0]
         if (code == SC_ER_NICKINUSE):
@@ -165,18 +166,18 @@ class PW(User):
                 l = s.split(';')
                 self.userlist.clear()
                 for c in l:
-                    self.userlist[c.split(':')[0]]=User(c.split(':')[1])
+                    self.userlist[int(c.split(':')[0])]=User(c.split(':')[1])
                 self._callback('on_user_list')
         elif (code == SC_AVATAR_POSITION):
             u = struct.unpack('>H',b[4:6])[0]
-            x = struct.unpack('>f',b[6:8])[0]
-            y = struct.unpack('>f',b[8:10])[0]
-            z = struct.unpack('>f',b[10:12])[0]
-            pitch = struct.unpack('>f',b[12:14])[0]
-            yaw = struct.unpack('>f',b[14:16])[0]
-            if u in self.userlist:
+            x = struct.unpack('>d',b[6:14])[0]
+            y = struct.unpack('>d',b[14:22])[0]
+            z = struct.unpack('>d',b[22:30])[0]
+            pitch = struct.unpack('>d',b[30:38])[0]
+            yaw = struct.unpack('>d',b[38:46])[0]
+            if u in self.userlist.keys():
                 self.userlist[u].setposition(x,y,z,pitch,yaw)
-                self._callback('on_avatar_position',x,y,z,pitch,yaw)
+                self._callback('on_avatar_position',u,x,y,z,pitch,yaw)
         elif (code == SC_USER_JOIN):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')

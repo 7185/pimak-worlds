@@ -14,6 +14,7 @@ class Connection : public QObject
     public slots:
     void dataRecv();
     void dataSend(quint16, QString="");
+    void positionSend(float, float, float, float, float);
     void dataHandler(quint16, QString);
     void socketError(QAbstractSocket::SocketError);
     void displayData(QString,quint16=0);
