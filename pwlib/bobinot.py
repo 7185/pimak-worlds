@@ -9,7 +9,8 @@ class Bot(PW):
         super(Bot, self).__init__(*args, **kwargs)
         self.loggingEnabled = False
         self.nickname = 'bobinot'
-        self.connect('localhost',1338)
+        self.connect('44891hpv114042.ikoula.com',1337)
+        self.following = 0
 
     def on_connected(self):
         self.auth()
@@ -24,7 +25,7 @@ class Bot(PW):
         if 'alo' in m: 
             self.message_public(user+': slt')
         elif '!loc' in m:  
-            self.message_public(user+'')
+            self.message_public(user+': je suis en '+str(int(self.x))+', '+str(int(self.y))+', '+str(int(self.z)))
         elif '!list' in m:
             s = ''
             for u in self.userlist:
@@ -32,14 +33,14 @@ class Bot(PW):
             self.message_public(s)
         elif '!follow' in m:
             u = self.getidbynick(user)
-            self.userlist[u].following = not self.userlist[u].following
+            self.following = u
     def on_message_private(self,user,msg):
         self.display('-'+user+'- '+msg)
         if 'alo' in msg.split(): 
             self.message_private(user,'slt')
     def on_avatar_position(self,user,x,y,z,pi,ya):
-        u = self.userlist[user]
-        if u.following:
+        if self.following == user:
+            u = self.userlist[user]
             self.setposition(u.x,u.y,u.z,u.pitch,u.yaw)
             self.sendposition()
     def on_user_join(self,user):

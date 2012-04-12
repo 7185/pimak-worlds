@@ -146,6 +146,14 @@ void OgreWidget::setupNLoadResources()
         }
     }
 
+    // Load font
+    Ogre::FontPtr mFont = Ogre::FontManager::getSingleton().create("FSEX300", "General");
+    mFont->setType(Ogre::FT_TRUETYPE);
+    mFont->setSource("FSEX300.ttf");
+    mFont->setTrueTypeSize(18);
+    mFont->setTrueTypeResolution(96);
+    mFont->addCodePointRange(Ogre::Font::CodePointRange(33, 255));
+
     // Initialise, parse scripts etc
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
@@ -279,7 +287,11 @@ void OgreWidget::createAvatar(User *u)
     u->avatar = ogreSceneMgr->createEntity("Avatar_"+u->getNickname().toStdString(), "Sinbad.mesh");
     u->node = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
     u->node->attachObject(u->avatar);
-    u->node->setPosition(1430.0f,10.0f,820.0f);
+    u->node->setPosition(Ogre::Vector3(0.0f,0.0f,0.0f));
+    Ogre::SceneNode* nicknode = u->node->createChildSceneNode(Ogre::Vector3(0.0f,6.0f,0.0f));
+    Ogre::MovableText* nick = new Ogre::MovableText("MovableText",u->getNickname().toStdString());
+    nick->setTextAlignment(Ogre::MovableText::H_CENTER, Ogre::MovableText::V_ABOVE);
+    nicknode->attachObject(nick);
 }
 void OgreWidget::destroyAvatar(User *u)
 {
@@ -288,7 +300,7 @@ void OgreWidget::destroyAvatar(User *u)
 }
 void OgreWidget::moveAvatar(User *u)
 {
-    u->node->setPosition(u->x,u->y,u->z);
+    u->node->setPosition(u->x,u->y-5.0f,u->z);
     u->node->setOrientation(Ogre::Quaternion());
     u->node->yaw(Ogre::Degree(180.0f));
     u->node->yaw(Ogre::Radian(u->yaw));

@@ -4,7 +4,9 @@
 #include <QtGui>
 #include <Ogre.h>
 #include <OGRE/Terrain/OgreTerrain.h>
-
+#include <OgreFont.h>
+#include <OgreFontManager.h>
+#include "MovableText.h"
 #include "OgreFrameListener.h"
 #include "User.h"
 
