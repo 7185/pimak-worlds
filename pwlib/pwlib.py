@@ -37,7 +37,6 @@ class User(object):
         self.z = 0
         self.pitch = 0
         self.yaw = 0
-        self.following = False
     def setposition(self,x,y,z,pitch,yaw):
         self.x = x
         self.y = y

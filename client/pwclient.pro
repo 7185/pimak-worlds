@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     SettingsWindow.cpp \
     AboutWindow.cpp \
     Connection.cpp \
-    User.cpp
+    User.cpp \
+    MovableText.cpp
 
 HEADERS  += Protocol.h \
     MainWindow.h \
@@ -28,7 +29,8 @@ HEADERS  += Protocol.h \
     SettingsWindow.h \
     AboutWindow.h \
     Connection.h \
-    User.h
+    User.h \
+    MovableText.h
 
 FORMS    += MainWindow.ui \
     SettingsWindow.ui \
