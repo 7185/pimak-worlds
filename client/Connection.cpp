@@ -81,9 +81,12 @@ void Connection::dataRecv()
         in >> z;
         in >> pitch;
         in >> yaw;
-        User *u = users->value(id);
-        u->setPosition(x,y,z,pitch,yaw);
-        emit userPosition(u);
+        if (users->contains(id))
+        {
+            User *u = users->value(id);
+            u->setPosition(x,y,z,pitch,yaw);
+            emit userPosition(u);
+        }
     }
     // we reset the messageSize to 0, waiting for next data
     messageSize = 0;
