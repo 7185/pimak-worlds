@@ -43,9 +43,8 @@ class User : public QObject
         Ogre::Entity *avatar;
         Ogre::SceneNode *node;
         quint16 id;
-        float x;
-        float y;
-        float z;
+        float x,y,z;
+        float oldX,oldY,oldZ;
         float pitch;
         float yaw;
     private:

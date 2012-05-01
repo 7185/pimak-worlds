@@ -29,9 +29,8 @@ User::User(quint16 uid, QString nick)
 {
     id = uid;
     nickname = new QString(nick);
-    x = 0;
-    y = 0;
-    z = 0;
+    x, y, z = 0;
+    oldX, oldY, oldZ = 0;
     pitch = 0;
     yaw = 0;
 }
@@ -51,6 +50,9 @@ quint16 User::getId() {
 
 void User::setPosition(float nx, float ny, float nz, float npitch, float nyaw)
 {
+    oldX = x;
+    oldY = y;
+    oldZ = z;
     x = nx;
     y = ny;
     z = nz;

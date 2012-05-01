@@ -24,6 +24,9 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
       <widget class="OgreWidget" name="renderZone" native="true"/>
       <widget class="QTextEdit" name="chatZone">
        <property name="readOnly">

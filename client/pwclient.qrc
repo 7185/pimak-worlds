@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>img/icon.png</file>
-        <file>img/pimak.png</file>
+        <file>img/pimakworlds.png</file>
         <file>img/application-exit.png</file>
         <file>img/gtk-about.png</file>
         <file>img/gtk-connect.png</file>
