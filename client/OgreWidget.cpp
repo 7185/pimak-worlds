@@ -325,6 +325,7 @@ void OgreWidget::destroyAvatar(User *u)
 }
 void OgreWidget::moveAvatar(User *u)
 {
+    //u->node->translate(u->x-u->oldX,u->y-u->oldY,u->z-u->oldZ);
     u->node->setPosition(u->x,u->y-5.0f,u->z);
     u->node->setOrientation(Ogre::Quaternion());
     u->node->yaw(Ogre::Degree(180.0f));

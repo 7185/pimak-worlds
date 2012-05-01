@@ -33,7 +33,10 @@ class Bot(PW):
             self.message_public(s)
         elif '!follow' in m:
             u = self.getidbynick(user)
-            self.following = u
+            if self.following != u:
+                self.following = u
+            else:
+                self.following = 0
     def on_message_private(self,user,msg):
         self.display('-'+user+'- '+msg)
         if 'alo' in msg.split(): 
