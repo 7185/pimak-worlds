@@ -9,6 +9,24 @@ QT       += core gui network
 TARGET = pwclient
 TEMPLATE = app
 
+win32-* {
+
+isEmpty(OGRE_ROOT) {
+    OGRE_ROOT = C:\OgreSDK
+}
+message("OGRE_ROOT for make is: "$$OGRE_ROOT)
+
+DEPENDPATH += .
+INCLUDEPATH += $$OGRE_ROOT\include\OGRE
+INCLUDEPATH += $$OGRE_ROOT\boost_1_44
+LIBS += -L$$OGRE_ROOT\lib\release
+LIBS += -L$$OGRE_ROOT\lib\bin\Release
+LIBS += -L$$OGRE_ROOT\lib\bin\Debug
+LIBS += -lOgreMain -lOgreTerrain
+}
+
+linux-* {
+
 INCLUDEPATH += . /usr/include/OGRE
 LIBS += -lOgreMain -lOgreTerrain
 
@@ -16,6 +34,7 @@ isEmpty(INSTALL_PREFIX) {
     INSTALL_PREFIX = /usr/local
 }
 message("INSTALL_PREFIX for make install is: "$$INSTALL_PREFIX)
+}
 
 SOURCES += main.cpp\
         MainWindow.cpp \
@@ -45,6 +64,7 @@ RESOURCES += \
     pwclient.qrc
 
 TRANSLATIONS += pwclient_fr.ts
+linux-* {
 
 target.path = $$INSTALL_PREFIX/bin/
 desktop.files = pwclient.desktop
@@ -53,3 +73,4 @@ icon.files = img/pimakworlds.png
 icon.path = $$INSTALL_PREFIX/share/pixmaps/
 
 INSTALLS += target desktop icon
+}
