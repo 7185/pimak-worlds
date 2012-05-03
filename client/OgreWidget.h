@@ -28,7 +28,11 @@
 
 #include <QtGui>
 #include <Ogre.h>
+#ifdef Q_WS_WIN
+#include <Terrain/OgreTerrain.h>
+#else
 #include <OGRE/Terrain/OgreTerrain.h>
+#endif
 #include <OgreFont.h>
 #include <OgreFontManager.h>
 #include "MovableText.h"

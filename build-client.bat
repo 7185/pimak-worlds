@@ -11,7 +11,7 @@ set PATH=%PATH%;%QT%\mingw\bin;%QT%\Desktop\Qt\4.8.0\mingw\bin
 
 cd client
 
-qmake
+qmake OGRE_ROOT=D:\OgreSDK
 mingw32-make release
 
 echo 
