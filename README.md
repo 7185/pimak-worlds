@@ -14,10 +14,7 @@ For now, our main focus is the linux release, but support for other operating sy
 * Qt : [http://qt.nokia.com/products/](http://qt.nokia.com/products/)
 * Ogre : [http://www.ogre3d.org/](http://www.ogre3d.org/)
 #### Build
-* Edit build-client.bat to set your MinGW and Qt paths
-* Edit client/client.pro.win to set your Ogre path
-* Rename client/client.pro.win to client/client.pro
-* Rename client/OgreWidget.h.win to client/OgreWidget.h
+* Edit build-client.bat to set your MinGW, Qt and Ogre paths
 * Run build-client.bat
 
 ##Scripting
