@@ -50,8 +50,9 @@ void Connection::dataSend(quint16 msgCode, QString msgToSend)
     out.device()->seek(0);
     out << (quint16) (packet.size()-sizeof(quint16));
 
-    socket->write(packet);
-
+    if (socket->state() == QTcpSocket::ConnectedState) {
+        socket->write(packet);
+    }
 }
 
 void Connection::positionSend(float x, float y, float z, float pitch, float yaw)
@@ -69,7 +70,9 @@ void Connection::positionSend(float x, float y, float z, float pitch, float yaw)
     out.device()->seek(0);
     out << (quint16) (packet.size()-sizeof(quint16));
 
-    socket->write(packet);
+    if (socket->state() == QTcpSocket::ConnectedState) {
+        socket->write(packet);
+    }
 }
 
 void Connection::dataRecv()

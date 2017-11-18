@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network widgets x11extras opengl
 
 TARGET = pwclient
 TEMPLATE = app
@@ -22,13 +22,13 @@ INCLUDEPATH += $$OGRE_ROOT\boost_1_44
 LIBS += -L$$OGRE_ROOT\lib\release
 LIBS += -L$$OGRE_ROOT\lib\bin\Release
 LIBS += -L$$OGRE_ROOT\lib\bin\Debug
-LIBS += -lOgreMain -lOgreTerrain
+LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay
 }
 
 linux-* {
 
-INCLUDEPATH += . /usr/include/OGRE
-LIBS += -lOgreMain -lOgreTerrain
+INCLUDEPATH += . /usr/include/OGRE /usr/include/OGRE/Overlay
+LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay -lboost_system
 
 isEmpty(INSTALL_PREFIX) {
     INSTALL_PREFIX = /usr/local

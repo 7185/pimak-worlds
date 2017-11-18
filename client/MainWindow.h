@@ -26,8 +26,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QLabel>
 #include "SettingsWindow.h"
 #include "AboutWindow.h"
 #include "Connection.h"

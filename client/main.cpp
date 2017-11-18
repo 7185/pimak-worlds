@@ -23,13 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+  //  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+  //  QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QString locale = QLocale::system().name().split('_')[0];
 
     QTranslator d;

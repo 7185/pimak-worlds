@@ -9,7 +9,7 @@ class Bot(PW):
         super(Bot, self).__init__(*args, **kwargs)
         self.loggingEnabled = False
         self.nickname = 'bobinot'
-        self.connect('44891hpv114042.ikoula.com',1337)
+        self.connect('7185.fr', 6670)
         self.following = 0
 
     def on_connected(self):

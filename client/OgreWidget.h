@@ -27,19 +27,20 @@
 #define OGREWIDGET_H
 
 #include <QtGui>
+#include <QGLWidget>
 #include <Ogre.h>
 #ifdef Q_WS_WIN
 #include <Terrain/OgreTerrain.h>
 #else
 #include <OGRE/Terrain/OgreTerrain.h>
 #endif
-#include <OgreFont.h>
-#include <OgreFontManager.h>
+#include <OGRE/Overlay/OgreFont.h>
+#include <OGRE/Overlay/OgreFontManager.h>
 #include "MovableText.h"
 #include "OgreFrameListener.h"
 #include "User.h"
 
-class OgreWidget : public QWidget
+class OgreWidget : public QGLWidget
 {
     Q_OBJECT
     

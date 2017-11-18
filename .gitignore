@@ -1,0 +1,12 @@
+*.o
+moc_*
+ui_*
+qrc_*
+pwclient
+pwserver
+Makefile
+*.log
+*.pyc
+*.ini
+*.pro.user
+*.qmake.stash
