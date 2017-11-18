@@ -36,7 +36,7 @@
      <item>
       <widget class="QLabel" name="version">
        <property name="text">
-        <string>&lt;h1&gt;Pimak Worlds 0.0.1a&lt;/h1&gt;&lt;h3&gt;Version numbers are useless&lt;/h3&gt;&lt;p&gt;Client based on Qt 4.7.0&lt;/p&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;Pimak Worlds 0.0.2a&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:large; font-weight:600;&quot;&gt;Version numbers are useless&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Client based on Qt 5.8.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

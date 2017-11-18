@@ -194,7 +194,7 @@ void MainWindow::appendMessage(QString mes, quint16 type)
         type = connection->getMessageType();
     }
 
-    mes = Qt::escape(mes);
+    mes = mes.toHtmlEscaped();
 
     QStringList splitted;
     switch (type)

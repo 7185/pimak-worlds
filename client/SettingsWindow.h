@@ -26,7 +26,7 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 #include <QSettings>
 #include <QCloseEvent>
 

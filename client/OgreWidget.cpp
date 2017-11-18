@@ -24,12 +24,12 @@
  */
 
 #include <QtDebug>
-#include <QtGui/QX11Info>
+#include <QX11Info>
 
 #include "OgreWidget.h"
 
 OgreWidget::OgreWidget(QWidget *parent) :
-    QWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreFirstCamera(0)
+    QGLWidget(parent),ogreRoot(0), ogreSceneMgr(0), ogreRenderWindow(0), ogreViewport(0),ogreFirstCamera(0)
 {
     setAttribute(Qt::WA_OpaquePaintEvent,true);
     setAttribute(Qt::WA_PaintOnScreen,true);
@@ -123,10 +123,9 @@ void OgreWidget::initOgreSystem()
     widgetHandle = Ogre::StringConverter::toString((size_t)((HWND)winId()));
 #else
     QWidget *q_parent = dynamic_cast <QWidget *> (parent());
-    QX11Info xInfo = x11Info();
 
-    widgetHandle = Ogre::StringConverter::toString((unsigned long)xInfo.display()) +
-        ":" + Ogre::StringConverter::toString((unsigned int)xInfo.screen()) +
+    widgetHandle = Ogre::StringConverter::toString((unsigned long)QX11Info::display()) +
+        ":" + Ogre::StringConverter::toString((unsigned int)QX11Info::appScreen()) +
         ":" + Ogre::StringConverter::toString((unsigned long)q_parent->winId());
 #endif
 
@@ -172,13 +171,14 @@ void OgreWidget::setupNLoadResources()
     }
 
     // Load font
+    /*
     Ogre::FontPtr mFont = Ogre::FontManager::getSingleton().create("FSEX300", "General");
     mFont->setType(Ogre::FT_TRUETYPE);
     mFont->setSource("FSEX300.ttf");
     mFont->setTrueTypeSize(18);
     mFont->setTrueTypeResolution(96);
     mFont->addCodePointRange(Ogre::Font::CodePointRange(33, 255));
-
+*/
     // Initialise, parse scripts etc
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
@@ -313,10 +313,10 @@ void OgreWidget::createAvatar(User *u)
     u->node = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
     u->node->attachObject(u->avatar);
     u->node->setPosition(Ogre::Vector3(0.0f,0.0f,0.0f));
-    Ogre::SceneNode* nicknode = u->node->createChildSceneNode(Ogre::Vector3(0.0f,6.0f,0.0f));
-    Ogre::MovableText* nick = new Ogre::MovableText("MovableText",u->getNickname().toStdString());
-    nick->setTextAlignment(Ogre::MovableText::H_CENTER, Ogre::MovableText::V_ABOVE);
-    nicknode->attachObject(nick);
+    //Ogre::SceneNode* nicknode = u->node->createChildSceneNode(Ogre::Vector3(0.0f,6.0f,0.0f));
+    //Ogre::MovableText* nick = new Ogre::MovableText("MovableText",u->getNickname().toStdString());
+    //nick->setTextAlignment(Ogre::MovableText::H_CENTER, Ogre::MovableText::V_ABOVE);
+    //nicknode->attachObject(nick);
 }
 void OgreWidget::destroyAvatar(User *u)
 {

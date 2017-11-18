@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE =
-TARGET = 
+TARGET = pwserver
 DEPENDPATH += .
 INCLUDEPATH += .
 QT += network
