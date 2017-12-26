@@ -326,11 +326,16 @@ void OgreWidget::destroyAvatar(User *u)
 void OgreWidget::moveAvatar(User *u)
 {
     //u->node->translate(u->x-u->oldX,u->y-u->oldY,u->z-u->oldZ);
-    u->node->setPosition(u->x,u->y-5.0f,u->z);
+    /* u->node->setPosition(u->x,u->y-5.0f,u->z);
     u->node->setOrientation(Ogre::Quaternion());
     u->node->yaw(Ogre::Degree(180.0f));
     u->node->yaw(Ogre::Radian(u->yaw));
-    u->node->pitch(Ogre::Radian(u->pitch));
+    u->node->pitch(Ogre::Radian(u->pitch)); */
+    ogreListener->addMovingAvatar(u->id,
+                                  u->node,
+                                  u->x,u->y-5.0f,u->z,
+                                  u->oldX,u->oldY-5.0f,u->oldZ,
+                                  u->pitch, u->yaw, u->pitch, u->yaw);
 }
 void OgreWidget::posSend()
 {

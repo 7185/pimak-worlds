@@ -24,6 +24,7 @@
  */
 
 #include "OgreFrameListener.h"
+#include <QVector>
 
 OgreFrameListener::OgreFrameListener(Ogre::Entity* e)
 {
@@ -40,6 +41,8 @@ OgreFrameListener::OgreFrameListener(Ogre::Entity* e)
     
     ogreControls = new bool[9];
     for (int i=0;i<=9;i++) { ogreControls[i] = false; }
+
+    movingAvatars = new QMap<quint16, MovingAvatar>;
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -73,6 +76,35 @@ bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
     }
     aniStateTop->addTime(evt.timeSinceLastFrame);
     aniStateBase->addTime(evt.timeSinceLastFrame);
+
+    QList<quint16> keys = (*movingAvatars).keys();
+    QList<quint16> removeList;
+    
+    for (const quint16 &key: keys) {
+    
+        MovingAvatar &ma = (*movingAvatars)[key];
+        Ogre::SceneNode *node = ma.node;
+
+        if(ma.completion >= 1.0){
+            ma.completion = 1.0;
+            removeList.append(key);
+        }
+        node->setPosition(ma.oldX + (ma.x - ma.oldX) * ma.completion,
+                          ma.oldY + (ma.y - ma.oldY) * ma.completion,
+                          ma.oldZ + (ma.z - ma.oldZ) * ma.completion);
+        node->setOrientation(Ogre::Quaternion());
+        node->yaw(Ogre::Degree(180.0f));
+        node->yaw(Ogre::Radian(ma.yaw));
+        node->pitch(Ogre::Radian(ma.pitch));
+        ma.completion += evt.timeSinceLastFrame*4;
+
+    }
+
+    for(const quint16 &key: removeList)
+        movingAvatars->remove(key);
+    
+    removeList.clear();
+    
     return true;
 }
 bool OgreFrameListener::frameEnded(const Ogre::FrameEvent &evt)
@@ -82,6 +114,47 @@ bool OgreFrameListener::frameEnded(const Ogre::FrameEvent &evt)
 bool OgreFrameListener::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
     return true;
+}
+
+bool OgreFrameListener::addMovingAvatar(quint16 id,
+                                        Ogre::SceneNode *node,
+                                        float x, float y, float z,
+                                        float oldX, float oldY, float oldZ,
+                                        float pitch, float yaw,
+                                        float oldPitch, float oldYaw) {
+
+    if (movingAvatars->contains(id)) {
+
+      MovingAvatar ma = (*movingAvatars)[id];
+      ma.oldX = ma.oldX + (ma.x - ma.oldX) * ma.completion;
+      ma.oldY = ma.oldY + (ma.y - ma.oldY) * ma.completion;
+      ma.oldZ = ma.oldZ + (ma.z - ma.oldZ) * ma.completion;
+      ma.x = x;
+      ma.y = y;
+      ma.z = z;
+      ma.pitch = pitch;
+      ma.yaw = yaw;
+      ma.oldPitch = oldPitch;
+      ma.oldYaw = oldYaw;
+      ma.completion = 0.0;
+      movingAvatars->insert(id, ma);
+      
+    }else{
+      
+        movingAvatars->insert(id,
+                              (MovingAvatar){
+                                  node,
+                                  x, y, z,
+                                  oldX, oldY, oldZ,
+                                  pitch, yaw,
+                                  oldPitch, oldYaw,
+                                  0.0
+                              });
+      
+    }
+
+    return true;
+  
 }
 
 void OgreFrameListener::handleKeys(int key, bool state)

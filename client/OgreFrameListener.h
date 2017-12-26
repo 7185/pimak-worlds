@@ -28,6 +28,20 @@
 
 #include <Ogre.h>
 #include <Qt>
+#include <QMap>
+
+typedef struct {
+
+  Ogre::SceneNode *node;
+  float x,y,z;
+  float oldX,oldY,oldZ;
+  float pitch;
+  float yaw;
+  float oldPitch;
+  float oldYaw;
+  float completion;
+  
+} MovingAvatar;
 
 class OgreFrameListener : public Ogre::FrameListener
 {
@@ -37,6 +51,12 @@ class OgreFrameListener : public Ogre::FrameListener
        bool frameStarted(const Ogre::FrameEvent &);
        bool frameEnded(const Ogre::FrameEvent &);
        bool frameRenderingQueued(const Ogre::FrameEvent &);
+       bool addMovingAvatar(quint16 id,
+                            Ogre::SceneNode *node,
+                            float x, float y, float z,
+                            float oldX, float oldY, float oldZ,
+                            float pitch, float yaw,
+                            float oldPitch, float oldYaw);
 
        void handleKeys(int, bool);
 
@@ -48,6 +68,8 @@ class OgreFrameListener : public Ogre::FrameListener
        Ogre::Entity* ent;
        Ogre::AnimationState* aniStateBase;
        Ogre::AnimationState* aniStateTop;
+       QMap<quint16, MovingAvatar> *movingAvatars;
+       
 };
 
 #endif // OGREFRAMELISTENER_H
