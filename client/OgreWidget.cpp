@@ -332,10 +332,11 @@ void OgreWidget::moveAvatar(User *u)
     u->node->yaw(Ogre::Radian(u->yaw));
     u->node->pitch(Ogre::Radian(u->pitch)); */
     ogreListener->addMovingAvatar(u->id,
+                                  u->avatar,
                                   u->node,
                                   u->x,u->y-5.0f,u->z,
                                   u->oldX,u->oldY-5.0f,u->oldZ,
-                                  u->pitch, u->yaw, u->pitch, u->yaw);
+                                  u->pitch, u->yaw, u->oldPitch, u->oldYaw);
 }
 void OgreWidget::posSend()
 {

@@ -32,6 +32,7 @@
 
 typedef struct {
 
+  Ogre::Entity *avatar;
   Ogre::SceneNode *node;
   float x,y,z;
   float oldX,oldY,oldZ;
@@ -52,6 +53,7 @@ class OgreFrameListener : public Ogre::FrameListener
        bool frameEnded(const Ogre::FrameEvent &);
        bool frameRenderingQueued(const Ogre::FrameEvent &);
        bool addMovingAvatar(quint16 id,
+                            Ogre::Entity *avatar,
                             Ogre::SceneNode *node,
                             float x, float y, float z,
                             float oldX, float oldY, float oldZ,
