@@ -47,6 +47,8 @@ class User : public QObject
         float oldX,oldY,oldZ;
         float pitch;
         float yaw;
+        float oldPitch;
+        float oldYaw;
     private:
         QString *nickname;
 };

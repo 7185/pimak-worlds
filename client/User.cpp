@@ -56,6 +56,8 @@ void User::setPosition(float nx, float ny, float nz, float npitch, float nyaw)
     x = nx;
     y = ny;
     z = nz;
+    oldPitch = pitch;
+    oldYaw = yaw;
     pitch = npitch;
     yaw = nyaw;
 }
