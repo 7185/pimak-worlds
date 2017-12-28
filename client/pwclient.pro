@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui network widgets x11extras opengl
+CONFIG   += c++11
 
 TARGET = pwclient
 TEMPLATE = app
