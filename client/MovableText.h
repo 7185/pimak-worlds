@@ -12,8 +12,7 @@
  
 namespace Ogre {
  
-class MovableText : public MovableObject, public Renderable
-{
+class MovableText : public MovableObject, public Renderable {
     /******************************** MovableText data ****************************/
 public:
     enum HorizontalAlignment    {H_LEFT, H_CENTER};

@@ -28,8 +28,6 @@
 
 int main(int argc, char *argv[])
 {
-  //  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-  //  QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QString locale = QLocale::system().name().split('_')[0];
 
     QTranslator d;

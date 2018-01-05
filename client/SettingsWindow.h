@@ -31,37 +31,36 @@
 #include <QCloseEvent>
 
 namespace Ui {
-    class SettingsWindow;
+class SettingsWindow;
 }
 
-class SettingsWindow : public QDialog
-{
-    Q_OBJECT
+class SettingsWindow : public QDialog {
+ Q_OBJECT
 
-public:
-    explicit SettingsWindow(QWidget *parent = 0);
-    ~SettingsWindow();
-    void readSettings();
-    void writeSettings();
+ public:
+  explicit SettingsWindow(QWidget *parent = 0);
+  ~SettingsWindow();
+  void readSettings();
+  void writeSettings();
+  QString getHost();
+  QString getNickname();
+  int getPort();
+  int getFps();
+  bool getDisplayTime();
+  bool getDisplayColors();
+ signals:
+  void fpsChanged(int);
 
-    QString getHost();
-    QString getNickname();
-    int getPort();
-    int getFps();
-    bool getDisplayTime();
-    bool getDisplayColors();
-signals:
-    void fpsChanged(int);
+ protected:
+  void closeEvent(QCloseEvent *event);
 
-private slots:
-     void on_buttonBox_accepted();
-     void on_buttonBox_rejected();
-protected:
-     void closeEvent(QCloseEvent *event);
+ private slots:
+  void on_buttonBox_accepted();
+  void on_buttonBox_rejected();
 
-private:
-    Ui::SettingsWindow *ui;
-    QSettings *settings;
+ private:
+  Ui::SettingsWindow *ui;
+  QSettings *settings;
 };
 
 #endif // SETTINGSWINDOW_H

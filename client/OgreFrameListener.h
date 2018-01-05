@@ -31,47 +31,40 @@
 #include <QMap>
 
 typedef struct {
-
-  Ogre::Entity *avatar;
-  Ogre::SceneNode *node;
-  float x,y,z;
-  float oldX,oldY,oldZ;
-  float pitch;
-  float yaw;
-  float oldPitch;
-  float oldYaw;
-  float completion;
-  
+ Ogre::Entity *avatar;
+ Ogre::SceneNode *node;
+ float x,y,z;
+ float oldX,oldY,oldZ;
+ float pitch;
+ float yaw;
+ float oldPitch;
+ float oldYaw;
+ float completion;
 } MovingAvatar;
 
-class OgreFrameListener : public Ogre::FrameListener
-{
-   public:
-       OgreFrameListener(Ogre::Entity*);
-       ~OgreFrameListener();
-       bool frameStarted(const Ogre::FrameEvent &);
-       bool frameEnded(const Ogre::FrameEvent &);
-       bool frameRenderingQueued(const Ogre::FrameEvent &);
-       bool addMovingAvatar(quint16 id,
-                            Ogre::Entity *avatar,
-                            Ogre::SceneNode *node,
-                            float x, float y, float z,
-                            float oldX, float oldY, float oldZ,
-                            float pitch, float yaw,
-                            float oldPitch, float oldYaw);
+class OgreFrameListener : public Ogre::FrameListener {
+ public:
+  OgreFrameListener(Ogre::Entity*);
+  ~OgreFrameListener();
+  bool frameStarted(const Ogre::FrameEvent &);
+  bool frameEnded(const Ogre::FrameEvent &);
+  bool frameRenderingQueued(const Ogre::FrameEvent &);
+  bool addMovingAvatar(quint16 id, Ogre::Entity *avatar, Ogre::SceneNode *node,
+                       float x, float y, float z,
+                       float oldX, float oldY, float oldZ,
+                       float pitch, float yaw,
+                       float oldPitch, float oldYaw);
+  void handleKeys(int, bool);
 
-       void handleKeys(int, bool);
+  enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
+  bool *ogreControls;
 
-       enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
-       bool *ogreControls;
-
-    private:
-       bool running;
-       Ogre::Entity* ent;
-       Ogre::AnimationState* aniStateBase;
-       Ogre::AnimationState* aniStateTop;
-       QMap<quint16, MovingAvatar> *movingAvatars;
-       
+ private:
+  bool running;
+  Ogre::Entity* ent;
+  Ogre::AnimationState* aniStateBase;
+  Ogre::AnimationState* aniStateTop;
+  QMap<quint16, MovingAvatar> *movingAvatars;
 };
 
 #endif // OGREFRAMELISTENER_H

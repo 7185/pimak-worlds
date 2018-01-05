@@ -251,7 +251,8 @@ quint16 Connection::getIdByNick(QString nick)
 {
     foreach(quint16 id, users->keys())
     {
-        if (users->value(id)->getNickname() == nick) return id;
+        if (users->value(id)->getNickname() == nick)
+            return id;
     }
     return 0;
 }

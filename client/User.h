@@ -29,28 +29,26 @@
 #include <QtNetwork>
 #include <Ogre.h>
 
-class User : public QObject
-{
-    Q_OBJECT
-    public:
-        User(quint16 uid, QString nick);
-        ~User();
-        QString getNickname();
-        quint16 getId();
-        void setPosition(float nx, float ny, float nz, float npitch, float nyaw);
+class User : public QObject {
+ Q_OBJECT
+ public:
+  User(quint16 uid, QString nick);
+  ~User();
+  QString getNickname();
+  quint16 getId();
+  void setPosition(float nx, float ny, float nz, float npitch, float nyaw);
 
-    public:
-        Ogre::Entity *avatar;
-        Ogre::SceneNode *node;
-        quint16 id;
-        float x,y,z;
-        float oldX,oldY,oldZ;
-        float pitch;
-        float yaw;
-        float oldPitch;
-        float oldYaw;
-    private:
-        QString *nickname;
+  Ogre::Entity *avatar;
+  Ogre::SceneNode *node;
+  quint16 id;
+  float x,y,z;
+  float oldX,oldY,oldZ;
+  float pitch;
+  float yaw;
+  float oldPitch;
+  float oldYaw;
+ private:
+  QString *nickname;
 };
 
 #endif // USER_H

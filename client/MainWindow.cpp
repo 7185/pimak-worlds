@@ -170,14 +170,14 @@ void MainWindow::clientDisconnect()
 void MainWindow::updateWhisperList()
 {
     ui->whisperSelector->clear();
-    if(connection->getUsers()->keys().isEmpty())
+    if (connection->getUsers()->keys().isEmpty())
     {
         ui->whisper->setEnabled(false);
         ui->whisperSelector->setEnabled(false);
     }
     else
     {
-        foreach(quint16 userid, connection->getUsers()->keys())
+        foreach (quint16 userid, connection->getUsers()->keys())
         {
             ui->whisperSelector->addItem(connection->getUsers()->value(userid)->getNickname());
         }
@@ -202,8 +202,10 @@ void MainWindow::appendMessage(QString mes, quint16 type)
     case SC_MSG_PUBLIC:
         if (settings->getDisplayColors()) {
             splitted = mes.split(":");
-            if (connection->getIdByNick(splitted[0]) == 0) splitted[0] = "<span style=\"color:"+nickColors->at(0)+";font-weight:bold;\">"+splitted[0]+"</span>";
-            else splitted[0] = "<span style=\"color:"+nickColors->at(connection->getIdByNick(splitted[0])%(nickColors->length()-1)+1)+";\">"+splitted[0]+"</span>";
+            if (connection->getIdByNick(splitted[0]) == 0)
+                splitted[0] = "<span style=\"color:"+nickColors->at(0)+";font-weight:bold;\">"+splitted[0]+"</span>";
+            else
+                splitted[0] = "<span style=\"color:"+nickColors->at(connection->getIdByNick(splitted[0])%(nickColors->length()-1)+1)+";\">"+splitted[0]+"</span>";
             mes = splitted.join(":");
         }
         mes = "<span style=\"color:black;font-weight:normal;font-style:normal\">"+mes+"</span>";
@@ -222,7 +224,8 @@ void MainWindow::appendMessage(QString mes, quint16 type)
         mes = "<span style=\"color:black;font-weight:bold;font-style:normal;\">"+mes+"</span>";
     }
 
-    if (settings->getDisplayTime()) mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
+    if (settings->getDisplayTime())
+        mes = QDateTime::currentDateTime().toString("[hh:mm:ss] ")+mes;
     ui->chatZone->append(mes);
 }
 

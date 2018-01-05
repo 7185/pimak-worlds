@@ -30,21 +30,19 @@
 #include <iostream>
 #include "Client.h"
 
-class Server : public QObject
-{
-    Q_OBJECT
+class Server : public QObject {
+ Q_OBJECT
 
-    public:
-        explicit Server(int port);
+ public:
+  explicit Server(int port);
 
-    private slots:
-        void clientConnect();
+ private slots:
+  void clientConnect();
 
-    private:
-        QString *serverState;
-
-        QTcpServer *server;
-        QList<Client *> clients;
+ private:
+  QString *serverState;
+  QTcpServer *server;
+  QList<Client *> clients;
 };
 
 #endif
