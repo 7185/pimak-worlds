@@ -25,6 +25,7 @@
 
 #include "MainWindow.h"
 #include "OgreWindow.h"
+#include "OgreWidget.h"
 #include "ui_MainWindow.h"
 #include "Protocol.h"
 
@@ -32,11 +33,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
 
-    OgreWindow* ogreWindow = new OgreWindow();
-    ui->renderZone = QWidget::createWindowContainer(ogreWindow);
-    ui->renderZone->hide();
+    ogreWindow = new OgreWindow();
+    ogreWindow->setFlags(Qt::FramelessWindowHint);
+    QWidget* container = QWidget::createWindowContainer(ogreWindow);
+
+
+    ui->renderZone->setParent(NULL);
+    ui->renderZone->close();
+    ui->splitter->insertWidget(0, container);
+
     settings = new SettingsWindow;
     about = new AboutWindow;
     connection = new Connection;
@@ -55,8 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     posTimer = new QTimer;
     posTimer->start(1000/5);
-   // connect(posTimer,SIGNAL(timeout()),ui->renderZone,SLOT(posSend()));
-   // connect(ui->renderZone,SIGNAL(positionSend(float,float,float,float,float)),connection,SLOT(positionSend(float,float,float,float,float)));
+    connect(posTimer,SIGNAL(timeout()),ogreWindow,SLOT(posSend()));
+    connect(ogreWindow,SIGNAL(positionSend(float,float,float,float,float)),connection,SLOT(positionSend(float,float,float,float,float)));
 
     nickColors = new QStringList;
     nickColors->append("#666666");
@@ -73,8 +81,11 @@ MainWindow::MainWindow(QWidget *parent) :
     posLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
     ui->statusBar->addPermanentWidget(posLbl);
     ui->statusBar->addPermanentWidget(fpsLbl);
-  //  connect(ui->renderZone,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
-  //  connect(ui->renderZone,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
+
+    ui->renderZone->show();
+
+    connect(ogreWindow,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
+    connect(ogreWindow,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -110,15 +121,15 @@ void MainWindow::on_actAbout_triggered()
 
 void MainWindow::on_actFirstCam_toggled(bool checked)
 {
-  //  if (checked) ui->renderZone->setActiveCam(false);
-  //  ui->actThirdCam->setChecked(!checked);
+  if (checked) ogreWindow->setActiveCam(false);
+  ui->actThirdCam->setChecked(!checked);
 }
 
 
 void MainWindow::on_actThirdCam_toggled(bool checked)
 {
- //   if (checked) ui->renderZone->setActiveCam(true);
- //   ui->actFirstCam->setChecked(!checked);
+   if (checked) ogreWindow->setActiveCam(true);
+   ui->actFirstCam->setChecked(!checked);
 }
 
 void MainWindow::on_message_returnPressed()
@@ -135,7 +146,7 @@ void MainWindow::on_whisper_returnPressed()
     connection->dataSend(CS_MSG_PRIVATE,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
     ui->whisper->clear();
     ui->whisper->setFocus();
- //   ui->renderZone->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
+    ogreWindow->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
 }
 
 void MainWindow::on_actConnect_triggered()
