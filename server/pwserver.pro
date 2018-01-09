@@ -10,10 +10,8 @@ TARGET = pwserver
 TEMPLATE = app
 
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . include
 
 # Input
-HEADERS += Server.h \
-    Client.h Protocol.h
-SOURCES += Server.cpp main.cpp \
-    Client.cpp
+HEADERS += include/*.h
+SOURCES += src/*.cpp

@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
     QString locale = QLocale::system().name().split('_')[0];
 
     QTranslator d;
-    d.load(QString("qt_") + locale);
+    d.load(QString("lang/qt_") + locale);
     QTranslator t;
-    t.load(QString("pwclient_") + locale);
+    t.load(QString("lang/pwclient_") + locale);
 
     QApplication a(argc, argv);
     a.installTranslator(&d);

@@ -18,6 +18,7 @@ win32-* {
     message("OGRE_ROOT for make is: "$$OGRE_ROOT)
 
     DEPENDPATH += .
+    INCLUDEPATH += . include
     INCLUDEPATH += $$OGRE_ROOT\include\OGRE
     INCLUDEPATH += $$OGRE_ROOT\boost_1_44
     LIBS += -L$$OGRE_ROOT\lib\release
@@ -27,7 +28,7 @@ win32-* {
 }
 
 linux-* {
-    INCLUDEPATH += . /usr/include/OGRE /usr/include/OGRE/Overlay
+    INCLUDEPATH += . include /usr/include/OGRE /usr/include/OGRE/Overlay
     LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay -lboost_system
 
     isEmpty(INSTALL_PREFIX) {
@@ -36,34 +37,14 @@ linux-* {
     message("INSTALL_PREFIX for make install is: "$$INSTALL_PREFIX)
 }
 
-SOURCES += main.cpp \
-    MainWindow.cpp \
-    OgreWidget.cpp \
-    OgreFrameListener.cpp \
-    SettingsWindow.cpp \
-    AboutWindow.cpp \
-    Connection.cpp \
-    User.cpp \
-    MovableText.cpp
+HEADERS += include/*.h
+SOURCES += src/*.cpp
+FORMS   += ui/*.ui
+UI_DIR = include
 
-HEADERS  += Protocol.h \
-    MainWindow.h \
-    OgreWidget.h \
-    OgreFrameListener.h \
-    SettingsWindow.h \
-    AboutWindow.h \
-    Connection.h \
-    User.h \
-    MovableText.h
+RESOURCES += pwclient.qrc
 
-FORMS    += MainWindow.ui \
-    SettingsWindow.ui \
-    AboutWindow.ui
-
-RESOURCES += \
-    pwclient.qrc
-
-TRANSLATIONS += pwclient_fr.ts
+TRANSLATIONS += lang/pwclient_fr.ts
 
 linux-* {
     target.path = $$INSTALL_PREFIX/bin/

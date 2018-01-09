@@ -269,7 +269,7 @@ void OgreWidget::createTerrain()
             blendMap1->convertImageToTerrainSpace(x, y, &terrainX, &terrainY);
             Ogre::Real height = ogreTerrain->getHeightAtTerrainPosition(terrainX, terrainY);
             if(height < 200) *pBlend1 = 1;
-            *pBlend1++;
+            pBlend1++;
         }
     }
     blendMap1->dirty();

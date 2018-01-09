@@ -23,9 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "OgreFrameListener.h"
 #include <QVector>
 #include <OgreMath.h>
+
+#include "OgreFrameListener.h"
 
 OgreFrameListener::OgreFrameListener(Ogre::Entity* e)
 {
