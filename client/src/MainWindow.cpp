@@ -35,11 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     OgreWindow* ogreWindow = new OgreWindow();
-    QWidget *container = QWidget::createWindowContainer(ogreWindow);
-    container->setMinimumSize(200, 200);
-    container->setMaximumSize(200, 200);
-    container->setFocusPolicy(Qt::TabFocus);
-    ui->verticalLayout->addWidget(container);
+    ui->renderZone = QWidget::createWindowContainer(ogreWindow);
     ui->renderZone->hide();
     settings = new SettingsWindow;
     about = new AboutWindow;
