@@ -1,3 +1,28 @@
+/**
+ * Copyright (c) 2012, Thibault Signor <tibsou@gmail.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "OgreWindow.h"
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
 #include <Compositor/OgreCompositorManager2.h>
@@ -400,21 +425,6 @@ void OgreWindow::posSend()
                       cameraNode->getOrientation().getYaw().valueRadians());
 }
 
-void OgreWindow::keyPressEvent(QKeyEvent *e)
-{
-   if (e->isAutoRepeat()) return;
-   ogreListener->handleKeys(e->key(),true);
-   e->accept();
-}
-
-
-void OgreWindow::keyReleaseEvent(QKeyEvent *e)
-{
-   if (e->isAutoRepeat()) return;
-   ogreListener->handleKeys(e->key(),false);
-   e->accept();
-}
-
 void OgreWindow::setActiveCam(bool cam)
 {
     if (cam) activeCamera = ogreThirdCamera;
@@ -467,7 +477,14 @@ void OgreWindow::render()
     to keep things separate and keep the render function as simple as possible.
     */
     Ogre::WindowEventUtilities::messagePump();
+    moveCamera();
     ogreRoot->renderOneFrame();
+    if (ogreRenderWindow != NULL) {
+    QString str = QString::number(ogreRenderWindow->getAverageFPS(),'f',2)+" FPS";
+    emit dispAverageFps(str);
+    ogreRenderWindow->update();
+    }
+
 }
 
 void OgreWindow::renderLater()
@@ -551,6 +568,18 @@ bool OgreWindow::eventFilter(QObject *target, QEvent *event)
             {
                 ogreRenderWindow->resize(this->width(), this->height());
             }
+            if(activeCamera)
+            {
+                Ogre::Real aspectRatio = Ogre::Real(this->width()) / Ogre::Real(this->height());
+                activeCamera->setAspectRatio(aspectRatio);
+            }
+        }
+        else if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            ogreListener->handleKeys(keyEvent->key(),true);
+        } else if (event->type() == QEvent::KeyRelease) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            ogreListener->handleKeys(keyEvent->key(),false);
         }
     }
 
