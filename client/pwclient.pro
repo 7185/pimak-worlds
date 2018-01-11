@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network widgets x11extras opengl
+QT       += network widgets
 CONFIG   += c++11
 
 TARGET = pwclient

@@ -24,6 +24,7 @@
  */
 
 #include "MainWindow.h"
+#include "OgreWindow.h"
 #include "ui_MainWindow.h"
 #include "Protocol.h"
 
@@ -31,8 +32,17 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
-    ui->renderZone->hide();
+
+    ogreWindow = new OgreWindow();
+    ogreWindow->setFlags(Qt::FramelessWindowHint);
+    QWidget* container = QWidget::createWindowContainer(ogreWindow);
+
+    ui->renderZone->setParent(NULL);
+    ui->renderZone->deleteLater();
+    ui->splitter->insertWidget(0, container);
+
     settings = new SettingsWindow;
     about = new AboutWindow;
     connection = new Connection;
@@ -40,19 +50,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(connection->getSocket(), SIGNAL(disconnected()), this,SLOT(clientDisconnect()));;;
     connect(connection,SIGNAL(messageChanged()),this,SLOT(appendMessage()));
     connect(connection,SIGNAL(listChanged()),this,SLOT(updateWhisperList()));
-    connect(connection,SIGNAL(userCreated(User*)),ui->renderZone,SLOT(createAvatar(User*)));
-    connect(connection,SIGNAL(userDeleted(User*)),ui->renderZone,SLOT(destroyAvatar(User*)));
-    connect(connection,SIGNAL(userPosition(User*)),ui->renderZone,SLOT(moveAvatar(User*)));
+    connect(connection,SIGNAL(userCreated(User*)),ogreWindow,SLOT(createAvatar(User*)));
+    connect(connection,SIGNAL(userDeleted(User*)),ogreWindow,SLOT(destroyAvatar(User*)));
+    connect(connection,SIGNAL(userPosition(User*)),ogreWindow,SLOT(moveAvatar(User*)));
 
     paintTimer = new QTimer;
     paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd
-    connect(paintTimer,SIGNAL(timeout()),ui->renderZone,SLOT(update()));
+    connect(paintTimer,SIGNAL(timeout()),ogreWindow,SLOT(renderNow()));
     connect(settings,SIGNAL(fpsChanged(int)),this,SLOT(updateTimer(int)));
 
     posTimer = new QTimer;
     posTimer->start(1000/5);
-    connect(posTimer,SIGNAL(timeout()),ui->renderZone,SLOT(posSend()));
-    connect(ui->renderZone,SIGNAL(positionSend(float,float,float,float,float)),connection,SLOT(positionSend(float,float,float,float,float)));
+    connect(posTimer,SIGNAL(timeout()),ogreWindow,SLOT(posSend()));
+    connect(ogreWindow,SIGNAL(positionSend(float,float,float,float,float)),connection,SLOT(positionSend(float,float,float,float,float)));
 
     nickColors = new QStringList;
     nickColors->append("#666666");
@@ -69,8 +79,9 @@ MainWindow::MainWindow(QWidget *parent) :
     posLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
     ui->statusBar->addPermanentWidget(posLbl);
     ui->statusBar->addPermanentWidget(fpsLbl);
-    connect(ui->renderZone,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
-    connect(ui->renderZone,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
+
+    connect(ogreWindow,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
+    connect(ogreWindow,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -80,7 +91,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::showRenderZone()
 {
-    ui->renderZone->show();
+    ogreWindow->show();
 }
 
 void MainWindow::updateTimer(int i)
@@ -106,15 +117,15 @@ void MainWindow::on_actAbout_triggered()
 
 void MainWindow::on_actFirstCam_toggled(bool checked)
 {
-    if (checked) ui->renderZone->setActiveCam(false);
-    ui->actThirdCam->setChecked(!checked);
+  if (checked) ogreWindow->setActiveCam(false);
+  ui->actThirdCam->setChecked(!checked);
 }
 
 
 void MainWindow::on_actThirdCam_toggled(bool checked)
 {
-    if (checked) ui->renderZone->setActiveCam(true);
-    ui->actFirstCam->setChecked(!checked);
+   if (checked) ogreWindow->setActiveCam(true);
+   ui->actFirstCam->setChecked(!checked);
 }
 
 void MainWindow::on_message_returnPressed()
@@ -131,7 +142,7 @@ void MainWindow::on_whisper_returnPressed()
     connection->dataSend(CS_MSG_PRIVATE,QString::number(connection->getIdByNick(ui->whisperSelector->currentText()))+":"+ui->whisper->text());
     ui->whisper->clear();
     ui->whisper->setFocus();
-    ui->renderZone->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
+    ogreWindow->createAvatar(connection->getUsers()->value(connection->getIdByNick(ui->whisperSelector->currentText())));
 }
 
 void MainWindow::on_actConnect_triggered()

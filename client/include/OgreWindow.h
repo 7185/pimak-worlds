@@ -23,32 +23,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OGREWIDGET_H
-#define OGREWIDGET_H
+#ifndef OGREWINDOW_H
+#define OGREWINDOW_H
 
-#include <QtGui>
-#include <QGLWidget>
+#include <QtWidgets/QApplication>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QWindow>
+
 #include <Ogre.h>
 #ifdef Q_WS_WIN
 #include <Terrain/OgreTerrain.h>
 #else
 #include <OGRE/Terrain/OgreTerrain.h>
 #endif
-#include <OGRE/Overlay/OgreFont.h>
-#include <OGRE/Overlay/OgreFontManager.h>
-#include "MovableText.h"
+
 #include "OgreFrameListener.h"
 #include "User.h"
 
-class OgreWidget : public QGLWidget {
+class OgreWindow : public QWindow {
  Q_OBJECT
 
  public:
-  OgreWidget(QWidget *parent=0);
-  ~OgreWidget();
-  void setActiveCam(bool); //0: First, 1:Third
+  explicit OgreWindow(QWindow *parent = NULL);
+  ~OgreWindow();
+
+  virtual void render(QPainter *painter);
+  virtual void render();
+  virtual void initialize();
+#if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
+  virtual void createCompositor();
+#endif
+
+  void setAnimating(bool animating);
+  void setActiveCam(bool); // 0: First, 1:Third
 
  public slots:
+  virtual void renderLater();
+  virtual void renderNow();
+
+  // capture keyboard/mouse events
+  virtual bool eventFilter(QObject *target, QEvent *event);
   void createAvatar(User *u);
   void destroyAvatar(User *u);
   void moveAvatar(User *u);
@@ -60,39 +74,37 @@ class OgreWidget : public QGLWidget {
   void positionSend(float,float,float,float,float);
 
  protected:
-  virtual void moveEvent(QMoveEvent *e);
-  virtual void paintEvent(QPaintEvent *e);
-  virtual void resizeEvent(QResizeEvent *e);
-  virtual void showEvent(QShowEvent *e);
-  virtual void keyPressEvent(QKeyEvent *e);
-  virtual void keyReleaseEvent(QKeyEvent *e);
-  virtual QPaintEngine* paintEngine() const;
+  virtual void exposeEvent(QExposeEvent *event);
+  virtual bool event(QEvent *event);
+
+  Ogre::ColourValue ogreBackground;
+  bool updatePending;
+  bool animating;
 
  private:
-  void initOgreSystem();
-  void setupNLoadResources();
+  void setupResources();
   void createCamera();
   void createViewport();
   void createTerrain();
   void createScene();
   void moveCamera();
 
-  Ogre::Root                 *ogreRoot;
-  Ogre::SceneManager         *ogreSceneMgr;
-  Ogre::RenderWindow         *ogreRenderWindow;
-  Ogre::Viewport             *ogreViewport;
-  Ogre::Terrain              *ogreTerrain;
+  Ogre::Root *ogreRoot;
+  Ogre::SceneManager *ogreSceneMgr;
+  Ogre::RenderWindow *ogreRenderWindow;
+  Ogre::Viewport *ogreViewport;
+  Ogre::Terrain *ogreTerrain;
   Ogre::TerrainGlobalOptions *ogreTerrainGlobals;
-  Ogre::Camera       *ogreFirstCamera;
-  Ogre::Camera       *ogreThirdCamera; // 3rd view cam
-  Ogre::Camera       *activeCamera;    // Current cam
-  Ogre::SceneNode    *cameraNode;      // Camera node
-  Ogre::SceneNode    *cameraPitchNode; // Separate pitch node
-  Ogre::Entity       *avatar;
-  OgreFrameListener  *ogreListener;
+  Ogre::Camera *ogreFirstCamera;
+  Ogre::Camera *ogreThirdCamera; // 3rd view cam
+  Ogre::Camera *activeCamera; // Current cam
+  Ogre::SceneNode *cameraNode; // Camera node
+  Ogre::SceneNode *cameraPitchNode; // Separate pitch node
+  Ogre::Entity *avatar;
+  OgreFrameListener *ogreListener;
 
   int turbo;
   enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 };
 
-#endif // OGREWIDGET_H
+#endif // OGREWINDOW_H

@@ -27,7 +27,7 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="OgreWidget" name="renderZone" native="true"/>
+      <widget class="QWidget" name="renderZone" native="true"/>
       <widget class="QTextEdit" name="chatZone">
        <property name="readOnly">
         <bool>true</bool>
@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -214,14 +214,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>OgreWidget</class>
-   <extends>QWidget</extends>
-   <header>OgreWidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="pwclient.qrc"/>
  </resources>

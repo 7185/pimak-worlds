@@ -31,6 +31,7 @@
 #include "SettingsWindow.h"
 #include "AboutWindow.h"
 #include "Connection.h"
+#include "OgreWindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -63,6 +64,7 @@ class MainWindow : public QMainWindow {
 
 private:
   Ui::MainWindow *ui;
+  OgreWindow *ogreWindow;
   SettingsWindow *settings;
   AboutWindow *about;
   QTimer *paintTimer;

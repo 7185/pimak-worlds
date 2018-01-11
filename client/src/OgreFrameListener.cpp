@@ -197,7 +197,7 @@ bool OgreFrameListener::addMovingAvatar(quint16 id,
       movingAvatars->insert(id, ma);
       
     }else{
-      
+
         movingAvatars->insert(id,
                               (MovingAvatar){
                                   avatar,
