@@ -25,39 +25,35 @@
 
 #include "User.h"
 
-User::User(quint16 uid, QString nick)
-{
-    id = uid;
-    nickname = new QString(nick);
-    x, y, z = 0;
-    oldX, oldY, oldZ = 0;
-    pitch = 0;
-    yaw = 0;
+User::User(quint16 uid, QString nick) {
+  id = uid;
+  nickname = new QString(nick);
+  x = 0, y = 0, z = 0;
+  oldX = 0, oldY = 0, oldZ = 0;
+  pitch = 0;
+  yaw = 0;
 }
 
-User::~User()
-{
+User::~User() {
 }
 
-QString User::getNickname()
-{
-    return *nickname;
+QString User::getNickname() {
+  return *nickname;
 }
 
 quint16 User::getId() {
-    return id;
+  return id;
 }
 
-void User::setPosition(float nx, float ny, float nz, float npitch, float nyaw)
-{
-    oldX = x;
-    oldY = y;
-    oldZ = z;
-    x = nx;
-    y = ny;
-    z = nz;
-    oldPitch = pitch;
-    oldYaw = yaw;
-    pitch = npitch;
-    yaw = nyaw;
+void User::setPosition(float nx, float ny, float nz, float npitch, float nyaw) {
+  oldX = x;
+  oldY = y;
+  oldZ = z;
+  x = nx;
+  y = ny;
+  z = nz;
+  oldPitch = pitch;
+  oldYaw = yaw;
+  pitch = npitch;
+  yaw = nyaw;
 }

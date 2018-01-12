@@ -208,8 +208,7 @@ void MainWindow::appendMessage(QString mes, quint16 type)
     mes = mes.toHtmlEscaped();
 
     QStringList splitted;
-    switch (type)
-    {
+    switch (type) {
     case SC_MSG_PUBLIC:
         if (settings->getDisplayColors()) {
             splitted = mes.split(":");
@@ -220,19 +219,27 @@ void MainWindow::appendMessage(QString mes, quint16 type)
             mes = splitted.join(":");
         }
         mes = "<span style=\"color:black;font-weight:normal;font-style:normal\">"+mes+"</span>";
+        break;
     case SC_MSG_EVENT:
         mes = "<span style=\"color:orange;font-weight:bold;font-style:italic;\">"+mes+"</span>";
+        break;
     case SC_USER_JOIN:
         mes = "<span style=\"color:green;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+        break;
     case SC_USER_PART:
         mes = "<span style=\"color:brown;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+        break;
     case SC_MSG_PRIVATE:
         mes = "<span style=\"color:blue;font-weight:normal;font-style:italic;\">"+mes+"</span>";
+        break;
     case SC_ER_NICKINUSE:
+        break;
     case SC_ER_ERRONEOUSNICK:
         mes = "<span style=\"color:red;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+        break;
     default:
         mes = "<span style=\"color:black;font-weight:bold;font-style:normal;\">"+mes+"</span>";
+        break;
     }
 
     if (settings->getDisplayTime())

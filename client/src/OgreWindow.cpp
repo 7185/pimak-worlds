@@ -220,6 +220,9 @@ void OgreWindow::createCamera() {
 
   cameraNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode();
   cameraPitchNode = cameraNode->createChildSceneNode();
+
+  cameraNode->setPosition(Ogre::Vector3(1445.0f,10.0f,910.0f));
+  cameraNode->yaw(Ogre::Degree(180.0f));
 }
 
 void OgreWindow::createViewport() {
@@ -239,8 +242,8 @@ void OgreWindow::createTerrain() {
 
   Ogre::Light* terLight = ogreSceneMgr->createLight("terrainLight");
   terLight->setType(Ogre::Light::LT_DIRECTIONAL);
-  terLight->setDirection(Ogre::Vector3(0.55f,-0.3f,0.75f));
-  terLight->setDiffuseColour(Ogre::ColourValue::White);
+  terLight->setDirection(Ogre::Vector3(0.60f,-0.3f,0.55f));
+  terLight->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
   terLight->setSpecularColour(Ogre::ColourValue(0.4f, 0.4f, 0.4f));
 
   ogreTerrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
@@ -261,12 +264,12 @@ void OgreWindow::createTerrain() {
   imp.minBatchSize = 33;
   imp.maxBatchSize = 65;
   imp.layerList.resize(3);
-  imp.layerList[0].worldSize = 100;
-  imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
-  imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
-  imp.layerList[1].worldSize = 30;
-  imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-  imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+  imp.layerList[1].worldSize = 100;
+  imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+  imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+  imp.layerList[0].worldSize = 300;
+  imp.layerList[0].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+  imp.layerList[0].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
   imp.layerList[2].worldSize = 200;
   imp.layerList[2].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
   imp.layerList[2].textureNames.push_back("dirt_grayrocky_normalheight.dds");
@@ -294,11 +297,18 @@ void OgreWindow::createScene() {
   Ogre::SceneNode* node = ogreSceneMgr->createSceneNode("Node");
   ogreSceneMgr->getRootSceneNode()->addChild(node);
 
-  Ogre::Entity* house =  ogreSceneMgr->createEntity("House", "House.mesh");
+  Ogre::Entity* house = ogreSceneMgr->createEntity("House", "House.mesh");
   Ogre::SceneNode* houseNode = node->createChildSceneNode("HouseNode");
   houseNode->setScale(0.1f,0.1f,0.1f);
   houseNode->setPosition(Ogre::Vector3(1400.0f,55.0f,1020.0f));
   houseNode->attachObject(house);
+
+  Ogre::Entity* knuckles = ogreSceneMgr->createEntity("Knuckles", "Knuckles.mesh");
+  Ogre::SceneNode* knucklesNode = node->createChildSceneNode("KnucklesNode");
+  knucklesNode->setPosition(Ogre::Vector3(1429.5f,12.0f,990.0f));
+  knucklesNode->yaw(Ogre::Degree(180.0f));
+  knucklesNode->setScale(0.15f,0.15f,0.15f);
+  knucklesNode->attachObject(knuckles);
 
   avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
 

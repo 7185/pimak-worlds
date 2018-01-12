@@ -56,7 +56,7 @@ OgreFrameListener::~OgreFrameListener()
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt)
 {
     if (ogreControls[UP] || ogreControls[DOWN] ||
-        ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT])) {
+        (ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT]))) {
         if (!running) {
             running = true;
             aniStateTop->setEnabled(false);
