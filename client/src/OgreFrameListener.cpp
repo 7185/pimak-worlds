@@ -23,7 +23,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QVector>
 #include <OgreMath.h>
 
 #include "OgreFrameListener.h"

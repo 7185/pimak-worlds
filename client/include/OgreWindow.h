@@ -54,7 +54,7 @@ class OgreWindow : public QWindow {
   virtual void createCompositor();
 #endif
 
-  void setAnimating(bool animating);
+  void setAnimating(bool anim);
   void setActiveCam(bool); // 0: First, 1:Third
 
  public slots:

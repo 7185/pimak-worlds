@@ -518,8 +518,8 @@ bool OgreWindow::eventFilter(QObject *target, QEvent *event) {
  * Function to keep track of when we should and shouldn't redraw the window; we wouldn't want to do
  * rendering when the QWindow is minimized. This takes care of those scenarios.
  */
-void OgreWindow::setAnimating(bool animating) {
-  animating = animating;
+void OgreWindow::setAnimating(bool anim) {
+  animating = anim;
 
   if (animating)
     renderLater();

@@ -54,10 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(connection,SIGNAL(userDeleted(User*)),ogreWindow,SLOT(destroyAvatar(User*)));
     connect(connection,SIGNAL(userPosition(User*)),ogreWindow,SLOT(moveAvatar(User*)));
 
-    paintTimer = new QTimer;
-    paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd
-    connect(paintTimer,SIGNAL(timeout()),ogreWindow,SLOT(renderNow()));
-    connect(settings,SIGNAL(fpsChanged(int)),this,SLOT(updateTimer(int)));
+    // paintTimer = new QTimer;
+    // paintTimer->start(1000/settings->getFps()); // ton oeil en voit que 10 par seconde pd
+    // connect(paintTimer,SIGNAL(timeout()),ogreWindow,SLOT(requestUpdate()));
+    // connect(settings,SIGNAL(fpsChanged(int)),this,SLOT(updateTimer(int)));
 
     posTimer = new QTimer;
     posTimer->start(1000/5);
@@ -79,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     posLbl->setFrameStyle(QFrame::Box | QFrame::Sunken);
     ui->statusBar->addPermanentWidget(posLbl);
     ui->statusBar->addPermanentWidget(fpsLbl);
+    ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
     connect(ogreWindow,SIGNAL(dispAverageFps(QString)),fpsLbl,SLOT(setText(QString)));
     connect(ogreWindow,SIGNAL(dispPosition(QString)),posLbl,SLOT(setText(QString)));
