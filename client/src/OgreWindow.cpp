@@ -23,6 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "AnimationManager.h"
 #include "OgreWindow.h"
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
 #include <Compositor/OgreCompositorManager2.h>
@@ -312,8 +313,11 @@ void OgreWindow::createScene() {
 
   avatar = ogreSceneMgr->createEntity("Avatar", "Sinbad.mesh");
 
-  ogreListener = new OgreFrameListener(avatar);
+  ogreListener = new OgreFrameListener();
   ogreRoot->addFrameListener(ogreListener);
+
+  AnimationManager::getSingleton()->setAvatar(avatar);
+  AnimationManager::getSingleton()->setFrameListener(ogreListener);
 
   Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("avatarNode");
   avatarNode->setPosition(Ogre::Vector3(0.0f,-5.0f,0.0f));
@@ -360,11 +364,8 @@ void OgreWindow::destroyAvatar(User *u) {
 }
 
 void OgreWindow::moveAvatar(User *u) {
-  ogreListener->addMovingAvatar(u->id, u->avatar, u->node,
-                                u->x, u->y-5.0f, u->z,
-                                u->oldX, u->oldY-5.0f, u->oldZ,
-                                u->pitch, u->yaw,
-                                u->oldPitch, u->oldYaw);
+  AnimationManager* animMgr = AnimationManager::getSingleton();
+  animMgr->moveAvatar(u);
 }
 void OgreWindow::posSend() {
   emit positionSend(cameraNode->getPosition().x, cameraNode->getPosition().y, cameraNode->getPosition().z,
