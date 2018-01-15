@@ -38,6 +38,7 @@
 #endif
 
 #include "OgreFrameListener.h"
+#include "AnimationManager.h"
 #include "User.h"
 
 class OgreWindow : public QWindow {

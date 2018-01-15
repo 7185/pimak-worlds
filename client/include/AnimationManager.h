@@ -23,25 +23,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OGREFRAMELISTENER_H
-#define OGREFRAMELISTENER_H
+#ifndef ANIMATIONMANAGER_H
+#define ANIMATIONMANAGER_H
 
+#include <Qt>
+#include <QMap>
 #include <Ogre.h>
 
-class OgreFrameListener : public Ogre::FrameListener {
- public:
-  OgreFrameListener();
-  ~OgreFrameListener();
-  bool frameStarted(const Ogre::FrameEvent &);
-  bool frameEnded(const Ogre::FrameEvent &);
-  bool frameRenderingQueued(const Ogre::FrameEvent &);
-  void handleKeys(int, bool);
+#include "OgreFrameListener.h"
+#include "User.h"
 
-  bool *ogreControls;
+typedef struct {
+ Ogre::Entity *avatar;
+ Ogre::SceneNode *node;
+ float x,y,z;
+ float oldX,oldY,oldZ;
+ float pitch;
+ float yaw;
+ float oldPitch;
+ float oldYaw;
+ float completion;
+} MovingAvatar;
+
+class AnimationManager {
+ public:
+  static AnimationManager* getSingleton();
+  void animate(const Ogre::FrameEvent &evt);
+  void setAvatar(Ogre::Entity* avatar);
+  void setFrameListener(OgreFrameListener* frameListener);
+  void moveAvatar(const User* u);
 
  private:
-  enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
+  AnimationManager();
 
+  bool running;
+  Ogre::AnimationState* aniStateBase;
+  Ogre::AnimationState* aniStateTop;
+  static AnimationManager* singleton;
+  Ogre::Entity* avatar;
+  OgreFrameListener* frameListener;
+  QMap<quint16, MovingAvatar> *movingAvatars;
+
+  enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 };
 
-#endif // OGREFRAMELISTENER_H
+#endif // ANIMATIONMANAGER_H
