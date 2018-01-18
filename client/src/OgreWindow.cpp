@@ -25,6 +25,7 @@
 
 #include "AnimationManager.h"
 #include "OgreWindow.h"
+#include "InputSystem.h"
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
 #include <Compositor/OgreCompositorManager2.h>
 #endif
@@ -43,6 +44,8 @@ OgreWindow::OgreWindow(QWindow *parent) : QWindow(parent), updatePending(false),
   ogreSceneMgr = NULL;
   ogreListener = NULL;
   activeCamera = NULL;
+
+  inputSystem = new InputSystem();
 }
 
 OgreWindow::~OgreWindow() {
@@ -317,7 +320,7 @@ void OgreWindow::createScene() {
   ogreRoot->addFrameListener(ogreListener);
 
   AnimationManager::getSingleton()->setAvatar(avatar);
-  AnimationManager::getSingleton()->setFrameListener(ogreListener);
+  AnimationManager::getSingleton()->setInputSystem(inputSystem);
 
   Ogre::SceneNode* avatarNode = cameraPitchNode->createChildSceneNode("avatarNode");
   avatarNode->setPosition(Ogre::Vector3(0.0f,-5.0f,0.0f));
@@ -384,25 +387,27 @@ void OgreWindow::moveCamera() {
   Ogre::Real pitchAngle = 2*Ogre::Degree(Ogre::Math::ACos(cameraPitchNode->getOrientation().w)).valueDegrees();
   Ogre::Real pitchAngleSign = cameraPitchNode->getOrientation().x;
 
-  // Should not be frame based
-  if (ogreListener->ogreControls[CTRL]) turbo = 5;
-  else turbo = 1;
-  if (ogreListener->ogreControls[UP]) cameraNode->translate(turbo*-Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0, cameraNode->getOrientation().zAxis().z));
-  if (ogreListener->ogreControls[DOWN]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0, cameraNode->getOrientation().zAxis().z));
-  if (ogreListener->ogreControls[PLUS]) cameraNode->translate(turbo*Ogre::Vector3(0, 1, 0));
-  if (ogreListener->ogreControls[MINUS]) cameraNode->translate(turbo*Ogre::Vector3(0, -1, 0));
+  bool* ogreControls = inputSystem->getControls();
 
-  if (ogreListener->ogreControls[LEFT]) {
-    if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(-cameraNode->getOrientation().zAxis().z, 0, cameraNode->getOrientation().zAxis().x));
+  // Should not be frame based
+  if (ogreControls[CTRL]) turbo = 5;
+  else turbo = 1;
+  if (ogreControls[UP]) cameraNode->translate(turbo*-Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0, cameraNode->getOrientation().zAxis().z));
+  if (ogreControls[DOWN]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0, cameraNode->getOrientation().zAxis().z));
+  if (ogreControls[PLUS]) cameraNode->translate(turbo*Ogre::Vector3(0, 1, 0));
+  if (ogreControls[MINUS]) cameraNode->translate(turbo*Ogre::Vector3(0, -1, 0));
+
+  if (ogreControls[LEFT]) {
+    if (ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(-cameraNode->getOrientation().zAxis().z, 0, cameraNode->getOrientation().zAxis().x));
     else cameraNode->yaw(turbo*Ogre::Radian(0.05f));
   }
-  if (ogreListener->ogreControls[RIGHT]) {
-    if (ogreListener->ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z, 0, -cameraNode->getOrientation().zAxis().x));
+  if (ogreControls[RIGHT]) {
+    if (ogreControls[SHIFT]) cameraNode->translate(turbo*Ogre::Vector3(cameraNode->getOrientation().zAxis().z, 0, -cameraNode->getOrientation().zAxis().x));
     else cameraNode->yaw(turbo*Ogre::Radian(-0.05f));
   }
-  if (ogreListener->ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
+  if (ogreControls[PGUP] && (pitchAngle < 90.0f || pitchAngleSign < 0))
     cameraPitchNode->pitch(turbo*Ogre::Radian(0.05f));
-  if (ogreListener->ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
+  if (ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
     cameraPitchNode->pitch(turbo*Ogre::Radian(-0.05f));
 
   ogreThirdCamera->lookAt(cameraNode->getPosition());
@@ -505,10 +510,10 @@ bool OgreWindow::eventFilter(QObject *target, QEvent *event) {
       }
     } else if (event->type() == QEvent::KeyPress) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      ogreListener->handleKeys(keyEvent->key(),true);
+      inputSystem->handleKeys(keyEvent->key(),true);
     } else if (event->type() == QEvent::KeyRelease) {
       QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-      ogreListener->handleKeys(keyEvent->key(),false);
+      inputSystem->handleKeys(keyEvent->key(),false);
     }
   }
 

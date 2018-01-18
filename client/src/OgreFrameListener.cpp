@@ -29,12 +29,9 @@
 #include "AnimationManager.h"
 
 OgreFrameListener::OgreFrameListener() {
-  ogreControls = new bool[9];
-  for (int i=0;i<=9;i++) { ogreControls[i] = false; }
 }
 
 OgreFrameListener::~OgreFrameListener() {
-  delete [] ogreControls;
 }
 
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt) {
@@ -49,41 +46,4 @@ bool OgreFrameListener::frameEnded(const Ogre::FrameEvent &evt) {
 bool OgreFrameListener::frameRenderingQueued(const Ogre::FrameEvent &evt) {
   Q_UNUSED(&evt);
   return true;
-}
-
-void OgreFrameListener::handleKeys(int key, bool state) {
-  switch(key) {
-  case Qt::Key_Up:
-    ogreControls[UP] = state;
-    break;
-  case Qt::Key_Right:
-    ogreControls[RIGHT] = state;
-    break;
-  case Qt::Key_Down:
-    ogreControls[DOWN] = state;
-    break;
-  case Qt::Key_Left:
-    ogreControls[LEFT] = state;
-    break;
-  case Qt::Key_PageUp:
-    ogreControls[PGUP] = state;
-    break;
-  case Qt::Key_PageDown:
-    ogreControls[PGDOWN] = state;
-    break;
-  case Qt::Key_Plus:
-    ogreControls[PLUS] = state;
-    break;
-  case Qt::Key_Minus:
-    ogreControls[MINUS] = state;
-    break;
-  case Qt::Key_Control:
-    ogreControls[CTRL] = state;
-    break;
-  case Qt::Key_Shift:
-    ogreControls[SHIFT] = state;
-    break;
-  default:
-    break;
-  }
 }

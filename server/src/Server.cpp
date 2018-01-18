@@ -41,7 +41,7 @@ Server::Server(int port) {
 }
 
 void Server::clientConnect() {
-  Client *newClient = new Client(server->nextPendingConnection(), this);
+  new Client(server->nextPendingConnection(), this);
 }
 
 

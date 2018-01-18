@@ -30,7 +30,7 @@
 #include <QMap>
 #include <Ogre.h>
 
-#include "OgreFrameListener.h"
+#include "InputSystem.h"
 #include "User.h"
 
 typedef struct {
@@ -50,7 +50,7 @@ class AnimationManager {
   static AnimationManager* getSingleton();
   void animate(const Ogre::FrameEvent &evt);
   void setAvatar(Ogre::Entity* avatar);
-  void setFrameListener(OgreFrameListener* frameListener);
+  void setInputSystem(InputSystem* inputSystem);
   void moveAvatar(const User* u);
 
  private:
@@ -61,10 +61,8 @@ class AnimationManager {
   Ogre::AnimationState* aniStateTop;
   static AnimationManager* singleton;
   Ogre::Entity* avatar;
-  OgreFrameListener* frameListener;
+  InputSystem* inputSystem;
   QMap<quint16, MovingAvatar> *movingAvatars;
-
-  enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 };
 
 #endif // ANIMATIONMANAGER_H

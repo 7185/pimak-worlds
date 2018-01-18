@@ -38,6 +38,7 @@
 #endif
 
 #include "OgreFrameListener.h"
+#include "InputSystem.h"
 #include "AnimationManager.h"
 #include "User.h"
 
@@ -103,9 +104,9 @@ class OgreWindow : public QWindow {
   Ogre::SceneNode *cameraPitchNode; // Separate pitch node
   Ogre::Entity *avatar;
   OgreFrameListener *ogreListener;
+  InputSystem *inputSystem;
 
   int turbo;
-  enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 };
 
 #endif // OGREWINDOW_H

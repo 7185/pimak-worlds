@@ -23,19 +23,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OGREFRAMELISTENER_H
-#define OGREFRAMELISTENER_H
+#ifndef INPUTSYSTEM_H
+#define INPUTSYSTEM_H
 
-#include <Ogre.h>
+enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 
-class OgreFrameListener : public Ogre::FrameListener {
+class InputSystem {
  public:
-  OgreFrameListener();
-  ~OgreFrameListener();
-  bool frameStarted(const Ogre::FrameEvent &);
-  bool frameEnded(const Ogre::FrameEvent &);
-  bool frameRenderingQueued(const Ogre::FrameEvent &);
+  InputSystem();
+  ~InputSystem();
   void handleKeys(int, bool);
+  bool* getControls();
+
+ private:
+  bool *ogreControls;
+
 };
 
-#endif // OGREFRAMELISTENER_H
+#endif // INPUTSYSTEM_H

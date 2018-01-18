@@ -52,8 +52,8 @@ void AnimationManager::setAvatar(Ogre::Entity* a) {
   aniStateBase->setLoop(true);
 }
 
-void AnimationManager::setFrameListener(OgreFrameListener* l) {
-  frameListener = l;
+void AnimationManager::setInputSystem(InputSystem* i) {
+  inputSystem = i;
 }
 
 void AnimationManager::moveAvatar(const User* u) {
@@ -95,7 +95,7 @@ void AnimationManager::moveAvatar(const User* u) {
 }
 
 void AnimationManager::animate(const Ogre::FrameEvent &evt) {
-  bool* ogreControls = frameListener->ogreControls;
+  bool* ogreControls = inputSystem->getControls();
 
   if (ogreControls[UP] || ogreControls[DOWN] ||
     (ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT]))) {

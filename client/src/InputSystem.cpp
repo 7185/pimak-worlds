@@ -23,19 +23,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OGREFRAMELISTENER_H
-#define OGREFRAMELISTENER_H
+#include <Qt>
 
-#include <Ogre.h>
+#include "InputSystem.h"
 
-class OgreFrameListener : public Ogre::FrameListener {
- public:
-  OgreFrameListener();
-  ~OgreFrameListener();
-  bool frameStarted(const Ogre::FrameEvent &);
-  bool frameEnded(const Ogre::FrameEvent &);
-  bool frameRenderingQueued(const Ogre::FrameEvent &);
-  void handleKeys(int, bool);
-};
+InputSystem::InputSystem() {
+  ogreControls = new bool[9];
+  for (int i=0;i<=9;i++) { ogreControls[i] = false; }
+}
 
-#endif // OGREFRAMELISTENER_H
+InputSystem::~InputSystem() {
+  delete [] ogreControls;
+}
+
+bool* InputSystem::getControls() {
+  return ogreControls;
+}
+
+void InputSystem::handleKeys(int key, bool state) {
+  switch(key) {
+  case Qt::Key_Up:
+    ogreControls[UP] = state;
+    break;
+  case Qt::Key_Right:
+    ogreControls[RIGHT] = state;
+    break;
+  case Qt::Key_Down:
+    ogreControls[DOWN] = state;
+    break;
+  case Qt::Key_Left:
+    ogreControls[LEFT] = state;
+    break;
+  case Qt::Key_PageUp:
+    ogreControls[PGUP] = state;
+    break;
+  case Qt::Key_PageDown:
+    ogreControls[PGDOWN] = state;
+    break;
+  case Qt::Key_Plus:
+    ogreControls[PLUS] = state;
+    break;
+  case Qt::Key_Minus:
+    ogreControls[MINUS] = state;
+    break;
+  case Qt::Key_Control:
+    ogreControls[CTRL] = state;
+    break;
+  case Qt::Key_Shift:
+    ogreControls[SHIFT] = state;
+    break;
+  default:
+    break;
+  }
+}
