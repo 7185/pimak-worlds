@@ -30,6 +30,8 @@
 #include <iostream>
 #include "Client.h"
 
+#define UPDATE_TICK 200
+
 class Server : public QObject {
  Q_OBJECT
 
@@ -38,11 +40,12 @@ class Server : public QObject {
 
  private slots:
   void clientConnect();
+  void updateClients();
 
  private:
   QString *serverState;
   QTcpServer *server;
-  QList<Client *> clients;
+  QTimer *updateTimer;
 };
 
 #endif

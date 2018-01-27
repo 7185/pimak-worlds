@@ -36,6 +36,7 @@ Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageS
   connect(clientTcp,SIGNAL(readyRead()), SLOT(dataRecv()));
     
   nickname = new QString;
+  needUpdate = true;
 
   for (quint16 i=1;i<=clients.size()+1;i++) {
     if (!clients.contains(i)) id=i;
@@ -45,6 +46,10 @@ Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageS
 
 Client::~Client() {
   clients.remove(id);
+}
+
+QMap<quint16, Client*> Client::getClients() {
+  return clients;
 }
 
 void Client::dataRecv() {
@@ -72,31 +77,27 @@ void Client::dataRecv() {
       else
         std::cout << "[From: " << id << " (" << nickname->toStdString() << ")] (" << messageCode << ") " << message.toStdString() << std::endl;
       dataHandler(messageCode, message);
-    } else {
+    } else if (messageCode == CS_AVATAR_POSITION) {
+      float oldX = x;
+      float oldY = y;
+      float oldZ = z;
+      float oldPitch = pitch;
+      float oldYaw = yaw;
       in >> x;
       in >> y;
       in >> z;
       in >> pitch;
       in >> yaw;
-      dataHandler(messageCode);
+
+      needUpdate = !(x == oldX && y == oldY && z == oldZ && pitch == oldPitch && yaw == oldYaw);
+
+    } else {
+        if (nickname->isEmpty())
+          std::cout << "UID " << id << " sent an unknown request!" << std::endl;
+        else
+          std::cout << "UID " << id << " (" << nickname->toStdString() << ") sent an unknown request!" << std::endl;
     }
   }
-}
-
-void Client::dataHandler(quint16 dataCode) {
-  switch (dataCode) {
-    case CS_AVATAR_POSITION:
-      //TODO: timer?
-      foreach (quint16 userId, clients.keys()) {
-        if (userId != id) emit sendDataTo(userId,SC_AVATAR_POSITION);
-      }
-      break;
-    default:
-      if (nickname->isEmpty())
-        std::cout << "UID " << id << " sent an unknown request!" << std::endl;
-      else
-        std::cout << "UID " << id << " (" << nickname->toStdString() << ") sent an unknown request!" << std::endl;
-    }
 }
 
 void Client::dataHandler(quint16 dataCode, QString data) {
@@ -159,6 +160,14 @@ void Client::clientDisconnect() {
   if (!nickname->isEmpty()) emit sendToAll(SC_USER_PART,*nickname);
   // We let the Client delete itself
   deleteLater();
+}
+
+void Client::sendPositionToAll() {
+  if (needUpdate) {
+    foreach (quint16 userId, clients.keys()) {
+      if (userId != id) emit sendDataTo(userId, SC_AVATAR_POSITION);
+    }
+  }
 }
 
 void Client::sendList() {

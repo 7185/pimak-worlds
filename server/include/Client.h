@@ -35,6 +35,8 @@ class Client : public QObject {
  public:
   explicit Client(QTcpSocket *tcp, QObject *parent = 0);
   ~Client();
+  static QMap<quint16, Client*> getClients();
+  void sendPositionToAll();
 
  public slots:
   static void sendToAll(const quint16 &, const QString & = "");
@@ -47,7 +49,6 @@ class Client : public QObject {
 
  private slots:
   void dataHandler(quint16 dataCode, QString data);
-  void dataHandler(quint16 dataCode);
   void dataRecv();
   void clientDisconnect();
 
@@ -56,6 +57,7 @@ class Client : public QObject {
   QString *nickname;
   quint16 messageSize;
   quint16 id;
+  bool needUpdate;
   static QMap<quint16, Client*> clients;
   float x, y, z;
   float pitch, yaw;

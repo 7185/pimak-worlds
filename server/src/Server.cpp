@@ -38,10 +38,18 @@ Server::Server(int port) {
     connect(server, SIGNAL(newConnection()), this, SLOT(clientConnect()));
   }
   std::cout << serverState->toStdString() << std::endl;
+
+  updateTimer = new QTimer;
+  updateTimer->start(UPDATE_TICK);
+  connect(updateTimer,SIGNAL(timeout()),this,SLOT(updateClients()));
 }
 
 void Server::clientConnect() {
   new Client(server->nextPendingConnection(), this);
 }
 
-
+void Server::updateClients() {
+  foreach (Client *client, Client::getClients()) {
+    client->sendPositionToAll();
+  }
+}
