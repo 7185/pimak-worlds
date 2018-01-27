@@ -57,8 +57,15 @@ void AnimationManager::setInputSystem(InputSystem* i) {
 }
 
 void AnimationManager::moveAvatar(const User* u) {
+  bool idle = (u->x == u->oldX &&
+               u->y == u->oldY &&
+               u->z == u->oldZ &&
+               u->pitch == u->oldPitch &&
+               u->yaw == u->oldYaw);
+  
   if (movingAvatars->contains(u->id)) {
     MovingAvatar ma = (*movingAvatars)[u->id];
+    ma.idle = idle;
     ma.oldX = ma.oldX + (ma.x - ma.oldX) * ma.completion;
     ma.oldY = ma.oldY + (ma.y - ma.oldY) * ma.completion;
     ma.oldZ = ma.oldZ + (ma.z - ma.oldZ) * ma.completion;
@@ -80,7 +87,8 @@ void AnimationManager::moveAvatar(const User* u) {
                                   u->oldX, u->oldY-5.0f, u->oldZ,
                                   u->pitch, u->yaw,
                                   u->oldPitch, u->oldYaw,
-                                  0.0
+                                  0.0,
+                                  idle,
                                 });
 
     Ogre::AnimationState* aniStateBase = u->avatar->getAnimationState("IdleTop");
@@ -148,7 +156,6 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
     node->setOrientation(Ogre::Quaternion());
     node->yaw(Ogre::Degree(180.0f));
 
-
     if (deltaYaw > Ogre::Math::PI)
       deltaYaw -= Ogre::Math::TWO_PI;
     else if (deltaYaw <  -Ogre::Math::PI )
@@ -167,7 +174,7 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
     Ogre::AnimationState *aniStateOldTop, *aniStateOldBase, *aniStateNewTop, *aniStateNewBase;
 
     try {
-      if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ > 0.0001) {
+      if(!ma.idle) {
         aniStateOldTop = ma.avatar->getAnimationState("IdleTop");
         aniStateOldBase = ma.avatar->getAnimationState("IdleBase");
         aniStateNewTop = ma.avatar->getAnimationState("RunTop");

@@ -36,6 +36,7 @@ Client::Client(QTcpSocket *tcp, QObject *p) : QObject(p),clientTcp(tcp),messageS
   connect(clientTcp,SIGNAL(readyRead()), SLOT(dataRecv()));
     
   nickname = new QString;
+  posChanged = true;
   needUpdate = true;
 
   for (quint16 i=1;i<=clients.size()+1;i++) {
@@ -89,7 +90,9 @@ void Client::dataRecv() {
       in >> pitch;
       in >> yaw;
 
-      needUpdate = !(x == oldX && y == oldY && z == oldZ && pitch == oldPitch && yaw == oldYaw);
+      posChanged = !(x == oldX && y == oldY && z == oldZ && pitch == oldPitch && yaw == oldYaw);
+      if(posChanged)
+        needUpdate = true;
 
     } else {
         if (nickname->isEmpty())
@@ -168,6 +171,9 @@ void Client::sendPositionToAll() {
       if (userId != id) emit sendDataTo(userId, SC_AVATAR_POSITION);
     }
   }
+  
+  if(!posChanged)
+    needUpdate = false;
 }
 
 void Client::sendList() {

@@ -57,6 +57,7 @@ class Client : public QObject {
   QString *nickname;
   quint16 messageSize;
   quint16 id;
+  bool posChanged;
   bool needUpdate;
   static QMap<quint16, Client*> clients;
   float x, y, z;
