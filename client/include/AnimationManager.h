@@ -43,6 +43,7 @@ typedef struct {
  float oldPitch;
  float oldYaw;
  float completion;
+ bool idle;
 } MovingAvatar;
 
 class AnimationManager {
