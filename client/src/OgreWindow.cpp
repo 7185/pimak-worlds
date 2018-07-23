@@ -156,7 +156,7 @@ void OgreWindow::initialize() {
   if (numThreads > 1)threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
   ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 #else
-  ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
+  ogreSceneMgr = ogreRoot->createSceneManager();
 #endif
 
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
@@ -430,7 +430,7 @@ void OgreWindow::render() {
   moveCamera();
   ogreRoot->renderOneFrame();
   if (ogreRenderWindow != NULL) {
-    QString str = QString::number(ogreRenderWindow->getAverageFPS(),'f',2)+" FPS";
+    QString str = QString::number(ogreRenderWindow->getStatistics().avgFPS,'f',1)+" FPS";
     emit dispAverageFps(str);
     ogreRenderWindow->update();
   }
