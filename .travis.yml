@@ -4,7 +4,10 @@ sudo: required
 language: cpp
 
 before_install:
-  - sudo apt-get install -qq qt5-qmake qtbase5-dev libogre-1.9-dev
+  - sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq qt59base qt59tools qt59qbs libogre-1.9-dev
+  - . /opt/qt59/bin/qt59-env.sh
 
 env:
   - PROJECT=server
@@ -12,6 +15,9 @@ env:
 
 script:
   - cd $PROJECT
-  - qmake -qt=qt5
-  - make
+  - qbs --version
+  - qbs setup-toolchains --detect
+  - qbs setup-qt --detect
+  - qbs config defaultProfile qt-5-9-4
+  - qbs build -d build/
 
