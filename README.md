@@ -1,7 +1,7 @@
 # Pimak Worlds
-Pimak Worlds is a project about creating a 4D virtual world and stuff.
+Pimak Worlds is a project about creating a 3D virtual world and stuff.
 
-[![Build Status](https://travis-ci.org/7186/pimak-worlds.png?branch=master)](https://travis-ci.org/7185/pimak-worlds)
+[![Build Status](https://travis-ci.org/7185/pimak-worlds.png?branch=master)](https://travis-ci.org/7185/pimak-worlds)
 
 ## Dependencies
 * qt
