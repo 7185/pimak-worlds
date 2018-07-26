@@ -156,7 +156,7 @@ void OgreWindow::initialize() {
   if (numThreads > 1)threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
   ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC, numThreads, threadedCullingMethod);
 #else
-  ogreSceneMgr = ogreRoot->createSceneManager();
+  ogreSceneMgr = ogreRoot->createSceneManager(Ogre::ST_GENERIC);
 #endif
 
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
