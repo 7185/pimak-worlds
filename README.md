@@ -1,23 +1,28 @@
 # Pimak Worlds
-Pimak Worlds is a project about creating a 3D virtual world and stuff.
+Pimak Worlds is a project about creating a 4D virtual world and stuff.
 
-[![Build Status](https://travis-ci.org/7185/pimak-worlds.png?branch=master)](https://travis-ci.org/7185/pimak-worlds)
+[![Build Status](https://travis-ci.org/7186/pimak-worlds.png?branch=master)](https://travis-ci.org/7185/pimak-worlds)
 
 ## Dependencies
 * qt
 * ogre
 * boost
 
-## Operating System
-For now, our main focus is the linux release, but support for other operating systems could magically appear one day.
+## Building
+### Linux
+* Install qbs
+* Run the following commands
+```
+qbs setup-toolchains --detect
+qbs setup-qt --detect
+qbs config defaultProfile <your-qt-version>
+qbs build -d build/
+```
+* For the client, you'll have to move the `pwclient` executable from `build/default/install-root` to the `client` directory
+
 ### Windows
-#### Dependencies
-* MinGW : [http://www.mingw.org/](http://www.mingw.org/)
-* Qt : [http://qt.nokia.com/products/](http://qt.nokia.com/products/)
-* Ogre : [http://www.ogre3d.org/](http://www.ogre3d.org/)
-#### Build
-* Edit build-client.bat to set your MinGW, Qt and Ogre paths
-* Run build-client.bat
+Sadly windows building isn't maintained anymore.
+
 
 ## Scripting
 This project includes a python library to access the PW protocol without GUI. An example can be found in `bobinot.py`.
