@@ -26,42 +26,49 @@
 #include "SettingsWindow.h"
 #include "ui_SettingsWindow.h"
 
-SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsWindow) {
+SettingsWindow::SettingsWindow(QWidget *parent)
+    : QDialog(parent), ui(new Ui::SettingsWindow) {
   ui->setupUi(this);
 
   settings = new QSettings("pimakworlds.ini", QSettings::IniFormat);
   readSettings();
-  connect(ui->framesSecSpinBox,SIGNAL(valueChanged(int)),this,SIGNAL(fpsChanged(int)));
+  connect(ui->framesSecSpinBox, SIGNAL(valueChanged(int)), this,
+          SIGNAL(fpsChanged(int)));
 }
 
-SettingsWindow::~SettingsWindow() {
-  delete ui;
-}
+SettingsWindow::~SettingsWindow() { delete ui; }
 
 void SettingsWindow::readSettings() {
   ui->nicknameLineEdit->setText(settings->value("account/name").toString());
   ui->adressLineEdit->setText(settings->value("server/host").toString());
   ui->portSpinBox->setValue(settings->value("server/port").toInt());
   ui->framesSecSpinBox->setValue(settings->value("video/fps").toInt());
-  ui->coloredNicksCheckBox->setChecked(settings->value("misc/colorednicks").toBool());
-  ui->displayTimeCheckBox->setChecked(settings->value("misc/displaytime").toBool());
+  ui->coloredNicksCheckBox->setChecked(
+      settings->value("misc/colorednicks").toBool());
+  ui->displayTimeCheckBox->setChecked(
+      settings->value("misc/displaytime").toBool());
 }
 
 void SettingsWindow::writeSettings() {
-  settings->setValue("account/name",ui->nicknameLineEdit->text());
-  settings->setValue("server/host",ui->adressLineEdit->text());
-  settings->setValue("server/port",ui->portSpinBox->value());
-  settings->setValue("video/fps",ui->framesSecSpinBox->value());
-  settings->setValue("misc/colorednicks",ui->coloredNicksCheckBox->isChecked());
-  settings->setValue("misc/displaytime",ui->displayTimeCheckBox->isChecked());
+  settings->setValue("account/name", ui->nicknameLineEdit->text());
+  settings->setValue("server/host", ui->adressLineEdit->text());
+  settings->setValue("server/port", ui->portSpinBox->value());
+  settings->setValue("video/fps", ui->framesSecSpinBox->value());
+  settings->setValue("misc/colorednicks",
+                     ui->coloredNicksCheckBox->isChecked());
+  settings->setValue("misc/displaytime", ui->displayTimeCheckBox->isChecked());
 }
 
 QString SettingsWindow::getHost() { return ui->adressLineEdit->text(); }
 QString SettingsWindow::getNickname() { return ui->nicknameLineEdit->text(); }
 int SettingsWindow::getPort() { return ui->portSpinBox->value(); }
 int SettingsWindow::getFps() { return ui->framesSecSpinBox->value(); }
-bool SettingsWindow::getDisplayTime() { return ui->displayTimeCheckBox->isChecked(); }
-bool SettingsWindow::getDisplayColors() { return ui->coloredNicksCheckBox->isChecked(); }
+bool SettingsWindow::getDisplayTime() {
+  return ui->displayTimeCheckBox->isChecked();
+}
+bool SettingsWindow::getDisplayColors() {
+  return ui->coloredNicksCheckBox->isChecked();
+}
 
 void SettingsWindow::closeEvent(QCloseEvent *event) {
   readSettings();
@@ -73,6 +80,4 @@ void SettingsWindow::on_buttonBox_accepted() {
   close();
 }
 
-void SettingsWindow::on_buttonBox_rejected() {
-  close();
-}
+void SettingsWindow::on_buttonBox_rejected() { close(); }

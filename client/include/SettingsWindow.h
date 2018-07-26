@@ -26,16 +26,16 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
 
-#include <QtWidgets/QDialog>
-#include <QSettings>
 #include <QCloseEvent>
+#include <QSettings>
+#include <QtWidgets/QDialog>
 
 namespace Ui {
 class SettingsWindow;
 }
 
 class SettingsWindow : public QDialog {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit SettingsWindow(QWidget *parent = 0);
@@ -63,4 +63,4 @@ class SettingsWindow : public QDialog {
   QSettings *settings;
 };
 
-#endif // SETTINGSWINDOW_H
+#endif  // SETTINGSWINDOW_H

@@ -26,22 +26,21 @@
 #include <QtWidgets/QApplication>
 #include "MainWindow.h"
 
-int main(int argc, char *argv[])
-{
-    QString locale = QLocale::system().name().split('_')[0];
+int main(int argc, char *argv[]) {
+  QString locale = QLocale::system().name().split('_')[0];
 
-    QTranslator d;
-    d.load(QString("lang/qt_") + locale);
-    QTranslator t;
-    t.load(QString("lang/pwclient_") + locale);
+  QTranslator d;
+  d.load(QString("lang/qt_") + locale);
+  QTranslator t;
+  t.load(QString("lang/pwclient_") + locale);
 
-    QApplication a(argc, argv);
-    a.installTranslator(&d);
-    a.installTranslator(&t);
+  QApplication a(argc, argv);
+  a.installTranslator(&d);
+  a.installTranslator(&t);
 
-    MainWindow w;
-    w.show();
-    w.showRenderZone();
+  MainWindow w;
+  w.show();
+  w.showRenderZone();
 
-    return a.exec();
+  return a.exec();
 }

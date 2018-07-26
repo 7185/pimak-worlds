@@ -33,7 +33,7 @@
 #define UPDATE_TICK 200
 
 class Server : public QObject {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit Server(int port);

@@ -26,7 +26,7 @@
 #ifndef INPUTSYSTEM_H
 #define INPUTSYSTEM_H
 
-enum keys { UP=0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
+enum keys { UP = 0, RIGHT, DOWN, LEFT, PGUP, PGDOWN, PLUS, MINUS, CTRL, SHIFT };
 
 class InputSystem {
  public:
@@ -36,8 +36,7 @@ class InputSystem {
   bool* getControls();
 
  private:
-  bool *ogreControls;
-
+  bool* ogreControls;
 };
 
-#endif // INPUTSYSTEM_H
+#endif  // INPUTSYSTEM_H

@@ -34,16 +34,11 @@ User::User(quint16 uid, QString nick) {
   yaw = 0;
 }
 
-User::~User() {
-}
+User::~User() {}
 
-QString User::getNickname() {
-  return *nickname;
-}
+QString User::getNickname() { return *nickname; }
 
-quint16 User::getId() {
-  return id;
-}
+quint16 User::getId() { return id; }
 
 void User::setPosition(float nx, float ny, float nz, float npitch, float nyaw) {
   oldX = x;

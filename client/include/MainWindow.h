@@ -26,19 +26,19 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets/QMainWindow>
 #include <QtWidgets/QLabel>
-#include "SettingsWindow.h"
+#include <QtWidgets/QMainWindow>
 #include "AboutWindow.h"
 #include "Connection.h"
 #include "OgreWindow.h"
+#include "SettingsWindow.h"
 
 namespace Ui {
 class MainWindow;
 }
 
 class MainWindow : public QMainWindow {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit MainWindow(QWidget *parent = 0);
@@ -53,16 +53,16 @@ class MainWindow : public QMainWindow {
   void updateWhisperList();
   void clientConnect();
   void clientDisconnect();
-  void on_actFirstCam_toggled(bool );
-  void on_actThirdCam_toggled(bool );
+  void on_actFirstCam_toggled(bool);
+  void on_actThirdCam_toggled(bool);
   void on_message_returnPressed();
   void on_whisper_returnPressed();
   void on_actConnect_triggered();
   void on_actDisconnect_triggered();
-  void appendMessage(QString="", quint16=0);
-  void on_actWhisper_toggled(bool );
+  void appendMessage(QString = "", quint16 = 0);
+  void on_actWhisper_toggled(bool);
 
-private:
+ private:
   Ui::MainWindow *ui;
   OgreWindow *ogreWindow;
   SettingsWindow *settings;
@@ -75,4 +75,4 @@ private:
   QLabel *posLbl;
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

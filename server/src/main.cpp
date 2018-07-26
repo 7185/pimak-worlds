@@ -30,7 +30,7 @@
 int main(int argc, char* argv[]) {
   QCoreApplication app(argc, argv);
 
-  if (argc<2) {
+  if (argc < 2) {
     std::cout << "usage: " << argv[0] << " <port>" << std::endl;
     return 1;
   }

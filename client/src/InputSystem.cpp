@@ -29,50 +29,48 @@
 
 InputSystem::InputSystem() {
   ogreControls = new bool[9];
-  for (int i=0;i<=9;i++) { ogreControls[i] = false; }
+  for (int i = 0; i <= 9; i++) {
+    ogreControls[i] = false;
+  }
 }
 
-InputSystem::~InputSystem() {
-  delete [] ogreControls;
-}
+InputSystem::~InputSystem() { delete[] ogreControls; }
 
-bool* InputSystem::getControls() {
-  return ogreControls;
-}
+bool *InputSystem::getControls() { return ogreControls; }
 
 void InputSystem::handleKeys(int key, bool state) {
-  switch(key) {
-  case Qt::Key_Up:
-    ogreControls[UP] = state;
-    break;
-  case Qt::Key_Right:
-    ogreControls[RIGHT] = state;
-    break;
-  case Qt::Key_Down:
-    ogreControls[DOWN] = state;
-    break;
-  case Qt::Key_Left:
-    ogreControls[LEFT] = state;
-    break;
-  case Qt::Key_PageUp:
-    ogreControls[PGUP] = state;
-    break;
-  case Qt::Key_PageDown:
-    ogreControls[PGDOWN] = state;
-    break;
-  case Qt::Key_Plus:
-    ogreControls[PLUS] = state;
-    break;
-  case Qt::Key_Minus:
-    ogreControls[MINUS] = state;
-    break;
-  case Qt::Key_Control:
-    ogreControls[CTRL] = state;
-    break;
-  case Qt::Key_Shift:
-    ogreControls[SHIFT] = state;
-    break;
-  default:
-    break;
+  switch (key) {
+    case Qt::Key_Up:
+      ogreControls[UP] = state;
+      break;
+    case Qt::Key_Right:
+      ogreControls[RIGHT] = state;
+      break;
+    case Qt::Key_Down:
+      ogreControls[DOWN] = state;
+      break;
+    case Qt::Key_Left:
+      ogreControls[LEFT] = state;
+      break;
+    case Qt::Key_PageUp:
+      ogreControls[PGUP] = state;
+      break;
+    case Qt::Key_PageDown:
+      ogreControls[PGDOWN] = state;
+      break;
+    case Qt::Key_Plus:
+      ogreControls[PLUS] = state;
+      break;
+    case Qt::Key_Minus:
+      ogreControls[MINUS] = state;
+      break;
+    case Qt::Key_Control:
+      ogreControls[CTRL] = state;
+      break;
+    case Qt::Key_Shift:
+      ogreControls[SHIFT] = state;
+      break;
+    default:
+      break;
   }
 }

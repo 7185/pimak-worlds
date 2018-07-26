@@ -33,7 +33,7 @@ class AboutWindow;
 }
 
 class AboutWindow : public QDialog {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit AboutWindow(QWidget *parent = 0);
@@ -43,4 +43,4 @@ class AboutWindow : public QDialog {
   Ui::AboutWindow *ui;
 };
 
-#endif // ABOUTWINDOW_H
+#endif  // ABOUTWINDOW_H

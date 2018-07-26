@@ -30,12 +30,12 @@
 #include <iostream>
 
 class Client : public QObject {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit Client(QTcpSocket *tcp, QObject *parent = 0);
   ~Client();
-  static QMap<quint16, Client*> getClients();
+  static QMap<quint16, Client *> getClients();
   void sendPositionToAll();
 
  public slots:
@@ -59,9 +59,9 @@ class Client : public QObject {
   quint16 id;
   bool posChanged;
   bool needUpdate;
-  static QMap<quint16, Client*> clients;
+  static QMap<quint16, Client *> clients;
   float x, y, z;
   float pitch, yaw;
 };
 
-#endif // CLIENT_H
+#endif  // CLIENT_H

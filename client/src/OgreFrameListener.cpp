@@ -25,14 +25,12 @@
 
 #include <OgreMath.h>
 
-#include "OgreFrameListener.h"
 #include "AnimationManager.h"
+#include "OgreFrameListener.h"
 
-OgreFrameListener::OgreFrameListener() {
-}
+OgreFrameListener::OgreFrameListener() {}
 
-OgreFrameListener::~OgreFrameListener() {
-}
+OgreFrameListener::~OgreFrameListener() {}
 
 bool OgreFrameListener::frameStarted(const Ogre::FrameEvent &evt) {
   AnimationManager::getSingleton()->animate(evt);

@@ -26,11 +26,11 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QtNetwork>
 #include <Ogre.h>
+#include <QtNetwork>
 
 class User : public QObject {
- Q_OBJECT
+  Q_OBJECT
  public:
   User(quint16 uid, QString nick);
   ~User();
@@ -41,14 +41,15 @@ class User : public QObject {
   Ogre::Entity *avatar;
   Ogre::SceneNode *node;
   quint16 id;
-  float x,y,z;
-  float oldX,oldY,oldZ;
+  float x, y, z;
+  float oldX, oldY, oldZ;
   float pitch;
   float yaw;
   float oldPitch;
   float oldYaw;
+
  private:
   QString *nickname;
 };
 
-#endif // USER_H
+#endif  // USER_H

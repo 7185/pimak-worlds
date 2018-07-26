@@ -26,9 +26,9 @@
 #ifndef OGREWINDOW_H
 #define OGREWINDOW_H
 
-#include <QtWidgets/QApplication>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWindow>
+#include <QtWidgets/QApplication>
 
 #include <Ogre.h>
 #ifdef Q_WS_WIN
@@ -37,13 +37,13 @@
 #include <OGRE/Terrain/OgreTerrain.h>
 #endif
 
-#include "OgreFrameListener.h"
-#include "InputSystem.h"
 #include "AnimationManager.h"
+#include "InputSystem.h"
+#include "OgreFrameListener.h"
 #include "User.h"
 
 class OgreWindow : public QWindow {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit OgreWindow(QWindow *parent = NULL);
@@ -57,7 +57,7 @@ class OgreWindow : public QWindow {
 #endif
 
   void setAnimating(bool anim);
-  void setActiveCam(bool); // 0: First, 1:Third
+  void setActiveCam(bool);  // 0: First, 1:Third
 
  public slots:
   virtual void renderLater();
@@ -73,7 +73,7 @@ class OgreWindow : public QWindow {
  signals:
   void dispAverageFps(QString);
   void dispPosition(QString);
-  void positionSend(float,float,float,float,float);
+  void positionSend(float, float, float, float, float);
 
  protected:
   virtual void exposeEvent(QExposeEvent *event);
@@ -98,10 +98,10 @@ class OgreWindow : public QWindow {
   Ogre::Terrain *ogreTerrain;
   Ogre::TerrainGlobalOptions *ogreTerrainGlobals;
   Ogre::Camera *ogreFirstCamera;
-  Ogre::Camera *ogreThirdCamera; // 3rd view cam
-  Ogre::Camera *activeCamera; // Current cam
-  Ogre::SceneNode *cameraNode; // Camera node
-  Ogre::SceneNode *cameraPitchNode; // Separate pitch node
+  Ogre::Camera *ogreThirdCamera;     // 3rd view cam
+  Ogre::Camera *activeCamera;        // Current cam
+  Ogre::SceneNode *cameraNode;       // Camera node
+  Ogre::SceneNode *cameraPitchNode;  // Separate pitch node
   Ogre::Entity *avatar;
   OgreFrameListener *ogreListener;
   InputSystem *inputSystem;
@@ -109,4 +109,4 @@ class OgreWindow : public QWindow {
   int turbo;
 };
 
-#endif // OGREWINDOW_H
+#endif  // OGREWINDOW_H

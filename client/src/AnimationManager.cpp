@@ -23,23 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <Ogre.h>
 #include "AnimationManager.h"
+#include <Ogre.h>
 
-AnimationManager* AnimationManager::singleton = NULL;
+AnimationManager *AnimationManager::singleton = NULL;
 
 AnimationManager::AnimationManager() {
   movingAvatars = new QMap<quint16, MovingAvatar>;
 }
 
-AnimationManager* AnimationManager::getSingleton() {
+AnimationManager *AnimationManager::getSingleton() {
   if (singleton == NULL) {
     singleton = new AnimationManager();
   }
   return singleton;
 }
 
-void AnimationManager::setAvatar(Ogre::Entity* a) {
+void AnimationManager::setAvatar(Ogre::Entity *a) {
   avatar = a;
   running = false;
 
@@ -52,17 +52,12 @@ void AnimationManager::setAvatar(Ogre::Entity* a) {
   aniStateBase->setLoop(true);
 }
 
-void AnimationManager::setInputSystem(InputSystem* i) {
-  inputSystem = i;
-}
+void AnimationManager::setInputSystem(InputSystem *i) { inputSystem = i; }
 
-void AnimationManager::moveAvatar(const User* u) {
-  bool idle = (u->x == u->oldX &&
-               u->y == u->oldY &&
-               u->z == u->oldZ &&
-               u->pitch == u->oldPitch &&
-               u->yaw == u->oldYaw);
-  
+void AnimationManager::moveAvatar(const User *u) {
+  bool idle = (u->x == u->oldX && u->y == u->oldY && u->z == u->oldZ &&
+               u->pitch == u->oldPitch && u->yaw == u->oldYaw);
+
   if (movingAvatars->contains(u->id)) {
     MovingAvatar ma = (*movingAvatars)[u->id];
     ma.idle = idle;
@@ -70,7 +65,7 @@ void AnimationManager::moveAvatar(const User* u) {
     ma.oldY = ma.oldY + (ma.y - ma.oldY) * ma.completion;
     ma.oldZ = ma.oldZ + (ma.z - ma.oldZ) * ma.completion;
     ma.x = u->x;
-    ma.y = u->y-5.0f;
+    ma.y = u->y - 5.0f;
     ma.z = u->z;
     ma.pitch = u->pitch;
     ma.yaw = u->yaw;
@@ -79,20 +74,27 @@ void AnimationManager::moveAvatar(const User* u) {
     ma.completion = 0.0;
     movingAvatars->insert(u->id, ma);
   } else {
-    movingAvatars->insert(u->id,
-                                {
-                                  u->avatar,
-                                  u->node,
-                                  u->x, u->y-5.0f, u->z,
-                                  u->oldX, u->oldY-5.0f, u->oldZ,
-                                  u->pitch, u->yaw,
-                                  u->oldPitch, u->oldYaw,
-                                  0.0,
-                                  idle,
-                                });
+    movingAvatars->insert(u->id, {
+                                     u->avatar,
+                                     u->node,
+                                     u->x,
+                                     u->y - 5.0f,
+                                     u->z,
+                                     u->oldX,
+                                     u->oldY - 5.0f,
+                                     u->oldZ,
+                                     u->pitch,
+                                     u->yaw,
+                                     u->oldPitch,
+                                     u->oldYaw,
+                                     0.0,
+                                     idle,
+                                 });
 
-    Ogre::AnimationState* aniStateBase = u->avatar->getAnimationState("IdleTop");
-    Ogre::AnimationState* aniStateTop = u->avatar->getAnimationState("IdleBase");
+    Ogre::AnimationState *aniStateBase =
+        u->avatar->getAnimationState("IdleTop");
+    Ogre::AnimationState *aniStateTop =
+        u->avatar->getAnimationState("IdleBase");
 
     aniStateTop->setEnabled(true);
     aniStateTop->setLoop(true);
@@ -103,10 +105,10 @@ void AnimationManager::moveAvatar(const User* u) {
 }
 
 void AnimationManager::animate(const Ogre::FrameEvent &evt) {
-  bool* ogreControls = inputSystem->getControls();
+  bool *ogreControls = inputSystem->getControls();
 
   if (ogreControls[UP] || ogreControls[DOWN] ||
-    (ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT]))) {
+      (ogreControls[SHIFT] && (ogreControls[LEFT] || ogreControls[RIGHT]))) {
     if (!running) {
       running = true;
       aniStateTop->setEnabled(false);
@@ -130,16 +132,14 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
   aniStateTop->addTime(evt.timeSinceLastFrame);
   aniStateBase->addTime(evt.timeSinceLastFrame);
 
-
   QList<quint16> keys = (*movingAvatars).keys();
   QList<quint16> removeList;
 
-  for (const quint16 &key: keys) {
-
+  for (const quint16 &key : keys) {
     MovingAvatar &ma = (*movingAvatars)[key];
     Ogre::SceneNode *node = ma.node;
 
-    if (ma.completion >= 1.0){
+    if (ma.completion >= 1.0) {
       ma.completion = 1.0;
       removeList.append(key);
     }
@@ -158,23 +158,24 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
 
     if (deltaYaw > Ogre::Math::PI)
       deltaYaw -= Ogre::Math::TWO_PI;
-    else if (deltaYaw <  -Ogre::Math::PI )
+    else if (deltaYaw < -Ogre::Math::PI)
       deltaYaw += Ogre::Math::TWO_PI;
 
     node->yaw(Ogre::Radian(ma.oldYaw + deltaYaw * ma.completion));
 
     if (deltaPitch > Ogre::Math::PI)
       deltaPitch -= Ogre::Math::TWO_PI;
-    else if (deltaPitch <  -Ogre::Math::PI )
+    else if (deltaPitch < -Ogre::Math::PI)
       deltaPitch += Ogre::Math::TWO_PI;
 
     node->pitch(Ogre::Radian(ma.oldPitch + deltaPitch * ma.completion));
-
-    ma.completion += evt.timeSinceLastFrame*5; // we assume one update every 200ms
-    Ogre::AnimationState *aniStateOldTop, *aniStateOldBase, *aniStateNewTop, *aniStateNewBase;
+    // we assume one update every 200ms
+    ma.completion += evt.timeSinceLastFrame * 5;
+    Ogre::AnimationState *aniStateOldTop, *aniStateOldBase, *aniStateNewTop,
+        *aniStateNewBase;
 
     try {
-      if(!ma.idle) {
+      if (!ma.idle) {
         aniStateOldTop = ma.avatar->getAnimationState("IdleTop");
         aniStateOldBase = ma.avatar->getAnimationState("IdleBase");
         aniStateNewTop = ma.avatar->getAnimationState("RunTop");
@@ -195,12 +196,11 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
 
       aniStateNewTop->addTime(evt.timeSinceLastFrame);
       aniStateNewBase->addTime(evt.timeSinceLastFrame);
-    } catch (Ogre::ItemIdentityException iie) {  }
-
+    } catch (Ogre::ItemIdentityException iie) {
+    }
   }
 
-  for (const quint16 &key: removeList)
-    movingAvatars->remove(key);
+  for (const quint16 &key : removeList) movingAvatars->remove(key);
 
   removeList.clear();
 }

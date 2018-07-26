@@ -38,4 +38,4 @@ class OgreFrameListener : public Ogre::FrameListener {
   void handleKeys(int, bool);
 };
 
-#endif // OGREFRAMELISTENER_H
+#endif  // OGREFRAMELISTENER_H

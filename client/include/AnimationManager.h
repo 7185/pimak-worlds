@@ -26,30 +26,30 @@
 #ifndef ANIMATIONMANAGER_H
 #define ANIMATIONMANAGER_H
 
-#include <Qt>
-#include <QMap>
 #include <Ogre.h>
+#include <QMap>
+#include <Qt>
 
 #include "InputSystem.h"
 #include "User.h"
 
 typedef struct {
- Ogre::Entity *avatar;
- Ogre::SceneNode *node;
- float x,y,z;
- float oldX,oldY,oldZ;
- float pitch;
- float yaw;
- float oldPitch;
- float oldYaw;
- float completion;
- bool idle;
+  Ogre::Entity* avatar;
+  Ogre::SceneNode* node;
+  float x, y, z;
+  float oldX, oldY, oldZ;
+  float pitch;
+  float yaw;
+  float oldPitch;
+  float oldYaw;
+  float completion;
+  bool idle;
 } MovingAvatar;
 
 class AnimationManager {
  public:
   static AnimationManager* getSingleton();
-  void animate(const Ogre::FrameEvent &evt);
+  void animate(const Ogre::FrameEvent& evt);
   void setAvatar(Ogre::Entity* avatar);
   void setInputSystem(InputSystem* inputSystem);
   void moveAvatar(const User* u);
@@ -63,7 +63,7 @@ class AnimationManager {
   static AnimationManager* singleton;
   Ogre::Entity* avatar;
   InputSystem* inputSystem;
-  QMap<quint16, MovingAvatar> *movingAvatars;
+  QMap<quint16, MovingAvatar>* movingAvatars;
 };
 
-#endif // ANIMATIONMANAGER_H
+#endif  // ANIMATIONMANAGER_H
