@@ -108,7 +108,7 @@ void OgreWindow::initialize() {
   }
   if (rs == NULL) {
     if (!ogreRoot->restoreConfig()) {
-      if (!ogreRoot->showConfigDialog())
+      if (!ogreRoot->showConfigDialog(OgreBites::getNativeConfigDialog()))
         OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS,
                     "Abort render system configuration",
                     "QTOgreWindow::initialize");
@@ -245,7 +245,7 @@ void OgreWindow::createCamera() {
 void OgreWindow::createViewport() {
   activeCamera = ogreFirstCamera;
   ogreViewport = ogreRenderWindow->addViewport(activeCamera);
-  ogreViewport->setBackgroundColour(Ogre::ColourValue(0.9, 0.9, 0.9));
+  ogreViewport->setBackgroundColour(Ogre::ColourValue(0.9f, 0.9f, 0.9f));
   activeCamera->setAspectRatio(Ogre::Real(ogreViewport->getActualWidth()) /
                                Ogre::Real(ogreViewport->getActualHeight()));
 }

@@ -29,12 +29,16 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
-
 #include <Ogre.h>
+
 #ifdef Q_WS_WIN
 #include <Terrain/OgreTerrain.h>
+#include <Bites/OgreWindowEventUtilities.h>
+#include <Bites/OgreBitesConfigDialog.h>
 #else
 #include <OGRE/Terrain/OgreTerrain.h>
+#include <OGRE/Bites/OgreWindowEventUtilities.h>
+#include <OGRE/Bites/OgreBitesConfigDialog.h>
 #endif
 
 #include "AnimationManager.h"
