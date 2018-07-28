@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget* parent)
   ogreWindow->setFlags(Qt::FramelessWindowHint);
   QWidget* container = QWidget::createWindowContainer(ogreWindow);
 
-  ui->renderZone->setParent(NULL);
+  ui->renderZone->setParent(nullptr);
   ui->renderZone->deleteLater();
   ui->splitter->insertWidget(0, container);
 
@@ -47,8 +47,7 @@ MainWindow::MainWindow(QWidget* parent)
           SLOT(clientConnect()));
   connect(connection->getSocket(), SIGNAL(disconnected()), this,
           SLOT(clientDisconnect()));
-  ;
-  ;
+
   connect(connection, SIGNAL(messageChanged()), this, SLOT(appendMessage()));
   connect(connection, SIGNAL(listChanged()), this, SLOT(updateWhisperList()));
   connect(connection, SIGNAL(userCreated(User*)), ogreWindow,

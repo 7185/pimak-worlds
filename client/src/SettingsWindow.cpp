@@ -61,7 +61,7 @@ void SettingsWindow::writeSettings() {
 
 QString SettingsWindow::getHost() { return ui->adressLineEdit->text(); }
 QString SettingsWindow::getNickname() { return ui->nicknameLineEdit->text(); }
-int SettingsWindow::getPort() { return ui->portSpinBox->value(); }
+quint16 SettingsWindow::getPort() { return static_cast<quint16>(ui->portSpinBox->value()); }
 int SettingsWindow::getFps() { return ui->framesSecSpinBox->value(); }
 bool SettingsWindow::getDisplayTime() {
   return ui->displayTimeCheckBox->isChecked();

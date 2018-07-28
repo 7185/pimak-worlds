@@ -38,16 +38,16 @@ OgreWindow::OgreWindow(QWindow *parent)
     : QWindow(parent),
       updatePending(false),
       animating(false),
-      ogreRoot(NULL),
-      ogreRenderWindow(NULL) {
+      ogreRoot(nullptr),
+      ogreRenderWindow(nullptr) {
   setAnimating(true);
   installEventFilter(this);
   ogreBackground = Ogre::ColourValue(0.0f, 0.5f, 1.0f);
 
-  ogreRoot = NULL;
-  ogreSceneMgr = NULL;
-  ogreListener = NULL;
-  activeCamera = NULL;
+  ogreRoot = nullptr;
+  ogreSceneMgr = nullptr;
+  ogreListener = nullptr;
+  activeCamera = nullptr;
 
   inputSystem = new InputSystem();
 }
@@ -104,9 +104,9 @@ void OgreWindow::initialize() {
         break;
       }
     }
-    if (rs != NULL) break;
+    if (rs != nullptr) break;
   }
-  if (rs == NULL) {
+  if (rs == nullptr) {
     if (!ogreRoot->restoreConfig()) {
       if (!ogreRoot->showConfigDialog(OgreBites::getNativeConfigDialog()))
         OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS,
@@ -116,7 +116,7 @@ void OgreWindow::initialize() {
   }
 
   // Setting size and VSync on windows will solve a lot of problems
-  if (rs != NULL) {
+  if (rs != nullptr) {
     QString dimensions =
         QString("%1 x %2").arg(this->width()).arg(this->height());
     rs->setConfigOption("Video Mode", dimensions.toStdString());
@@ -146,10 +146,10 @@ void OgreWindow::initialize() {
   parameters["parentWindowHandle"] =
       Ogre::StringConverter::toString((size_t)(this->winId()));
 #else
-  parameters["externalWindowHandle"] =
-      Ogre::StringConverter::toString((unsigned long)(this->winId()));
-  parameters["parentWindowHandle"] =
-      Ogre::StringConverter::toString((unsigned long)(this->winId()));
+  parameters["externalWindowHandle"] = Ogre::StringConverter::toString(
+      static_cast<unsigned long>(this->winId()));
+  parameters["parentWindowHandle"] = Ogre::StringConverter::toString(
+      static_cast<unsigned long>(this->winId()));
 #endif
 
 #if defined(Q_OS_MAC)
@@ -278,7 +278,7 @@ void OgreWindow::createTerrain() {
            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   Ogre::Terrain::ImportData imp;
   imp.inputImage = &img;
-  imp.terrainSize = img.getWidth();
+  imp.terrainSize = static_cast<unsigned short>(img.getWidth());
   imp.worldSize = 8000;
   imp.inputScale = 600;
   imp.minBatchSize = 33;
@@ -478,9 +478,9 @@ void OgreWindow::render() {
   Ogre::WindowEventUtilities::messagePump();
   moveCamera();
   ogreRoot->renderOneFrame();
-  if (ogreRenderWindow != NULL) {
+  if (ogreRenderWindow != nullptr) {
     QString str =
-        QString::number(ogreRenderWindow->getStatistics().avgFPS, 'f', 1) +
+        QString::number(static_cast<double>(ogreRenderWindow->getStatistics().avgFPS), 'f', 1) +
         " FPS";
     emit dispAverageFps(str);
     ogreRenderWindow->update();
@@ -533,7 +533,7 @@ void OgreWindow::exposeEvent(QExposeEvent *event) {
 void OgreWindow::renderNow() {
   if (!isExposed()) return;
 
-  if (ogreRoot == NULL) {
+  if (ogreRoot == nullptr) {
     initialize();
   }
 
@@ -550,8 +550,9 @@ void OgreWindow::renderNow() {
 bool OgreWindow::eventFilter(QObject *target, QEvent *event) {
   if (target == this) {
     if (event->type() == QEvent::Resize) {
-      if (isExposed() && ogreRenderWindow != NULL) {
-        ogreRenderWindow->resize(this->width(), this->height());
+      if (isExposed() && ogreRenderWindow != nullptr) {
+        ogreRenderWindow->resize(static_cast<unsigned int>(this->width()),
+                                 static_cast<unsigned int>(this->height()));
       }
       if (activeCamera) {
         Ogre::Real aspectRatio =

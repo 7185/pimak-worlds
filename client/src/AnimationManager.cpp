@@ -26,14 +26,14 @@
 #include "AnimationManager.h"
 #include <Ogre.h>
 
-AnimationManager *AnimationManager::singleton = NULL;
+AnimationManager *AnimationManager::singleton = nullptr;
 
 AnimationManager::AnimationManager() {
   movingAvatars = new QMap<quint16, MovingAvatar>;
 }
 
 AnimationManager *AnimationManager::getSingleton() {
-  if (singleton == NULL) {
+  if (singleton == nullptr) {
     singleton = new AnimationManager();
   }
   return singleton;
@@ -139,8 +139,8 @@ void AnimationManager::animate(const Ogre::FrameEvent &evt) {
     MovingAvatar &ma = (*movingAvatars)[key];
     Ogre::SceneNode *node = ma.node;
 
-    if (ma.completion >= 1.0) {
-      ma.completion = 1.0;
+    if (ma.completion >= 1.0f) {
+      ma.completion = 1.0f;
       removeList.append(key);
     }
 

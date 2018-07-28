@@ -44,7 +44,7 @@ class SettingsWindow : public QDialog {
   void writeSettings();
   QString getHost();
   QString getNickname();
-  int getPort();
+  quint16 getPort();
   int getFps();
   bool getDisplayTime();
   bool getDisplayColors();
