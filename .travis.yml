@@ -1,23 +1,24 @@
-dist: trusty
 sudo: required
 
 language: cpp
 
-before_install:
-  - sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq qt59base qt59tools qt59qbs libogre-1.9-dev
-  - . /opt/qt59/bin/qt59-env.sh
+services:
+  - docker
 
 env:
   - PROJECT=server
   - PROJECT=client
 
-script:
-  - cd $PROJECT
-  - qbs --version
-  - qbs setup-toolchains --detect
-  - qbs setup-qt --detect
-  - qbs config defaultProfile qt-5-9-4
-  - qbs build -d build/
+before_install:
+  - docker pull archlinux/base
+  - docker run -e BUILD_DIR=$PROJECT -itd --name build archlinux/base
+  - docker exec build pacman -Syyu --noconfirm
+  - docker exec build pacman -S --noconfirm base-devel clang git qbs qt5 ogre
+  - docker exec build git clone https://github.com/7185/pimak-worlds
 
+script:
+  - docker exec build qbs --version
+  - docker exec build qbs setup-toolchains --detect
+  - docker exec build qbs setup-qt --detect
+  - docker exec build qbs config defaultProfile qt-5-11-1
+  - docker exec build /bin/sh -c 'cd pimak-worlds/$BUILD_DIR; qbs build -d build/'
