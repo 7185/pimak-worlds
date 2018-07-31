@@ -553,6 +553,7 @@ bool OgreWindow::eventFilter(QObject *target, QEvent *event) {
       if (isExposed() && ogreRenderWindow != nullptr) {
         ogreRenderWindow->resize(static_cast<unsigned int>(this->width()),
                                  static_cast<unsigned int>(this->height()));
+        ogreRenderWindow->windowMovedOrResized();
       }
       if (activeCamera) {
         Ogre::Real aspectRatio =
