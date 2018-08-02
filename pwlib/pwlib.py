@@ -61,7 +61,8 @@ class User(object):
         self.z = 0
         self.pitch = 0
         self.yaw = 0
-    def setposition(self,x,y,z,pitch,yaw):
+
+    def set_position(self,x=0.0,y=0.0,z=0.0,pitch=0.0,yaw=0.0):
         self.x = x
         self.y = y
         self.z = z
@@ -69,9 +70,9 @@ class User(object):
         self.yaw = yaw
 
 class PW(User):
-    def __init__(self, loggingEnabled = True):
+    def __init__(self, logging_enabled = True):
         super(PW,self).__init__()
-        self.loggingEnabled = loggingEnabled
+        self.logging_enabled = logging_enabled
         self.connected = False
         self.enabled = True
         self.handlers = {}
@@ -114,7 +115,7 @@ class PW(User):
                 return i[0]
 
     def log(self, txt):
-        if self.loggingEnabled:
+        if self.logging_enabled:
             print(txt)
 
     def raw(self, b):
@@ -127,12 +128,12 @@ class PW(User):
         l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c+s))))[0])
         self.raw(l+c+s)
 
-    def asklist(self):
+    def ask_list(self):
         c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(CS_USER_LIST)))[0])
         l = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(len(c))))[0])
         self.raw(l+c)
 
-    def sendposition(self):
+    def send_position(self):
         c = struct.pack('<H',struct.unpack('>H',bytes(c_uint16(CS_AVATAR_POSITION)))[0])
         x = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.x)))[0])
         y = struct.pack('<d',struct.unpack('>d',bytes(c_double(self.y)))[0])
@@ -199,19 +200,19 @@ class PW(User):
             pitch = struct.unpack('>d',b[30:38])[0]
             yaw = struct.unpack('>d',b[38:46])[0]
             if u in self.userlist.keys():
-                self.userlist[u].setposition(x,y,z,pitch,yaw)
+                self.userlist[u].set_position(x,y,z,pitch,yaw)
                 self._callback('on_avatar_position',u,x,y,z,pitch,yaw)
         elif (code == SC_USER_JOIN):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
-                self.asklist()
+                self.ask_list()
                 self._callback('on_user_join', s)
         elif (code == SC_USER_PART):
             slength = struct.unpack('>L',b[4:8])[0]
             s = b[8:].decode('utf-16-be')
             if len(s)*2 == slength:
-                self.asklist()
+                self.ask_list()
                 self._callback('on_user_part', s)
         else:
             self.log("! Can't handle packet.")
