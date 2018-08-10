@@ -34,7 +34,8 @@ Client::Client(QTcpSocket *tcp, QObject *p)
 
   connect(clientTcp, SIGNAL(disconnected()), SLOT(clientDisconnect()));
   connect(clientTcp, SIGNAL(readyRead()), SLOT(dataRecv()));
-  connect(lifetime, SIGNAL(timeout()), clientTcp, SLOT(disconnectFromHost()));
+  lifetime = new QTimer;
+  connect(lifetime, SIGNAL(timeout()), SLOT(clientDisconnect()));
 
   nickname = new QString;
   posChanged = true;
@@ -68,7 +69,8 @@ void Client::dataRecv() {
     lifetime->stop();
     lifetime->start(CONNECTION_TIMEOUT);
 
-    if (messageCode < 0x10) {
+    if (messageCode == CS_AUTH || messageCode == CS_MSG_PUBLIC ||
+        messageCode == CS_MSG_PRIVATE || messageCode == CS_USER_LIST) {
       QString message;
       in >> message;
 
