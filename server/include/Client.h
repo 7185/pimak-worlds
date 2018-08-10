@@ -29,6 +29,8 @@
 #include <QtNetwork>
 #include <iostream>
 
+#define CONNECTION_TIMEOUT 120000
+
 class Client : public QObject {
   Q_OBJECT
 
@@ -57,6 +59,7 @@ class Client : public QObject {
   QString *nickname;
   quint16 messageSize;
   quint16 id;
+  QTimer *lifetime;
   bool posChanged;
   bool needUpdate;
   static QMap<quint16, Client *> clients;

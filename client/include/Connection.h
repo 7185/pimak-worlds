@@ -30,6 +30,8 @@
 
 #include <QtNetwork>
 
+#define HEARTBEAT_RATE 60000
+
 class Connection : public QObject {
   Q_OBJECT
  public:
@@ -40,6 +42,7 @@ class Connection : public QObject {
   QMap<quint16, User *> *getUsers();
   quint16 getIdByNick(QString);
   void clearUserlist();
+  void sendPacket(const QByteArray&);
 
  public slots:
   void dataRecv();
@@ -48,6 +51,7 @@ class Connection : public QObject {
   void dataHandler(quint16, QString);
   void socketError(QAbstractSocket::SocketError);
   void displayData(QString, quint16 = 0);
+  void sendHeartbeat();
 
  signals:
   void messageChanged();
@@ -60,7 +64,7 @@ class Connection : public QObject {
   QMap<quint16, User *> *users;
   QTcpSocket *socket;  // server
   quint16 messageSize;
-
+  QTimer *heartbeat;
   QString *message;
   quint16 messageType;
 };

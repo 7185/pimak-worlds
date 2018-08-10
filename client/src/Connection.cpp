@@ -34,8 +34,18 @@ Connection::Connection() {
   connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
           SLOT(socketError(QAbstractSocket::SocketError)));
 
+  heartbeat = new QTimer;
+  connect(heartbeat, SIGNAL(timeout()), this, SLOT(sendHeartbeat()));
   message = new QString;
   messageSize = 0;
+}
+
+void Connection::sendPacket(const QByteArray &packet) {
+  if (socket->state() == QTcpSocket::ConnectedState) {
+    socket->write(packet);
+    heartbeat->stop();
+    heartbeat->start(HEARTBEAT_RATE);
+  }
 }
 
 void Connection::dataSend(quint16 msgCode, QString msgToSend) {
@@ -48,9 +58,19 @@ void Connection::dataSend(quint16 msgCode, QString msgToSend) {
   out.device()->seek(0);
   out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
-  if (socket->state() == QTcpSocket::ConnectedState) {
-    socket->write(packet);
-  }
+  sendPacket(packet);
+}
+
+void Connection::sendHeartbeat() {
+  QByteArray packet;
+  QDataStream out(&packet, QIODevice::WriteOnly);
+
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(CS_HEARTBEAT);
+  out.device()->seek(0);
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
+
+  sendPacket(packet);
 }
 
 void Connection::positionSend(float x, float y, float z, float pitch,
@@ -68,9 +88,7 @@ void Connection::positionSend(float x, float y, float z, float pitch,
   out.device()->seek(0);
   out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
-  if (socket->state() == QTcpSocket::ConnectedState) {
-    socket->write(packet);
-  }
+  sendPacket(packet);
 }
 
 void Connection::dataRecv() {

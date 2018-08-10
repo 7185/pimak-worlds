@@ -50,7 +50,7 @@ class OgreWindow : public QWindow {
   Q_OBJECT
 
  public:
-  explicit OgreWindow(QWindow *parent = NULL);
+  explicit OgreWindow(QWindow *parent = nullptr);
   ~OgreWindow();
 
   virtual void render(QPainter *painter);
@@ -109,6 +109,7 @@ class OgreWindow : public QWindow {
   Ogre::Entity *avatar;
   OgreFrameListener *ogreListener;
   InputSystem *inputSystem;
+  Ogre::Vector3 *lastSentPos;
 
   int turbo;
 };

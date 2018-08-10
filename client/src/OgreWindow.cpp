@@ -394,10 +394,13 @@ void OgreWindow::moveAvatar(User *u) {
 }
 
 void OgreWindow::posSend() {
-  emit positionSend(cameraNode->getPosition().x, cameraNode->getPosition().y,
-                    cameraNode->getPosition().z,
+  Ogre::Vector3 camPos = cameraNode->getPosition();
+  if (!camPos.positionEquals(*lastSentPos)) {
+    emit positionSend(camPos.x, camPos.y, camPos.z,
                     cameraNode->getOrientation().getPitch().valueRadians(),
                     cameraNode->getOrientation().getYaw().valueRadians());
+    *lastSentPos = camPos;
+  }
 }
 
 void OgreWindow::setActiveCam(bool cam) {

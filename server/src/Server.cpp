@@ -26,11 +26,11 @@
 #include "Server.h"
 #include "Client.h"
 
-Server::Server(quint8 port) {
+Server::Server(int port) {
   QString *serverState = new QString;
 
   server = new QTcpServer(this);
-  if (!server->listen(QHostAddress::Any, port)) {
+  if (!server->listen(QHostAddress::Any, static_cast<quint16>(port))) {
     *serverState = tr("Server didn't start. Reason: ") + server->errorString();
   } else {
     *serverState =

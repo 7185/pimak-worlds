@@ -34,6 +34,7 @@ Client::Client(QTcpSocket *tcp, QObject *p)
 
   connect(clientTcp, SIGNAL(disconnected()), SLOT(clientDisconnect()));
   connect(clientTcp, SIGNAL(readyRead()), SLOT(dataRecv()));
+  connect(lifetime, SIGNAL(timeout()), clientTcp, SLOT(disconnectFromHost()));
 
   nickname = new QString;
   posChanged = true;
@@ -64,6 +65,9 @@ void Client::dataRecv() {
     quint16 messageCode;
     in >> messageCode;
 
+    lifetime->stop();
+    lifetime->start(CONNECTION_TIMEOUT);
+
     if (messageCode < 0x10) {
       QString message;
       in >> message;
@@ -76,6 +80,13 @@ void Client::dataRecv() {
                   << ")] (" << messageCode << ") " << message.toStdString()
                   << std::endl;
       dataHandler(messageCode, message);
+    } else if (messageCode == CS_HEARTBEAT) {
+      if (nickname->isEmpty())
+        std::cout << "[From: " << id << "] (" << messageCode << " - HEARTBEAT)"
+                  << std::endl;
+      else
+        std::cout << "[From: " << id << " (" << nickname->toStdString()
+                  << ")] (" << messageCode << " - HEARTBEAT)" << std::endl;
     } else if (messageCode == CS_AVATAR_POSITION) {
       float oldX = x;
       float oldY = y;
