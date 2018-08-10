@@ -14,13 +14,13 @@ class Bot(PW):
         self.nickname = 'bobinot'
         self.connect('7185.fr', 6670)
         self.following = 0
-        self.move_speed = 10
+        self.move_speed = 5
         self.current_move_thread = 0
 
     def move(self, dest_x, dest_z):
         thread_id = self.current_move_thread
         tick = 200
-        length = ((dest_x - dest_z) ** 2 + (self.x - self.z) ** 2) ** 0.5
+        length = ((dest_x - self.x) ** 2 + (dest_z - self.z) ** 2) ** 0.5
         direction = atan2(dest_x - self.x, dest_z - self.z) + pi
         n = int(length * (1 / self.move_speed))
         if n > 0:
