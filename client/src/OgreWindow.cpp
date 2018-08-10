@@ -158,7 +158,8 @@ void OgreWindow::initialize() {
 #endif
 
   ogreRenderWindow = ogreRoot->createRenderWindow(
-      "QT Window", this->width(), this->height(), false, &parameters);
+      "QT Window", static_cast<unsigned int>(this->width()),
+      static_cast<unsigned int>(this->height()), false, &parameters);
   ogreRenderWindow->setVisible(true);
 
 #if OGRE_VERSION >= ((2 << 16) | (0 << 8) | 0)
@@ -410,10 +411,11 @@ void OgreWindow::setActiveCam(bool cam) {
 }
 
 void OgreWindow::moveCamera() {
+  Ogre::Quaternion pitchOri = cameraPitchNode->getOrientation();
   Ogre::Real pitchAngle =
-      2 * Ogre::Degree(Ogre::Math::ACos(cameraPitchNode->getOrientation().w))
-              .valueDegrees();
-  Ogre::Real pitchAngleSign = cameraPitchNode->getOrientation().x;
+      2 * Ogre::Degree(Ogre::Math::ACos(pitchOri.w)).valueDegrees();
+  Ogre::Real pitchAngleSign = pitchOri.x;
+  Ogre::Quaternion camOri = cameraNode->getOrientation();
 
   bool *ogreControls = inputSystem->getControls();
 
@@ -424,12 +426,10 @@ void OgreWindow::moveCamera() {
     turbo = 1;
   if (ogreControls[UP])
     cameraNode->translate(
-        turbo * -Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0,
-                               cameraNode->getOrientation().zAxis().z));
+        turbo * -Ogre::Vector3(camOri.zAxis().x, 0, camOri.zAxis().z));
   if (ogreControls[DOWN])
-    cameraNode->translate(
-        turbo * Ogre::Vector3(cameraNode->getOrientation().zAxis().x, 0,
-                              cameraNode->getOrientation().zAxis().z));
+    cameraNode->translate(turbo *
+                          Ogre::Vector3(camOri.zAxis().x, 0, camOri.zAxis().z));
   if (ogreControls[PLUS]) cameraNode->translate(turbo * Ogre::Vector3(0, 1, 0));
   if (ogreControls[MINUS])
     cameraNode->translate(turbo * Ogre::Vector3(0, -1, 0));
@@ -437,16 +437,14 @@ void OgreWindow::moveCamera() {
   if (ogreControls[LEFT]) {
     if (ogreControls[SHIFT])
       cameraNode->translate(
-          turbo * Ogre::Vector3(-cameraNode->getOrientation().zAxis().z, 0,
-                                cameraNode->getOrientation().zAxis().x));
+          turbo * Ogre::Vector3(-camOri.zAxis().z, 0, camOri.zAxis().x));
     else
       cameraNode->yaw(turbo * Ogre::Radian(0.05f));
   }
   if (ogreControls[RIGHT]) {
     if (ogreControls[SHIFT])
       cameraNode->translate(
-          turbo * Ogre::Vector3(cameraNode->getOrientation().zAxis().z, 0,
-                                -cameraNode->getOrientation().zAxis().x));
+          turbo * Ogre::Vector3(camOri.zAxis().z, 0, -camOri.zAxis().x));
     else
       cameraNode->yaw(turbo * Ogre::Radian(-0.05f));
   }
@@ -455,12 +453,13 @@ void OgreWindow::moveCamera() {
   if (ogreControls[PGDOWN] && (pitchAngle < 90.0f || pitchAngleSign > 0))
     cameraPitchNode->pitch(turbo * Ogre::Radian(-0.05f));
 
-  ogreThirdCamera->lookAt(cameraNode->getPosition());
+  Ogre::Vector3 camPos = cameraNode->getPosition();
+  ogreThirdCamera->lookAt(camPos);
 
   emit dispPosition(
-      "x:" + QString::number(cameraNode->getPosition().x, 'f', 0) +
-      " y:" + QString::number(cameraNode->getPosition().y, 'f', 0) +
-      " z:" + QString::number(cameraNode->getPosition().z, 'f', 0));
+      "x:" + QString::number(static_cast<double>(camPos.x), 'f', 0) +
+      " y:" + QString::number(static_cast<double>(camPos.y), 'f', 0) +
+      " z:" + QString::number(static_cast<double>(camPos.z), 'f', 0));
 }
 
 void OgreWindow::render() {
@@ -479,9 +478,8 @@ void OgreWindow::render() {
   moveCamera();
   ogreRoot->renderOneFrame();
   if (ogreRenderWindow != nullptr) {
-    QString str =
-        QString::number(static_cast<double>(ogreRenderWindow->getStatistics().avgFPS), 'f', 1) +
-        " FPS";
+    Ogre::Real avgFps = ogreRenderWindow->getStatistics().avgFPS;
+    QString str = QString::number(static_cast<double>(avgFps), 'f', 1) + " FPS";
     emit dispAverageFps(str);
     ogreRenderWindow->update();
   }

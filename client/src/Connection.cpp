@@ -42,11 +42,11 @@ void Connection::dataSend(quint16 msgCode, QString msgToSend) {
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
 
-  out << (quint16)0;
-  out << (quint16)msgCode;
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(msgCode);
   out << msgToSend;
   out.device()->seek(0);
-  out << (quint16)(packet.size() - sizeof(quint16));
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
   if (socket->state() == QTcpSocket::ConnectedState) {
     socket->write(packet);
@@ -58,15 +58,15 @@ void Connection::positionSend(float x, float y, float z, float pitch,
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
 
-  out << (quint16)0;
-  out << (quint16)CS_AVATAR_POSITION;
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(CS_AVATAR_POSITION);
   out << x;
   out << y;
   out << z;
   out << pitch;
   out << yaw;
   out.device()->seek(0);
-  out << (quint16)(packet.size() - sizeof(quint16));
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
   if (socket->state() == QTcpSocket::ConnectedState) {
     socket->write(packet);
@@ -77,7 +77,7 @@ void Connection::dataRecv() {
   forever {
     QDataStream in(socket);
     if (messageSize == 0) {
-      if (socket->bytesAvailable() < (int)sizeof(quint16)) return;
+      if (socket->bytesAvailable() < static_cast<int>(sizeof(quint16))) return;
       in >> messageSize;
     }
 

@@ -33,7 +33,7 @@ class Client : public QObject {
   Q_OBJECT
 
  public:
-  explicit Client(QTcpSocket *tcp, QObject *parent = 0);
+  explicit Client(QTcpSocket *tcp, QObject *parent = nullptr);
   ~Client();
   static QMap<quint16, Client *> getClients();
   void sendPositionToAll();

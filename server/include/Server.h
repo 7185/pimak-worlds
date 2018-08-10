@@ -36,7 +36,7 @@ class Server : public QObject {
   Q_OBJECT
 
  public:
-  explicit Server(int port);
+  explicit Server(quint8 port);
 
  private slots:
   void clientConnect();

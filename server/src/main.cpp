@@ -35,6 +35,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  Server server(atoi(argv[1]));
+  Server server(static_cast<quint8>(atoi(argv[1])));
   return app.exec();
 }

@@ -55,8 +55,11 @@ void AnimationManager::setAvatar(Ogre::Entity *a) {
 void AnimationManager::setInputSystem(InputSystem *i) { inputSystem = i; }
 
 void AnimationManager::moveAvatar(const User *u) {
-  bool idle = (u->x == u->oldX && u->y == u->oldY && u->z == u->oldZ &&
-               u->pitch == u->oldPitch && u->yaw == u->oldYaw);
+  bool idle = (Ogre::Math::RealEqual(u->x, u->oldX) &&
+               Ogre::Math::RealEqual(u->y, u->oldY) &&
+               Ogre::Math::RealEqual(u->z, u->oldZ) &&
+               Ogre::Math::RealEqual(u->pitch, u->oldPitch) &&
+               Ogre::Math::RealEqual(u->yaw, u->oldYaw));
 
   if (movingAvatars->contains(u->id)) {
     MovingAvatar ma = (*movingAvatars)[u->id];

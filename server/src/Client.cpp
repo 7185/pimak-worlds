@@ -54,7 +54,8 @@ void Client::dataRecv() {
     QDataStream in(clientTcp);
 
     if (messageSize == 0) {
-      if (clientTcp->bytesAvailable() < (int)sizeof(quint16)) return;
+      if (clientTcp->bytesAvailable() < static_cast<int>(sizeof(quint16)))
+        return;
       in >> messageSize;
     }
     if (clientTcp->bytesAvailable() < messageSize) return;
@@ -87,8 +88,12 @@ void Client::dataRecv() {
       in >> pitch;
       in >> yaw;
 
-      posChanged = !(x == oldX && y == oldY && z == oldZ && pitch == oldPitch &&
-                     yaw == oldYaw);
+      posChanged = !(
+          std::abs(x - oldX) <= std::numeric_limits<float>::epsilon() &&
+          std::abs(y - oldY) <= std::numeric_limits<float>::epsilon() &&
+          std::abs(z - oldZ) <= std::numeric_limits<float>::epsilon() &&
+          std::abs(pitch - oldPitch) <= std::numeric_limits<float>::epsilon() &&
+          std::abs(yaw - oldYaw) <= std::numeric_limits<float>::epsilon());
       if (posChanged) needUpdate = true;
 
     } else {
@@ -189,11 +194,11 @@ void Client::sendList() {
 void Client::sendToAll(const quint16 &messageCode, const QString &message) {
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
-  out << (quint16)0;
-  out << (quint16)messageCode;
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(messageCode);
   out << message;
   out.device()->seek(0);
-  out << (quint16)(packet.size() - sizeof(quint16));
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
   foreach (Client *client, clients) { client->sendPacket(packet); }
 }
@@ -202,11 +207,11 @@ void Client::sendTo(quint16 uid, const quint16 &messageCode,
                     const QString &message) {
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
-  out << (quint16)0;
-  out << (quint16)messageCode;
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(messageCode);
   out << message;
   out.device()->seek(0);
-  out << (quint16)(packet.size() - sizeof(quint16));
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
 
   clients[uid]->sendPacket(packet);
   std::cout << "[To: " << uid << "] (" << messageCode << ") "
@@ -216,8 +221,8 @@ void Client::sendTo(quint16 uid, const quint16 &messageCode,
 void Client::sendDataTo(quint16 uid, const quint16 &messageCode) {
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
-  out << (quint16)0;
-  out << (quint16)messageCode;
+  out << static_cast<quint16>(0);
+  out << static_cast<quint16>(messageCode);
   out << id;
   out << x;
   out << y;
@@ -225,7 +230,7 @@ void Client::sendDataTo(quint16 uid, const quint16 &messageCode) {
   out << pitch;
   out << yaw;
   out.device()->seek(0);
-  out << (quint16)(packet.size() - sizeof(quint16));
+  out << static_cast<quint16>(packet.size() - sizeof(quint16));
   clients[uid]->sendPacket(packet);
 }
 

@@ -26,7 +26,7 @@
 #include "Server.h"
 #include "Client.h"
 
-Server::Server(int port) {
+Server::Server(quint8 port) {
   QString *serverState = new QString;
 
   server = new QTcpServer(this);
