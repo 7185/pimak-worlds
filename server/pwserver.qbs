@@ -3,8 +3,9 @@ import qbs
 QtApplication {
     name: "pwserver"
     Depends { name: "Qt"; submodules: ["core", "network"] }
-    cpp.includePaths: ["./include"]
+    cpp.includePaths: ["./include", "../common/include"]
     files: [
+        "../common/include/*.h",
         "include/*.h",
         "src/*.cpp",
     ]
