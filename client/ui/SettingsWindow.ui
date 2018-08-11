@@ -14,7 +14,7 @@
    <string>Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="pwclient.qrc">
+   <iconset resource="../pwclient.qrc">
     <normaloff>:/img/icon.png</normaloff>:/img/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -42,7 +42,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="adressLabel">
               <property name="text">
-               <string>Adress: </string>
+               <string>Adress:</string>
               </property>
              </widget>
             </item>
@@ -82,7 +82,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="nicknameLabel">
               <property name="text">
-               <string>Nickname: </string>
+               <string>Nickname:</string>
               </property>
              </widget>
             </item>
@@ -190,7 +190,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="pwclient.qrc"/>
+  <include location="../pwclient.qrc"/>
  </resources>
  <connections>
   <connection>

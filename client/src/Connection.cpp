@@ -156,7 +156,7 @@ void Connection::dataHandler(quint16 dataCode, QString data) {
       break;
     case SC_USER_JOIN:
       dataSend(CS_USER_LIST);
-      data = data + tr(" just log in");
+      data = data + tr(" just logged in");
       displayData(data, dataCode);
       break;
     case SC_USER_PART:

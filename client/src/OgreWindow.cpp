@@ -48,6 +48,7 @@ OgreWindow::OgreWindow(QWindow *parent)
   ogreSceneMgr = nullptr;
   ogreListener = nullptr;
   activeCamera = nullptr;
+  lastSentPos = new Ogre::Vector3;
 
   inputSystem = new InputSystem();
 }
