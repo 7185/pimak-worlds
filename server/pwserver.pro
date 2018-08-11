@@ -10,8 +10,9 @@ TARGET = pwserver
 TEMPLATE = app
 
 DEPENDPATH += .
-INCLUDEPATH += . include
+INCLUDEPATH += . include ../common/include
 
 # Input
 HEADERS += include/*.h
+HEADERS += ../common/include/*.h
 SOURCES += src/*.cpp

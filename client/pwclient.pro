@@ -18,7 +18,7 @@ win32-* {
     message("OGRE_ROOT for make is: "$$OGRE_ROOT)
 
     DEPENDPATH += .
-    INCLUDEPATH += . include
+    INCLUDEPATH += . include ..\common\include
     INCLUDEPATH += $$OGRE_ROOT\include\OGRE
     INCLUDEPATH += $$OGRE_ROOT\boost_1_44
     LIBS += -L$$OGRE_ROOT\lib\release
@@ -28,7 +28,7 @@ win32-* {
 }
 
 linux-* {
-    INCLUDEPATH += . include /usr/include/OGRE /usr/include/OGRE/Overlay
+    INCLUDEPATH += . include ../common/include /usr/include/OGRE /usr/include/OGRE/Overlay
     LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay -lboost_system
 
     isEmpty(INSTALL_PREFIX) {
