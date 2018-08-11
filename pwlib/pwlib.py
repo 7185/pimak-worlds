@@ -38,6 +38,8 @@ import struct
 import binascii
 from protocol import *
 
+HEARTBEAT_RATE = 60
+
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), errors='backslashreplace', line_buffering=True)
 
 
@@ -56,7 +58,7 @@ def qstring(string):
     return l + msg
 
 
-class User(object):
+class User:
     def __init__(self, nick=""):
         self.nickname = nick
         self.x = 0
@@ -82,6 +84,7 @@ class PW(User):
         self.handlers = {}
         self.userlist = {}
         self.sk = None
+        self.heartbeat = threading.Timer(HEARTBEAT_RATE, self.send_heartbeat)
 
     def connect(self, host, port=6667, use_ssl=False):
         """Etablish a connection to a server"""
@@ -92,6 +95,7 @@ class PW(User):
         self.sk.connect((host, port))
         self.log('@ Connected')
         self.connected = True
+        self.heartbeat.start()
         self._callback('on_connected')
 
     def run(self):
@@ -121,6 +125,10 @@ class PW(User):
 
     def raw(self, b):
         self.sk.send(b)
+        if self.heartbeat.is_alive():
+            self.heartbeat.cancel()
+        self.heartbeat = threading.Timer(HEARTBEAT_RATE, self.send_heartbeat)
+        self.heartbeat.start()
         self.log('> ' + str(binascii.hexlify(b)))
 
     def send(self, code, msg):
@@ -143,6 +151,11 @@ class PW(User):
         ya = struct.pack('<d', struct.unpack('>d', bytes(c_double(self.yaw)))[0])
         l = struct.pack('<H', struct.unpack('>H', bytes(c_uint16(len(c + x + y + z + pi + ya))))[0])
         self.raw(l + c + x + y + z + pi + ya)
+
+    def send_heartbeat(self):
+        c = struct.pack('<H', struct.unpack('>H', bytes(c_uint16(CS_HEARTBEAT)))[0])
+        l = struct.pack('<H', struct.unpack('>H', bytes(c_uint16(len(c))))[0])
+        self.raw(l + c)
 
     def auth(self):
         self.send(CS_AUTH, self.nickname)
