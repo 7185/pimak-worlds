@@ -28,6 +28,7 @@
 
 #include <QtNetwork>
 #include <iostream>
+#include <Protocol.h>
 
 #define CONNECTION_TIMEOUT 120000
 
@@ -65,6 +66,8 @@ class Client : public QObject {
   static QMap<quint16, Client *> clients;
   float x, y, z;
   float pitch, yaw;
+
+  ENABLE_MSGPACK(Client);
 };
 
 #endif  // CLIENT_H

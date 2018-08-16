@@ -24,12 +24,12 @@ win32-* {
     LIBS += -L$$OGRE_ROOT\lib\release
     LIBS += -L$$OGRE_ROOT\lib\bin\Release
     LIBS += -L$$OGRE_ROOT\lib\bin\Debug
-    LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay
+    LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay  -lmsgpackc
 }
 
 linux-* {
     INCLUDEPATH += . include ../common/include /usr/include/OGRE /usr/include/OGRE/Overlay
-    LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay -lboost_system
+    LIBS += -lOgreMain -lOgreTerrain -lOgreOverlay -lboost_system -lmsgpack
 
     isEmpty(INSTALL_PREFIX) {
         INSTALL_PREFIX = /usr/local
@@ -39,6 +39,7 @@ linux-* {
 
 HEADERS += include/*.h
 SOURCES += src/*.cpp
+SOURCES += ../common/src/*.cpp
 FORMS   += ui/*.ui
 UI_DIR = include
 

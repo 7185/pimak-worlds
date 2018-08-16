@@ -78,13 +78,11 @@ void Connection::positionSend(float x, float y, float z, float pitch,
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
 
+  BaseUser bu = {x, y, z, pitch, yaw};
+
   out << static_cast<quint16>(0);
   out << static_cast<quint16>(CS_AVATAR_POSITION);
-  out << x;
-  out << y;
-  out << z;
-  out << pitch;
-  out << yaw;
+  msgpack::pack(out, bu);
   out.device()->seek(0);
   out << static_cast<quint16>(packet.size() - sizeof(quint16));
 

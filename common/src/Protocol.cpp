@@ -23,34 +23,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef USER_H
-#define USER_H
-
-#include <Ogre.h>
-#include <QtNetwork>
 #include <Protocol.h>
 
-class User : public QObject, public BaseUser {
-  Q_OBJECT
- public:
-  User(quint16 uid, QString nick);
-  ~User();
-  QString getNickname();
-  quint16 getId();
-  void setPosition(float nx, float ny, float nz, float npitch, float nyaw);
+msgpack::object_handle msgpack::unpack(QDataStream* s, std::size_t len) {
+  std::string str(len, '\0');
+  s->readRawData(&str[0], len);
+  msgpack::object_handle oh = unpack(str.data(), str.size());
+  return oh;
+}
 
-  Ogre::Entity *avatar;
-  Ogre::SceneNode *node;
-  quint16 id;
-  //float x, y, z; defined in BaseUser
-  float oldX, oldY, oldZ;
-  //float pitch; defined in BaseUser
-  //float yaw; defined in BaseUser
-  float oldPitch;
-  float oldYaw;
-
- private:
-  QString *nickname;
-};
-
-#endif  // USER_H
+msgpack::object_handle msgpack::unpack(QDataStream& s, std::size_t len) {
+  return msgpack::unpack(&s, len);
+}

@@ -61,6 +61,7 @@ void Client::dataRecv() {
       in >> messageSize;
     }
     if (clientTcp->bytesAvailable() < messageSize) return;
+    size_t len = messageSize;
     messageSize = 0;  // MARK IT ZERO!
 
     quint16 messageCode;
@@ -90,16 +91,19 @@ void Client::dataRecv() {
         std::cout << "[From: " << id << " (" << nickname->toStdString()
                   << ")] (" << messageCode << " - HEARTBEAT)" << std::endl;
     } else if (messageCode == CS_AVATAR_POSITION) {
+      size_t readSize = len - sizeof(quint16);
+      
       float oldX = x;
       float oldY = y;
       float oldZ = z;
       float oldPitch = pitch;
       float oldYaw = yaw;
-      in >> x;
-      in >> y;
-      in >> z;
-      in >> pitch;
-      in >> yaw;
+
+      msgpack::object_handle oh =
+        msgpack::unpack(in, readSize);
+
+      msgpack::object deserialized = oh.get();
+      deserialized.convert(*this);
 
       posChanged = !(
           std::abs(x - oldX) <= std::numeric_limits<float>::epsilon() &&
@@ -166,6 +170,9 @@ void Client::dataHandler(quint16 dataCode, QString data) {
           }
         }
       }
+      break;
+    case CS_AVATAR_POSITION:
+      
       break;
     default:
       if (nickname->isEmpty())
