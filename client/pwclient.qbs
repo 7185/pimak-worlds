@@ -5,11 +5,12 @@ QtApplication {
     Depends { name: "Qt"; submodules: ["core", "network", "widgets"] }
     cpp.includePaths: ["./include", "../common/include", "/usr/include/OGRE", "/usr/include/OGRE/Bites", "/usr/include/OGRE/Overlay"]
     cpp.libraryPaths: ["/usr/lib"]
-    cpp.dynamicLibraries: ["boost_system", "OgreMain", "OgreBites", "OgreOverlay", "OgreTerrain"]
+    cpp.dynamicLibraries: ["boost_system", "OgreMain", "OgreBites", "OgreOverlay", "OgreTerrain", "msgpackc"]
     files: [
+        "../common/include/*.h",
         "include/*.h",
-	"../common/include/*.h",
         "src/*.cpp",
+        "../common/src/*.cpp",
         "ui/*.ui",
         "lang/*.ts",
         "pwclient.qrc"

@@ -13,6 +13,8 @@ DEPENDPATH += .
 INCLUDEPATH += . include ../common/include
 
 # Input
+LIBS += -lmsgpackc
 HEADERS += include/*.h
 HEADERS += ../common/include/*.h
 SOURCES += src/*.cpp
+SOURCES += ../common/src/*.cpp 
