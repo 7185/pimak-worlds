@@ -10,15 +10,19 @@ env:
   - PROJECT=client
 
 before_install:
+  - export PW_SLUG=$TRAVIS_REPO_SLUG
+  - export PW_BRANCH=$TRAVIS_BRANCH
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export PW_SLUG=$TRAVIS_PULL_REQUEST_SLUG; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export PW_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH; fi'
   - docker pull archlinux/base
-  - docker run -e BUILD_DIR=$PROJECT -itd --name build archlinux/base
+  - docker run -e PROJECT -e PW_SLUG -e PW_BRANCH -itd --name build archlinux/base
   - docker exec build pacman -Syyu --noconfirm
   - docker exec build pacman -S --noconfirm base-devel clang git qbs qt5 ogre
-  - docker exec build git clone https://github.com/7185/pimak-worlds
+  - docker exec build git clone --single-branch -b $PW_BRANCH https://github.com/$PW_SLUG
 
 script:
   - docker exec build qbs --version
   - docker exec build qbs setup-toolchains --detect
-  - docker exec build qbs setup-qt --detect
-  - docker exec build qbs config defaultProfile qt-5-11-1
-  - docker exec build /bin/sh -c 'cd pimak-worlds/$BUILD_DIR; qbs build -d build/'
+  - docker exec build qbs setup-qt /usr/bin/qmake default-qt
+  - docker exec build qbs config defaultProfile default-qt
+  - docker exec build /bin/sh -c 'cd pimak-worlds/$PROJECT; qbs build -d build/'
