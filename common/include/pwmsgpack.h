@@ -23,52 +23,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef PWMSGPACK_H
+#define PWMSGPACK_H
 
+#include <msgpack.hpp>
+#include <sstream>
 #include <QtNetwork>
-#include <pwmsgpack.h>
 
-#define CONNECTION_TIMEOUT 120000
+#define ENABLE_MSGPACK(T) friend struct msgpack::v1::adaptor::convert<T, void>
 
-class Client : public QObject {
-  Q_OBJECT
+typedef msgpack::type::tuple<uint16_t, msgpack::type::raw_ref> NetMsg;
 
- public:
-  explicit Client(QTcpSocket *tcp, QObject *parent = nullptr);
-  ~Client();
-  static QMap<quint16, Client *> getClients();
-  void sendPositionToAll();
+namespace msgpack {
 
- public slots:
-  static void sendToAll(const quint16 &, const QString & = "");
-  void sendTo(quint16, const quint16 &, const QString & = "");
-  void sendDataTo(quint16, const quint16 &);
-  void sendPacket(const QByteArray &);
-  void sendList();
-  QString getNickname();
-  quint16 getId();
+  template <typename T>
+  size_t pack(QDataStream* s, const T& v) {
+    std::stringstream buffer;
+    msgpack::pack(buffer, v);
+    buffer.seekg(0);
+    std::string str = buffer.str();
+    return s->writeRawData(str.data(), str.size());
+  }
 
- private slots:
-  void dataHandler(quint16 dataCode, QString data);
-  void dataRecv();
-  void clientDisconnect();
+  template <typename T>
+  size_t pack(QDataStream& s, const T& v) {
+    return pack(&s, v);
+  }
 
- private:
-  QTcpSocket *clientTcp;
-  QString *nickname;
-  quint16 messageSize;
-  quint16 id;
-  QTimer *lifetime;
-  bool posChanged;
-  bool needUpdate;
-  static QMap<quint16, Client *> clients;
+  object_handle unpack(QDataStream* s, std::size_t len);
+  object_handle unpack(QDataStream& s, std::size_t len);
+
+}
+
+typedef struct _BaseUser {
+
   float x, y, z;
   float pitch, yaw;
-
+  
   MSGPACK_DEFINE_MAP(x, y, z, pitch, yaw);
-  ENABLE_MSGPACK(Client);
+  
+} BaseUser;
 
-};
-
-#endif  // CLIENT_H
+#endif // PWMSGPACK_H
