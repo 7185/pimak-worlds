@@ -7,6 +7,7 @@ Pimak Worlds is a project about creating a 3D virtual world and stuff.
 * qt
 * ogre
 * boost
+* msgpack-c
 
 ## Building
 ### Linux
