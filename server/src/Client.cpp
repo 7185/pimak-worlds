@@ -25,6 +25,7 @@
 
 #include "Client.h"
 #include "Protocol.h"
+#include <iostream>
 
 QMap<quint16, Client *> Client::clients;
 

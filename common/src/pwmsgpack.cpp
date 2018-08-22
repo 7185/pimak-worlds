@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <Protocol.h>
+#include <pwmsgpack.h>
 
 msgpack::object_handle msgpack::unpack(QDataStream* s, std::size_t len) {
   std::string str(len, '\0');

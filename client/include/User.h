@@ -28,7 +28,7 @@
 
 #include <Ogre.h>
 #include <QtNetwork>
-#include <Protocol.h>
+#include <pwmsgpack.h>
 
 class User : public QObject {
   Q_OBJECT
