@@ -30,8 +30,9 @@
 #include <QtNetwork>
 #include <Protocol.h>
 
-class User : public QObject, public BaseUser {
+class User : public QObject {
   Q_OBJECT
+
  public:
   User(quint16 uid, QString nick);
   ~User();
@@ -42,12 +43,14 @@ class User : public QObject, public BaseUser {
   Ogre::Entity *avatar;
   Ogre::SceneNode *node;
   quint16 id;
-  //float x, y, z; defined in BaseUser
+  float x, y, z;
   float oldX, oldY, oldZ;
-  //float pitch; defined in BaseUser
-  //float yaw; defined in BaseUser
+  float pitch;
+  float yaw;
   float oldPitch;
   float oldYaw;
+
+  MSGPACK_DEFINE_MAP(x, y, z, pitch, yaw);
 
  private:
   QString *nickname;
