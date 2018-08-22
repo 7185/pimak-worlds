@@ -67,6 +67,7 @@ class Client : public QObject {
   float x, y, z;
   float pitch, yaw;
 
+  MSGPACK_DEFINE_MAP(x, y, z, pitch, yaw);
   ENABLE_MSGPACK(Client);
 };
 

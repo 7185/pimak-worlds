@@ -26,6 +26,15 @@
 #include "Connection.h"
 #include "Protocol.h"
 
+typedef struct {
+
+  float x, y, z;
+  float pitch, yaw;
+  
+  MSGPACK_DEFINE_MAP(x, y, z, pitch, yaw);
+  
+} _User;
+
 Connection::Connection() {
   users = new QMap<quint16, User *>;
 
@@ -78,7 +87,7 @@ void Connection::positionSend(float x, float y, float z, float pitch,
   QByteArray packet;
   QDataStream out(&packet, QIODevice::WriteOnly);
 
-  BaseUser bu = {x, y, z, pitch, yaw};
+  _User bu = {x, y, z, pitch, yaw};
 
   out << static_cast<quint16>(0);
   out << static_cast<quint16>(CS_AVATAR_POSITION);
