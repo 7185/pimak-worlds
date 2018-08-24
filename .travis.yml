@@ -14,10 +14,9 @@ before_install:
   - export PW_BRANCH=$TRAVIS_BRANCH
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export PW_SLUG=$TRAVIS_PULL_REQUEST_SLUG; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export PW_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH; fi'
-  - docker pull archlinux/base
-  - docker run -e PROJECT -e PW_SLUG -e PW_BRANCH -itd --name build archlinux/base
-  - docker exec build pacman -Syyu --noconfirm
-  - docker exec build pacman -S --noconfirm base-devel clang git qbs qt5 ogre
+  - docker pull base/devel
+  - docker run -e PROJECT -e PW_SLUG -e PW_BRANCH -itd --name build base/devel
+  - docker exec build pacman -Sy --noconfirm clang git qbs qt5-base qt5-tools ogre boost
   - docker exec build git clone --single-branch -b $PW_BRANCH https://github.com/$PW_SLUG
 
 script:
