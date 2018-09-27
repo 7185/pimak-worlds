@@ -172,9 +172,6 @@ void Client::dataHandler(quint16 dataCode, QString data) {
         }
       }
       break;
-    case CS_AVATAR_POSITION:
-      
-      break;
     default:
       if (nickname->isEmpty())
         std::cout << "UID " << id << " sent an unknown request!" << std::endl;
