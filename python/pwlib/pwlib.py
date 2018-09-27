@@ -43,7 +43,7 @@ HEARTBEAT_RATE = 60
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), errors='backslashreplace', line_buffering=True)
 
 
-def update_protocol(filename='../server/Protocol.h'):
+def update_protocol(filename='../../common/include/Protocol.h'):
     """python -c "import pwlib; pwlib.update_protocol()" > protocol.py"""
     f = open(filename, 'r')
     for line in f.readlines():
@@ -86,7 +86,7 @@ class PW(User):
         self.sk = None
         self.heartbeat = threading.Timer(HEARTBEAT_RATE, self.send_heartbeat)
 
-    def connect(self, host, port=6667, use_ssl=False):
+    def connect(self, host, port=6670):
         """Etablish a connection to a server"""
         self.log('@ Connecting to %s port %d' % (host, port))
 

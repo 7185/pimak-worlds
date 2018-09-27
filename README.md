@@ -1,6 +1,8 @@
 # Pimak Worlds
 Pimak Worlds is a project about creating a 3D virtual world and stuff.
 
+[![GitHub](https://img.shields.io/github/license/7185/pimak-worlds.svg)](https://github.com/7185/pimak-worlds/blob/master/LICENSE)
+
 [![Build Status](https://travis-ci.org/7185/pimak-worlds.png?branch=master)](https://travis-ci.org/7185/pimak-worlds)
 
 ## Dependencies

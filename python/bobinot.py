@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 import threading
-from pwlib import *
+from pwlib.pwlib import *
 from math import atan2, pi
 from time import sleep, strftime
 
